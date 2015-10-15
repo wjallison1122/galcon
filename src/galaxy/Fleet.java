@@ -1,19 +1,16 @@
 package galaxy;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.util.LinkedList;
 
-public class Fleet extends Unit
-{
+public class Fleet extends Unit {
    public static final double SPEED = Main.FLEET_SPEED;
 
    private Planet destination;
 
    private static LinkedList<Fleet> fleets = new LinkedList<Fleet>();
 
-   Fleet(Coordinates c, int units, Player owner, Planet target) {
-      super(owner, c, units);
+   Fleet(int units, Player owner, Planet target, double ... coords) {
+      super(owner, units, coords);
       destination = target;
 
       fleets.add(this);
@@ -28,29 +25,11 @@ public class Fleet extends Unit
    }
 
    static LinkedList<Fleet> getAllFleets() {
-      return fleets;
-   }
-
-   private void update() {
-//      double a = destination.X - x; //Distance to the planet vertically
-//      double b = destination.Y - y;
-//      double c = Math.sqrt(a * a + b * b);
-      
-      double[] targetCoords = destination.getCoords().getCoords();
-      double[] newCoords = new double[Coordinates.DIMENSIONS];
-      
-      
-      for (int i = 0; i < Coordinates.DIMENSIONS; i++) {
-         newCoords[i] = targetCoords[i];
+      LinkedList<Fleet> armada = new LinkedList<Fleet>();
+      for (Fleet f : fleets) {
+         armada.add(f);
       }
-
-//      x += (a / c) * SPEED;
-//      y += (b / c) * SPEED;
-
-      if(distanceLeft() < 0) {
-         destination.hitBy(this);
-         fleets.remove(this);
-      }
+      return armada;
    }
 
    static void updateAll() {
@@ -59,21 +38,19 @@ public class Fleet extends Unit
       }
    }
 
-   static void drawAll(Graphics g) {
-      for(Fleet f : fleets) {
-         f.draw(g);
+   private void update() {
+      double[] targetCoords = destination.getCoords();
+      double[] fleetCoords = getCoords();
+      double distance = distanceLeft();
+      
+      for (int i = 0; i < Main.DIMENSIONS; i++) {
+         fleetCoords[i] += (targetCoords[i] - fleetCoords[i]) / distance * SPEED;
       }
-   }
 
-   private void draw(Graphics g) {
-      int arbitraryRadius = 10 + numUnits / 5;
-      Color c = getColor();
-      g.setColor(c);
-//      g.fillOval((int)x - arbitraryRadius, (int)y - arbitraryRadius, arbitraryRadius *2, arbitraryRadius*2);
-      g.setFont(FONT);
-      g.setColor(invertColor(c));
-//      g.drawString("" + numUnits, (int)(x - 8), (int)(y + 5));
-
+      if(distance - SPEED < 0) {
+         destination.hitBy(this);
+         fleets.remove(this);
+      }
    }
 
    static void clear() {
@@ -92,7 +69,7 @@ public class Fleet extends Unit
       return winner;
    }
 
-   public static int getNumUnitsInFleets(Player p) {
+   static int getNumUnitsInFleets(Player p) {
       int count = 0;
       for(Fleet f : fleets) {
          if(f.ownedBy(p)) {

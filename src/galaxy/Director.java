@@ -90,7 +90,7 @@ class Director {
       int offset = 1;
       for (Player p : active) {
          g.setColor(p.COLOR);
-         g.drawString(p.NAME + ": " + Galaxy.numUnitsOwnedBy(p), 10, Main.TOP_BAR_HEIGHT + FONT_HEIGHT * offset++);
+         g.drawString(p.NAME + ": " + Galaxy.numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset++);
       }
    }
    

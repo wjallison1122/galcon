@@ -1,18 +1,12 @@
 package galaxy;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import ais.*;
+import ais.BasicAI;
+import ais.OtherAI;
 
 /***************************************************************************
  * ATCS AI Challenge: Galcon
@@ -44,15 +38,13 @@ import ais.*;
 
 /*** Version 2.0.1 ***/
 
-@SuppressWarnings("serial")
-class Main implements ActionListener, KeyListener {
+class Main implements ActionListener {
 
-   private Player [] players = {new BasicAI(), new OtherAI()};
+   private static Player [] players = {new BasicAI(), new OtherAI()};
 
    public static boolean debugMode = false;
    
    //Window setup data
-   public static final int TOP_BAR_HEIGHT = 21;//24 for windows 21 for mac
    public static final int WIN_WIDTH = 1280;
    public static final int WIN_HEIGHT = 800; 
 
@@ -63,19 +55,16 @@ class Main implements ActionListener, KeyListener {
    public static final int FLEET_SPEED = 2;
    public static final int DIMENSIONS = 2;
 
-   private static final Image STAR_BACKGROUND = new ImageIcon("SpacePic.jpg").getImage();
    public static final int FRAME_TIME = 1;
-
-   //double Buffering stuff
-   private static Graphics bufferGraphics;
-   private static Image bufferImage;
    
    public static final int PLAYERS_PER_GAME = 2;
    public static final int NUM_ROUNDS = 5;
 
-   private static Timer clock;
+   private Timer clock;
 
    private Director director;
+   private static boolean pause = false;
+   private static boolean skipGame = false;
 
    public static void main(String[] args) {
       Player p = new BasicAI();
@@ -104,20 +93,8 @@ class Main implements ActionListener, KeyListener {
       debug("Made director");
 
       if (USE_GRAPHICS) {
-         setName("GalCon AI Challenge");
-         setSize(WIN_WIDTH, WIN_HEIGHT + TOP_BAR_HEIGHT);
-         setDefaultCloseOperation(EXIT_ON_CLOSE);
-         setBackground(Color.GRAY);
-         setResizable(false);
-         setVisible(true);
-         
-         debug("Made window");
-         
          clock = new Timer(FRAME_TIME, this);
          clock.start();
-         
-         debug("Failed to start");
-         addKeyListener(this);
       }
       else {
          while (!director.done()) {
@@ -129,30 +106,27 @@ class Main implements ActionListener, KeyListener {
    }
 
    public void actionPerformed(ActionEvent e) {
-      debug("Doign next");
-      director.next();
-      debug("Done next");
+      if (skipGame) {
+         skipGame = false;
+         director.skipGame();
+      }
+      
+      if (!pause) {
+         debug("Doign next");
+         director.next();
+         debug("Done next");         
+      }
       
       if (clock.isRunning() && director.done()) {
          clock.stop();
       }
    }
    
-   public void keyPressed(KeyEvent e) {
-      char command = (char)e.getKeyCode();
-      if(command == 'Q') {
-         System.exit(0);
-      } else if (command == 'S') {
-         director.skipGame();
-      } else if (command == ' ') {
-         if (clock.isRunning()) {
-            clock.stop();            
-         } else {
-            clock.start();
-         }
-      }
+   static void togglePause() {
+      pause = !pause;
    }
    
-   public void keyReleased(KeyEvent arg0) {}
-   public void keyTyped(KeyEvent arg0) {}
+   static void skipGame() {
+      skipGame = true;
+   }
 }

@@ -1,20 +1,7 @@
-//Jan 14 2015
-
 package galaxy;
 
-import java.awt.Graphics;
-import java.awt.Image;
 import java.util.LinkedList;
 import java.util.Scanner;
-
-import javax.swing.ImageIcon;
-
-enum SymmetryType {
-   VERTICAL,
-   HORIZONTAL,
-   DIAGONAL,
-   RADIAL,
-}
 
 public class Planet extends Unit
 {
@@ -27,11 +14,12 @@ public class Planet extends Unit
 
    public final int RADIUS, PRODUCTION_TIME;
    private int updateCnt = 0;
+   private boolean recentlyConquered = false;
    
    private static LinkedList<Planet> planets = new LinkedList<Planet>();
 
-   private Planet(Coordinates loc, Player owner, int numUnits, int radius, int prodTime) {
-      super(owner, loc, numUnits);
+   private Planet(Player owner, int numUnits, int radius, int prodTime, double ... coords) {
+      super(owner, numUnits, coords);
       RADIUS = radius;
       PRODUCTION_TIME = prodTime;
 
@@ -40,14 +28,20 @@ public class Planet extends Unit
    
    static Planet generatePlanetFromString(String str) {
       Scanner s = new Scanner(str);
-      Planet p = new Planet(new Coordinates(s.nextInt(), s.nextInt()), Main.getPlayer(s.nextInt()), 
-            s.nextInt(), s.nextInt(), s.nextInt());
+      
+      double[] coords = new double[Main.DIMENSIONS];
+      for (int i = 0; i < Main.DIMENSIONS; i++) {
+         coords[i] = s.nextDouble();
+      }
+      
+      Planet p = new Planet(Main.getPlayer(s.nextInt()), 
+            s.nextInt(), s.nextInt(), s.nextInt(), coords);
       s.close();
       return p;
    }
    
    static Planet generateStartingPlanet(Player owner) {
-      return new Planet(getLocation(MAX_RADIUS), owner, 100, MAX_RADIUS, MIN_PRODUCE_TIME);
+      return new Planet(owner, 100, MAX_RADIUS, MIN_PRODUCE_TIME, getLocation(MAX_RADIUS));
    }
    
    static Planet generatePlanet() {
@@ -55,29 +49,30 @@ public class Planet extends Unit
       int radius = (int) (Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS);
       int prodTime = (int) ((1 - ((double) radius - MIN_RADIUS) / (MAX_RADIUS - MIN_RADIUS)) * 
             (MAX_PRODUCE_TIME - MIN_PRODUCE_TIME) + MIN_PRODUCE_TIME);
-      Coordinates loc = getLocation(radius);
-      return new Planet(loc, null, numUnits, radius, prodTime);
+      double[] coords = getLocation(radius);
+      return new Planet(null, numUnits, radius, prodTime, coords);
    }
-
-   private static Coordinates getLocation(int radius) {
-      int x, y;
+   
+   private static double[] getLocation(int radius) {
+      double[] coords = new double[Main.DIMENSIONS];
       do {
-         x = (int) (Math.random() * (Main.WIN_WIDTH - radius * 2) + radius);
-         y = (int) (Math.random() * (Main.WIN_HEIGHT - radius * 2) + Main.TOP_BAR_HEIGHT
-               + radius);
-      } while (checkOverlappingOtherPlanets(new Coordinates(x, y), radius));
-      return new Coordinates(x, y);
+         for (int i = 0; i < Main.DIMENSIONS; i++) {
+            coords[i] = Math.random() * (Main.WIN_WIDTH - radius * 2) + radius;
+         }
+      } while (checkOverlappingOtherPlanets(radius, coords));
+      return coords;
    }
 
-   private static boolean checkOverlappingOtherPlanets(Coordinates loc, int radius) {
+   private static boolean checkOverlappingOtherPlanets(int radius, double ... coords) {
       for(Planet p : planets) {
-         if(loc.distanceTo(p) < radius + p.RADIUS + 10) {
+         if(p.distanceTo(coords) < radius + p.RADIUS + 10) {
             return true;
          }
       }
       return false;
    }
 
+   //********** END PLANET GENERATION CODE **********//
 
 
    static void updateAll() {
@@ -92,9 +87,13 @@ public class Planet extends Unit
       }
    }
 
-   @SuppressWarnings("unchecked")
-   static LinkedList<Planet> getAllPlanets() {
-      return (LinkedList<Planet>) planets.clone();
+   static Planet[] getAllPlanets() {
+      Planet[] all = new Planet[planets.size()];
+      int i = 0;
+      for (Planet p : planets) {
+         all[i++] = p;
+      }
+      return all;
    }
 
    static Player isGameOver() {
@@ -114,25 +113,31 @@ public class Planet extends Unit
    }
 
    void hitBy(Fleet f) {
-      if(ownedBy(f.getOwner())) {
-         numUnits = numUnits + f.getNumUnits();
+      if(f.ownedBy(owner)) {
+         numUnits += f.getNumUnits();
       } else {
-         numUnits = numUnits - f.getNumUnits();
+         numUnits -= f.getNumUnits();
          if(numUnits < 0) {
+            recentlyConquered = true; // Variable for visualizer, visualizer resets. 
             owner = f.getOwner();
             numUnits *= -1;
-            if (USE_EXPLOSIONS) {
-//               new Explosion(X, Y, RADIUS);
-            }
+         } else if (numUnits == 0) {
+            owner = null;
          }
       }
+   }
+   
+   boolean checkRecentlyConquered() {
+      boolean recent = recentlyConquered;
+      recentlyConquered = false;
+      return recent;
    }
 
    Fleet sendFleet(Planet target, int numSent) {
       if (numSent > 0) {
          numSent = Math.min(numSent, numUnits);
          numUnits -= numSent;
-         return new Fleet(new Coordinates(coords.getCoords()), numSent, getOwner(), target);
+         return new Fleet(numSent, owner, target, getCoords());
       } else {
          return null;
       }
@@ -142,7 +147,7 @@ public class Planet extends Unit
       planets.clear();
    }
 
-   public static int getNumUnitsInPlanets(Player p)  {
+   static int getNumUnitsInPlanets(Player p)  {
       int count = 0;
       for(Planet f : planets) {
          if(f.ownedBy(p)) {

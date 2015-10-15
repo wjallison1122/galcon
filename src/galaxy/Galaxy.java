@@ -3,6 +3,13 @@ package galaxy;
 import java.io.File;
 import java.util.LinkedList;
 
+enum SymmetryType {
+   VERTICAL,
+   HORIZONTAL,
+   DIAGONAL,
+   RADIAL,
+}
+
 class Galaxy
 {
    private static void debug(String str) {
@@ -27,7 +34,7 @@ class Galaxy
 
    }
 
-   static void generateSymmetricMap() {
+   static void generateSymmetricMap(SymmetryType symmetry) {
 
    }
 
