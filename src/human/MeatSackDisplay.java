@@ -1,18 +1,28 @@
 package human;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import galaxy.Action;
 import galaxy.Main;
 import galaxy.Planet;
 
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -23,9 +33,13 @@ public class MeatSackDisplay extends JPanel {
    private BufferedImage base;
    private Planet selectedPlanet;
    private Planet destinationPlanet;
-   private int cursorX;
-   private int cursorY;
+   private double cursorX;
+   private double cursorY;
    private State interfaceState = State.NONE;
+   private EButton sendUnitsButton;
+   
+   private static final double SCALE = 0.4;
+   private static final double SELECTION_AREA_SCALE = 1.5;
    
    private static enum State {
       NONE,
@@ -47,16 +61,20 @@ public class MeatSackDisplay extends JPanel {
    public MeatSackDisplay(MeatSackAI ai) {
       this.player = ai;
       
-      updateBase();
-      
       MeatSackDisplay display = this;
       
       myframe = new JFrame() {{
-         this.setSize(Main.WIN_WIDTH, Main.WIN_HEIGHT);
-         this.setContentPane(display);
+         this.setSize((int) (Main.WIN_WIDTH * SCALE), (int) (Main.WIN_HEIGHT * SCALE) + 32);
+         JPanel content = new JPanel();
+         content.setLayout(new BorderLayout());
+         content.add(display, BorderLayout.CENTER);
+         content.add(getControlPanel(), BorderLayout.SOUTH);
+         this.setContentPane(content);
          this.setVisible(true);
          this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       }};
+      
+      updateBase();
       
       Timer timer = new Timer();
       timer.scheduleAtFixedRate(new TimerTask() {
@@ -65,25 +83,64 @@ public class MeatSackDisplay extends JPanel {
          }
       }, 33, 33);
       
+      addListeners();
+   }
+   
+   public JPanel getControlPanel() {
+      //this.setLayout(new BorderLayout());
+      JPanel controls = new JPanel();
+      controls.setLayout(new FlowLayout(FlowLayout.LEFT));
+      
+      JFormattedTextField unitCount = new JFormattedTextField(NumberFormat.getIntegerInstance());
+      unitCount.setPreferredSize(new Dimension(100,25));
+      controls.add(unitCount);
+      
+      sendUnitsButton = new EButton("Send", () -> {
+         player.addAction(new Action(selectedPlanet, destinationPlanet, 
+               Integer.parseInt(unitCount.getText().replaceAll("^[0-9]", ""))));
+      });
+      sendUnitsButton.setEnabled(false);
+      controls.add(sendUnitsButton);
+      controls.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+      controls.add(new EButton("Finish Turn", () -> player.finishTurn()));
+      
+      final EButton autoAdvanceButton = new EButton(player.getAutoAdvance() ? "Turn Auto Advance Off" : "Turn Auto Advance On");
+      autoAdvanceButton.addAction(() -> {
+         player.setAutoAdvance(!player.getAutoAdvance());
+         autoAdvanceButton.setText(player.getAutoAdvance() ? "Turn Auto Advance Off" : "Turn Auto Advance On");
+      });
+      controls.add(autoAdvanceButton);
+      
+      return controls;
+   }
+   
+   public void addListeners() {
       this.addMouseListener(new MouseAdapter() {
          
          @Override
          public void mousePressed(MouseEvent e) {
-            selectedPlanet = getPlanetAtLocation(e.getX(), e.getY());
+            setCursor(e);
+            selectedPlanet = getPlanetAtScreenLocation(cursorX, cursorY);
             if (selectedPlanet == null) {
-               interfaceState = State.NONE;
+               setState(State.NONE);
             } else {
-               interfaceState = State.SEEKING;
+               setState(State.SEEKING);
             }
          }
          
          @Override
          public void mouseReleased(MouseEvent e) {
+            setCursor(e);
             if (interfaceState == State.SEEKING) {
-               destinationPlanet = getPlanetAtLocation(e.getX(), e.getY());
-               interfaceState = State.FOUND;
+               destinationPlanet = getPlanetAtScreenLocation(cursorX, cursorY);
+               if (destinationPlanet != null && destinationPlanet != selectedPlanet) {
+                  setState(State.FOUND);
+               } else {
+                  selectedPlanet = destinationPlanet;
+                  setState(State.NONE);
+               }
             } else {
-               interfaceState = State.NONE;
+               setState(State.NONE);
             }
          }
       });
@@ -91,94 +148,93 @@ public class MeatSackDisplay extends JPanel {
       this.addMouseMotionListener(new MouseAdapter() {
          @Override
          public void mouseMoved(MouseEvent e) {
-            cursorX = e.getX();
-            cursorY = e.getY();
+            setCursor(e);
             if (interfaceState == State.SEEKING) {
-               destinationPlanet = getPlanetAtLocation(e.getX(), e.getY());
+               destinationPlanet = getPlanetAtScreenLocation(cursorX, cursorY);
             } else if (interfaceState == State.NONE) {
-               selectedPlanet = getPlanetAtLocation(e.getX(), e.getY());
+               selectedPlanet = getPlanetAtScreenLocation(cursorX, cursorY);
             }
          }
          
          @Override
          public void mouseDragged(MouseEvent e) {
-            cursorX = e.getX();
-            cursorY = e.getY();
+            setCursor(e);
             if (interfaceState == State.SEEKING) {
-               destinationPlanet = getPlanetAtLocation(e.getX(), e.getY());
+               destinationPlanet = getPlanetAtScreenLocation(cursorX, cursorY);
             } else if (interfaceState == State.NONE) {
-               selectedPlanet = getPlanetAtLocation(e.getX(), e.getY());
+               selectedPlanet = getPlanetAtScreenLocation(cursorX, cursorY);
             }
          }
       });
+      
+      this.addComponentListener(new ComponentAdapter() {
+         @Override
+         public void componentResized(ComponentEvent e) {
+            updateBase();
+         }
+      });
+   }
+   
+   private void setCursor(MouseEvent e) {
+      cursorX = e.getX();
+      cursorY = e.getY();
    }
 
    @Override
    public void paint(Graphics g) {
-      
       g.drawImage(getFrame(), 0, 0, null);
    }
    
    public BufferedImage getFrame() {
-      BufferedImage frame = new BufferedImage(Main.WIN_WIDTH, Main.WIN_HEIGHT, BufferedImage.TYPE_INT_RGB);
+      BufferedImage frame = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
       Graphics2D g = frame.createGraphics();
       g.drawImage(base, 0, 0, null);
+      if (interfaceState == State.NONE) {
+         if (selectedPlanet != null) {
+            circle(selectedPlanet, g);
+         }
+      }
       if (interfaceState == State.SEEKING) {
-         g.setStroke(new BasicStroke(3.0f));
-         g.setColor(Color.WHITE);
-         g.drawOval(
-               (int) selectedPlanet.getCoords()[0] - selectedPlanet.RADIUS / 2 - 5, 
-               (int) selectedPlanet.getCoords()[1] - selectedPlanet.RADIUS / 2 - 5, 
-               selectedPlanet.RADIUS + 10, 
-               selectedPlanet.RADIUS + 10);
+         circle(selectedPlanet, g);
          
-         int x = (int) selectedPlanet.getCoords()[0];
-         int y = (int) selectedPlanet.getCoords()[1];
-         int diffx = x - cursorX;
-         int diffy = y - cursorY;
-         double factor = Math.sqrt(diffx * diffx + diffy * diffy);
-         int fromx1 = x + (int) (diffy * (5 + selectedPlanet.RADIUS / 2) / factor);
-         int fromx2 = x - (int) (diffy * (5 + selectedPlanet.RADIUS / 2) / factor);
-         int fromy1 = y - (int) (diffx * (5 + selectedPlanet.RADIUS / 2) / factor);
-         int fromy2 = y + (int) (diffx * (5 + selectedPlanet.RADIUS / 2) / factor);
-         g.drawLine(fromx1, fromy1, cursorX, cursorY);
-         g.drawLine(fromx2, fromy2, cursorX, cursorY);
+         drawPointer(selectedPlanet, cursorX, cursorY, g);
       } else if (interfaceState == State.FOUND) {
-         g.setStroke(new BasicStroke(3.0f));
-         g.setColor(Color.WHITE);
-         g.drawOval(
-               (int) selectedPlanet.getCoords()[0] - selectedPlanet.RADIUS / 2 - 5, 
-               (int) selectedPlanet.getCoords()[1] - selectedPlanet.RADIUS / 2 - 5, 
-               selectedPlanet.RADIUS + 10, 
-               selectedPlanet.RADIUS + 10);
+         circle(selectedPlanet, g);
+         circle(destinationPlanet, g);
          
-         g.setStroke(new BasicStroke(3.0f));
-         g.setColor(Color.WHITE);
-         g.drawOval(
-               (int) destinationPlanet.getCoords()[0] - destinationPlanet.RADIUS / 2 - 5, 
-               (int) destinationPlanet.getCoords()[1] - destinationPlanet.RADIUS / 2 - 5, 
-               destinationPlanet.RADIUS + 10, 
-               destinationPlanet.RADIUS + 10);
-         
-         int x = (int) selectedPlanet.getCoords()[0];
-         int y = (int) selectedPlanet.getCoords()[1];
-         int destx = (int) destinationPlanet.getCoords()[0];
-         int desty = (int) destinationPlanet.getCoords()[1];
-         int diffx = x - destx;
-         int diffy = y - desty;
-         double factor = Math.sqrt(diffx * diffx + diffy * diffy);
-         int fromx1 = x + (int) (diffy * (5 + selectedPlanet.RADIUS / 2) / factor);
-         int fromx2 = x - (int) (diffy * (5 + selectedPlanet.RADIUS / 2) / factor);
-         int fromy1 = y - (int) (diffx * (5 + selectedPlanet.RADIUS / 2) / factor);
-         int fromy2 = y + (int) (diffx * (5 + selectedPlanet.RADIUS / 2) / factor);
-         g.drawLine(fromx1, fromy1, destx, desty);
-         g.drawLine(fromx2, fromy2, destx, desty);
+         drawPointer(selectedPlanet, destinationPlanet.getCoords()[0] * SCALE, destinationPlanet.getCoords()[1] * SCALE, g);
       }
       return frame;
    }
    
+   private void circle(Planet p, Graphics2D g) {
+      g.setStroke(new BasicStroke(3.0f));
+      g.setColor(Color.WHITE);
+      g.drawOval(
+            (int) (p.getCoords()[0] * SCALE - p.RADIUS * SCALE - 5), 
+            (int) (p.getCoords()[1] * SCALE - p.RADIUS * SCALE - 5), 
+            (int) (p.RADIUS * 2 * SCALE + 10), 
+            (int) (p.RADIUS * 2 * SCALE + 10));
+   }
+   
+   private void drawPointer(Planet from, double xTo, double yTo, Graphics2D g) {
+      g.setStroke(new BasicStroke(3.0f));
+      g.setColor(Color.WHITE);
+      double x = from.getCoords()[0] * SCALE;
+      double y = from.getCoords()[1] * SCALE;
+      double diffx = x - xTo;
+      double diffy = y - yTo;
+      double factor = Math.sqrt(diffx * diffx + diffy * diffy);
+      double fromx1 = x + diffy * (5 + from.RADIUS * SCALE) / factor;
+      double fromx2 = x - diffy * (5 + from.RADIUS * SCALE) / factor;
+      double fromy1 = y - diffx * (5 + from.RADIUS * SCALE) / factor;
+      double fromy2 = y + diffx * (5 + from.RADIUS * SCALE) / factor;
+      g.drawLine((int) (fromx1), (int) (fromy1), (int) xTo, (int) yTo);
+      g.drawLine((int) (fromx2), (int) (fromy2), (int) xTo, (int) yTo);
+   }
+   
    public void updateBase() {
-      BufferedImage newImage = new BufferedImage(Main.WIN_WIDTH, Main.WIN_HEIGHT, BufferedImage.TYPE_INT_RGB);
+      BufferedImage newImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
       drawBackground(newImage.getGraphics());
       drawPlanets(newImage.getGraphics());
       base = newImage;
@@ -186,24 +242,44 @@ public class MeatSackDisplay extends JPanel {
 
    private void drawBackground(Graphics g) {
       g.setColor(Color.BLACK);
-      g.fillRect(0, 0, Main.WIN_WIDTH, Main.WIN_HEIGHT);
+      g.fillRect(0, 0, this.getWidth(), this.getHeight());
    }
 
    private void drawPlanets(Graphics g) {
       for (Planet p : player.getPlanets()) {
          g.setColor(p.getColor());
-         g.fillOval((int) p.getCoords()[0] - p.RADIUS / 2, (int) p.getCoords()[1] -  p.RADIUS / 2, p.RADIUS, p.RADIUS);
+         g.fillOval(
+               (int) ((p.getCoords()[0] - p.RADIUS) * SCALE), 
+               (int) ((p.getCoords()[1] -  p.RADIUS) * SCALE), 
+               (int) (p.RADIUS * 2 * SCALE), 
+               (int) (p.RADIUS * 2 * SCALE));
       }
    }
    
-   private Planet getPlanetAtLocation(int x, int y) {
+   private Planet getPlanetAtScreenLocation(double x, double y) {
+      x = x / SCALE;
+      y = y / SCALE;
+      
+      double best = SELECTION_AREA_SCALE + 1;
+      Planet rtn = null;
       for (Planet p : player.getPlanets()) {
-         int planetX = (int) p.getCoords()[0];
-         int planetY = (int) p.getCoords()[1];
-         if (Math.sqrt((x - planetX) * (x - planetX) + (y - planetY) * (y - planetY)) < p.RADIUS) {
-            return p;
+         double planetX = p.getCoords()[0];
+         double planetY = p.getCoords()[1];
+         double distance = Math.sqrt((x - planetX) * (x - planetX) + (y - planetY) * (y - planetY));
+         
+         if (distance < p.RADIUS * SELECTION_AREA_SCALE) {
+            double ratio = distance / p.RADIUS;
+            if (ratio < best) {
+               best = ratio;
+               rtn = p;
+            }
          }
       }
-      return null;
+      return rtn;
+   }
+   
+   private void setState(State state) {
+      this.interfaceState = state;
+      sendUnitsButton.setEnabled(state == State.FOUND);
    }
 }
