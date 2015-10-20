@@ -10,6 +10,9 @@ public class Planet extends Unit
    public static final int MAX_NEUTRAL_UNITS = 50;
    public static final int MIN_PRODUCE_TIME = 34;
    public static final int MAX_PRODUCE_TIME = 100;
+   
+   static int id = 0;
+   final int ID = id++;
 
 
    public final int RADIUS, PRODUCTION_TIME;
@@ -29,8 +32,8 @@ public class Planet extends Unit
    static Planet generatePlanetFromString(String str) {
       Scanner s = new Scanner(str);
       
-      double[] coords = new double[Main.DIMENSIONS];
-      for (int i = 0; i < Main.DIMENSIONS; i++) {
+      double[] coords = new double[Main.DIMENSIONS.length];
+      for (int i = 0; i < Main.DIMENSIONS.length; i++) {
          coords[i] = s.nextDouble();
       }
       
@@ -54,10 +57,10 @@ public class Planet extends Unit
    }
    
    private static double[] getLocation(int radius) {
-      double[] coords = new double[Main.DIMENSIONS];
+      double[] coords = new double[Main.DIMENSIONS.length];
       do {
-         for (int i = 0; i < Main.DIMENSIONS; i++) {
-            coords[i] = Math.random() * (Main.WIN_WIDTH - radius * 2) + radius;
+         for (int i = 0; i < Main.DIMENSIONS.length; i++) {
+            coords[i] = Math.random() * (Main.DIMENSIONS[i] - radius * 2) + radius;
          }
       } while (checkOverlappingOtherPlanets(radius, coords));
       return coords;
@@ -88,12 +91,12 @@ public class Planet extends Unit
    }
 
    static Planet[] getAllPlanets() {
-      Planet[] all = new Planet[planets.size()];
+      Planet[] solarSystem = new Planet[planets.size()];
       int i = 0;
       for (Planet p : planets) {
-         all[i++] = p;
+         solarSystem[i++] = p;
       }
-      return all;
+      return solarSystem;
    }
 
    static Player isGameOver() {

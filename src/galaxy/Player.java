@@ -10,6 +10,7 @@ public abstract class Player {
    final int ID = currentId++;
 
    protected Planet[] planets = Planet.getAllPlanets();
+   protected Fleet[] fleets;
    protected LinkedList<Action> actions;
 
 
@@ -21,6 +22,19 @@ public abstract class Player {
       COLOR = c;
       NAME = name;
    }
+   
+   protected void debug(String str) {
+      if (Main.debugMode) {
+         System.out.println(str);
+      }
+   }
+   
+   void nextGame() {
+      planets = Planet.getAllPlanets();
+      newGame();
+   }
+   
+   protected abstract void newGame();
 
    LinkedList<Action> getActions() {
       return actions == null ? new LinkedList<Action>() : actions;
@@ -28,10 +42,13 @@ public abstract class Player {
    
    void doTurn() {
       actions = new LinkedList<Action>();
+      fleets = Fleet.getAllFleets();
       turn();
    }
    
    protected abstract void turn();
+   
+   protected abstract String storeSelf();
 
    /**
     * Checks if two players are equal. Works with null. 
@@ -53,10 +70,6 @@ public abstract class Player {
    
    protected int numUnitsInFleets(Player p) {
       return Fleet.getNumUnitsInFleets(p);
-   }
-
-   protected LinkedList<Fleet> getAllFleets() {
-      return Fleet.getAllFleets();
    }
 }
 

@@ -10,8 +10,7 @@ enum SymmetryType {
    RADIAL,
 }
 
-class Galaxy
-{
+class Galaxy {
    private static void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);
@@ -48,6 +47,12 @@ class Galaxy
 
    static int numUnitsOwnedBy(Player p) {
       return Planet.getNumUnitsInPlanets(p) + Fleet.getNumUnitsInFleets(p);
+   }
+   
+   static void update() {
+      debug("Updating galaxy");
+      Planet.updateAll();
+      Fleet.updateAll();
    }
 
    static void clear() {

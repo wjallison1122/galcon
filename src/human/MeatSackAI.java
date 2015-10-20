@@ -15,19 +15,17 @@ public class MeatSackAI extends Player {
    private boolean autoAdvance = false;
    private boolean singleAdvance = false;
 
-   protected MeatSackAI() {
+   public MeatSackAI() {
       super(Color.CYAN, "Fleshling");
+      new MeatSackDisplay(this);
    }
 
    @Override
-   protected void turn() {
-      actions = new LinkedList<Action>(pendingActions);
+   public void turn() {
       pendingActions.clear();
       
-      if (autoAdvance) {
-         singleAdvance = false;
-      } else {
-         while (!singleAdvance) {
+      if (!autoAdvance) {
+         while (!singleAdvance && !autoAdvance) {
             try {
                Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -35,7 +33,9 @@ public class MeatSackAI extends Player {
                throw new RuntimeException(ex);
             }
          }
+         
       }
+      singleAdvance = false;
    }
    
    public void finishTurn() {
@@ -47,7 +47,7 @@ public class MeatSackAI extends Player {
    }
    
    public void addAction(Action action) {
-      pendingActions.add(action);
+      actions.add(action);
    }
    
    //for testing
@@ -61,5 +61,17 @@ public class MeatSackAI extends Player {
 
    public void setAutoAdvance(boolean autoAdvance) {
       this.autoAdvance = autoAdvance;
+   }
+
+   @Override
+   protected void newGame() {
+      // TODO Auto-generated method stub
+      
+   }
+
+   @Override
+   protected String storeSelf() {
+      // TODO Auto-generated method stub
+      return null;
    }
 }

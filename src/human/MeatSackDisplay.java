@@ -1,7 +1,6 @@
 package human;
 
 import galaxy.Action;
-import galaxy.Main;
 import galaxy.Planet;
 
 import java.awt.BasicStroke;
@@ -17,8 +16,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,24 +44,13 @@ public class MeatSackDisplay extends JPanel {
       FOUND;
    }
 
-   public static void main(String args[]) {
-      int COUNT = 10;
-      MeatSackAI ai = new MeatSackAI();
-      Planet[] testPlanets = new Planet[COUNT];
-      for (int i = 0; i < COUNT; i++) {
-         testPlanets[i] = Planet.generatePlanet();
-      }
-      ai.setPlanets(testPlanets);
-      MeatSackDisplay thing = new MeatSackDisplay(ai);
-   }
-
    public MeatSackDisplay(MeatSackAI ai) {
       this.player = ai;
       
       MeatSackDisplay display = this;
       
       myframe = new JFrame() {{
-         this.setSize((int) (Main.WIN_WIDTH * SCALE), (int) (Main.WIN_HEIGHT * SCALE) + 32);
+         this.setSize((int) (1280 * SCALE), (int) (800 * SCALE) + 32);
          JPanel content = new JPanel();
          content.setLayout(new BorderLayout());
          content.add(display, BorderLayout.CENTER);
@@ -74,8 +60,6 @@ public class MeatSackDisplay extends JPanel {
          this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       }};
       
-      updateBase();
-      
       Timer timer = new Timer();
       timer.scheduleAtFixedRate(new TimerTask() {
          public void run() {
@@ -84,10 +68,11 @@ public class MeatSackDisplay extends JPanel {
       }, 33, 33);
       
       addListeners();
+      
+      updateBase();
    }
    
    public JPanel getControlPanel() {
-      //this.setLayout(new BorderLayout());
       JPanel controls = new JPanel();
       controls.setLayout(new FlowLayout(FlowLayout.LEFT));
       
@@ -96,8 +81,10 @@ public class MeatSackDisplay extends JPanel {
       controls.add(unitCount);
       
       sendUnitsButton = new EButton("Send", () -> {
+         System.out.println("Text: " + unitCount.getText() + " " + unitCount.getText().replaceAll("[^0-9]", ""));
          player.addAction(new Action(selectedPlanet, destinationPlanet, 
-               Integer.parseInt(unitCount.getText().replaceAll("^[0-9]", ""))));
+               Integer.parseInt(unitCount.getText().replaceAll("[^0-9]", ""))));
+         System.out.println("Adding Action");
       });
       sendUnitsButton.setEnabled(false);
       controls.add(sendUnitsButton);
