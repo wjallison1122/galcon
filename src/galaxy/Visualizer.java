@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public abstract class Visualizer extends JPanel implements KeyListener, MouseListener {
    private BufferedImage bufferImage;
-   private Planet[] planets = Planet.getAllPlanets();
+   protected Planet[] planets = Planet.getAllPlanets();
    protected final int WIN_WIDTH, WIN_HEIGHT;
    private JFrame frame;
 
