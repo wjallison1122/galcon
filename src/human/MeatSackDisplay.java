@@ -38,7 +38,7 @@ public class MeatSackDisplay extends JPanel {
    private EButton sendUnitsButton;
    
    private static final double SCALE = 0.4;
-   private static final double SELECTION_AREA_SCALE = 1.5;
+   private static final double SELECTION_AREA_SCALE = 3;
    
    private static enum State {
       NONE,
@@ -195,6 +195,9 @@ public class MeatSackDisplay extends JPanel {
          circle(selectedPlanet, g);
          
          drawPointer(selectedPlanet, cursorX, cursorY, g);
+         if (destinationPlanet != null) {
+            circle(destinationPlanet, g);
+         }
       } else if (interfaceState == State.FOUND) {
          circle(selectedPlanet, g);
          circle(destinationPlanet, g);

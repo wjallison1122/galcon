@@ -15,7 +15,7 @@ public class ValueDefenderAI extends Player {
    }
 
    public double getValue(Planet p) {
-      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 1500.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 2000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
    @Override
@@ -60,7 +60,6 @@ public class ValueDefenderAI extends Player {
             int contribution = p.getNumUnits() - PlanetUtils.getIncomingFleetCount(p, fleets) - MIN_DEFENSE;
             
             if (available + contribution > needed) {
-               System.out.println("Av: " + available + " cont:" + contribution + " needed:" + needed);
                actions.add(new Action(p, target, needed - available));
                available += contribution;
                break;
