@@ -70,16 +70,13 @@ public class Fleet extends Unit {
       fleets.clear();
    }
 
-   static Player findWinner() {
-      Player winner = null;
+   static boolean checkWinner(Player winner) {
       for (Fleet f : fleets) {
-         if (winner == null) {
-            winner = f.getOwner();
-         } else if (!f.ownedBy(winner)) {
-            return null;
+         if (!f.ownedBy(winner)) {
+            return false;
          }
       }
-      return winner;
+      return true;
    }
 
    static int getNumUnitsInFleets(Player p) {

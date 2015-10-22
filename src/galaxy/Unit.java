@@ -12,7 +12,7 @@ abstract class Unit {
       this.numUnits = numUnits;
       this.coords = coords;
    }
-   
+
    protected void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);
@@ -46,16 +46,28 @@ abstract class Unit {
       return Player.areEqual(owner, player);
    }
    
+   public boolean ownedByOpponentOf(Player p) {
+      return !isNeutral() && !ownedBy(p);
+   }
+   
+   public boolean isNeutral() {
+      return owner == null;
+   }
+
    /**
     * E-Z null protection
     * @param u
     * @param player
     * @return
     */
-   public static boolean unitOwnedBy(Unit u, Player player) {
-      return u == null ? false : u.ownedBy(player);
+   public static boolean unitOwnedBy(Unit u, Player p) {
+      return u == null ? false : u.ownedBy(p);
    }
-   
+
+   public static boolean unitOwnedByOpponentOf(Unit u, Player p) {
+      return u == null ? false : u.ownedByOpponentOf(p);
+   }
+
    public double distanceTo(double ... otherCoords) {
       double sum = 0;
       for (int i = 0; i < Main.DIMENSIONS.length; i++) {

@@ -1,6 +1,5 @@
 package galaxy;
 
-
 public class Action {
    private final Planet START;
    private final Planet TARGET;
@@ -8,18 +7,19 @@ public class Action {
 
    static Player currentTurn;
 
-   public Action(Planet start, Planet target, int numUnits) {
+   public Action(Planet start, Planet target, int numUnits) throws InvalidActionException {
+
       if (start == null) {
-         throw new NullPointerException("Attempted to make action to send fleet from null planet.");
+         throw new InvalidActionException("Attempted to make action to send fleet from null planet.");
       }
 
       if (target == null) {
-         throw new NullPointerException("Attempted to make action to send fleet to null planet.");
+         throw new InvalidActionException("Attempted to make action to send fleet to null planet.");
       }
 
-//      if (!start.ownedBy(currentTurn)) {
-//         throw new RuntimeException("Player attempted to make an action for a planet not owned by them.");
-//      }
+      if (!start.ownedBy(currentTurn)) {
+         throw new InvalidActionException("Player attempted to make an action for a planet not owned by them.");
+      }
 
       START = start;
       TARGET = target;
@@ -27,7 +27,7 @@ public class Action {
    }
 
    void doAction(Player p, int tic) {
-      if (Unit.unitOwnedBy(START, p)) {
+      if (Unit.unitOwnedBy(START, p) && TARGET != null) {
          START.sendFleet(TARGET, NUM_UNITS);
       }
    }
@@ -35,5 +35,12 @@ public class Action {
    @Override
    public String toString() {
       return START.ID + " " + NUM_UNITS + " " + TARGET.ID;
+   }
+
+   @SuppressWarnings("serial")
+   public class InvalidActionException extends RuntimeException {
+      public InvalidActionException(String msg) {
+         super(msg);
+      }
    }
 }

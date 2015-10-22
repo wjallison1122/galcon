@@ -1,16 +1,16 @@
 package galaxy;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public class Planet extends Unit
-{
+public class Planet extends Unit {
    public static final int MAX_RADIUS = 50;
    public static final int MIN_RADIUS = 12;
    public static final int MAX_NEUTRAL_UNITS = 50;
    public static final int MIN_PRODUCE_TIME = 34;
    public static final int MAX_PRODUCE_TIME = 100;
-   
+
    static int id = 0;
    final int ID = id++;
 
@@ -18,7 +18,7 @@ public class Planet extends Unit
    public final int RADIUS, PRODUCTION_TIME;
    private int updateCnt = 0;
    private boolean recentlyConquered = false;
-   
+
    private static LinkedList<Planet> planets = new LinkedList<Planet>();
 
    private Planet(Player owner, int numUnits, int radius, int prodTime, double ... coords) {
@@ -28,26 +28,26 @@ public class Planet extends Unit
 
       planets.add(this);
    }
-   
+
    static Planet generatePlanetFromString(String str) {
       Scanner s = new Scanner(str);
-      
+
       double[] coords = new double[Main.DIMENSIONS.length];
       for (int i = 0; i < Main.DIMENSIONS.length; i++) {
          coords[i] = s.nextDouble();
       }
-      
+
       Planet p = new Planet(Main.getPlayer(s.nextInt()), 
             s.nextInt(), s.nextInt(), s.nextInt(), coords);
       s.close();
       return p;
    }
-   
+
    static Planet generateStartingPlanet(Player owner) {
       return new Planet(owner, 100, MAX_RADIUS, MIN_PRODUCE_TIME, getLocation(MAX_RADIUS));
    }
-   
-   static Planet generatePlanet() {
+
+   static Planet generateRandomPlanet() {
       int numUnits = (int) (Math.random() * MAX_NEUTRAL_UNITS);
       int radius = (int) (Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS);
       int prodTime = (int) ((1 - ((double) radius - MIN_RADIUS) / (MAX_RADIUS - MIN_RADIUS)) * 
@@ -55,7 +55,7 @@ public class Planet extends Unit
       double[] coords = getLocation(radius);
       return new Planet(null, numUnits, radius, prodTime, coords);
    }
-   
+
    private static double[] getLocation(int radius) {
       double[] coords = new double[Main.DIMENSIONS.length];
       do {
@@ -100,14 +100,13 @@ public class Planet extends Unit
    }
 
    static Player isGameOver() {
-      Player winner = Fleet.findWinner();
+      Iterator<Planet> iter = planets.iterator();
+      Player winner = null;
 
-      if (winner == null) {
-         return null;
-      }
+      while ((winner = iter.next().owner) == null);
 
-      for (Planet p : planets) {
-         if (!p.ownedBy(null) && !p.ownedBy(winner)) {
+      while (iter.hasNext()) {
+         if (iter.next().ownedByOpponentOf(winner)) {
             return null;
          }
       }
@@ -129,7 +128,7 @@ public class Planet extends Unit
          }
       }
    }
-   
+
    boolean checkRecentlyConquered() {
       boolean recent = recentlyConquered;
       recentlyConquered = false;

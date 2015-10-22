@@ -23,24 +23,24 @@ public abstract class Player {
       NAME = name;
    }
    
-   protected void debug(String str) {
+   protected final void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);
       }
    }
    
-   void nextGame() {
+   final void nextGame() {
       planets = Planet.getAllPlanets();
       newGame();
    }
    
    protected abstract void newGame();
 
-   LinkedList<Action> getActions() {
+   final LinkedList<Action> getActions() {
       return actions == null ? new LinkedList<Action>() : actions;
    }
    
-   void doTurn() {
+   final void doTurn() {
       actions = new LinkedList<Action>();
       fleets = Fleet.getAllFleets();
       turn();
@@ -56,19 +56,19 @@ public abstract class Player {
     * @param p2
     * @return Whether two players are equal. Both null returns true, only one null returns false. 
     */
-   protected static boolean areEqual(Player p1, Player p2) {
+   protected static final boolean areEqual(Player p1, Player p2) {
       return (p1 == null || p2 == null) ? p1 == p2 : p1.ID == p2.ID;
    }
 
-   protected int numUnitsOwnedBy(Player p) {
+   protected static final int numUnitsOwnedBy(Player p) {
       return Galaxy.numUnitsOwnedBy(p);
    }
    
-   protected int numUnitsInPlanets(Player p) {
+   protected static final int numUnitsInPlanets(Player p) {
       return Planet.getNumUnitsInPlanets(p);
    }
    
-   protected int numUnitsInFleets(Player p) {
+   protected static final int numUnitsInFleets(Player p) {
       return Fleet.getNumUnitsInFleets(p);
    }
 }

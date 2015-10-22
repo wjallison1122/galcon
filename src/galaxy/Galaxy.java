@@ -16,16 +16,16 @@ class Galaxy {
          System.out.println(str);
       }
    }
- 
+
    static void generateRandomMap(LinkedList<Player> active) {
-      for (int i = 0; i < Main.NUM_PLANETS; i++) {
-         Planet.generatePlanet();
-      }
-      
       for (Player p : active) {
          Planet.generateStartingPlanet(p);
       }
-      
+
+      for (int i = 0; i < Main.NUM_PLANETS; i++) {
+         Planet.generateRandomPlanet();
+      }
+
       debug("Made planets");
    }
 
@@ -48,7 +48,7 @@ class Galaxy {
    static int numUnitsOwnedBy(Player p) {
       return Planet.getNumUnitsInPlanets(p) + Fleet.getNumUnitsInFleets(p);
    }
-   
+
    static void update() {
       debug("Updating galaxy");
       Planet.updateAll();
