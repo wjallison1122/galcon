@@ -4,7 +4,6 @@ import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +33,7 @@ public class PlanetUtils {
    public static List<Planet> getUnoccupiedPlanets(Planet[] planets) {
       ArrayList<Planet> rtn = new ArrayList<>();
       for (Planet p : planets) {
-         if (p.getColor().equals(Color.GRAY)) {
+         if (p.isNeutral()) {
             rtn.add(p);
          }
       }
@@ -44,7 +43,7 @@ public class PlanetUtils {
    public static List<Planet> getOwnedPlanets(Planet[] planets) {
       ArrayList<Planet> rtn = new ArrayList<>();
       for (Planet p : planets) {
-         if (!p.getColor().equals(Color.GRAY)) {
+         if (!p.isNeutral()) {
             rtn.add(p);
          }
       }

@@ -11,10 +11,26 @@ import java.util.List;
 
 public class MeatSackAI extends Player {
    
-   private List<Action> pendingActions = new ArrayList<>();
+   private List<FutureAction> pendingActions = new ArrayList<>();
    private boolean autoAdvance = false;
    private int turnsToFinish = 0;
    private MeatSackDisplay display;
+   
+   public static class FutureAction {
+      Planet source;
+      Planet destination;
+      int count;
+      
+      public FutureAction(Planet source, Planet destination, int count) {
+         this.source = source;
+         this.destination = destination;
+         this.count = count;
+      }
+      
+      public Action toAction() {
+         return new Action(source, destination, count);
+      }
+   }
 
    public MeatSackAI() {
       super(Color.CYAN, "Fleshling");
@@ -24,7 +40,7 @@ public class MeatSackAI extends Player {
    @Override
    public void turn() {
       display.updateBase();
-      actions.addAll(pendingActions);
+      pendingActions.forEach((action) -> actions.add(action.toAction()));
       pendingActions.clear();
       
       if (!autoAdvance) {
@@ -49,7 +65,7 @@ public class MeatSackAI extends Player {
       return planets;
    }
    
-   public void addAction(Action action) {
+   public void addAction(FutureAction action) {
       pendingActions.add(action);
    }
    

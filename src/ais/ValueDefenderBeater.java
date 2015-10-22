@@ -39,9 +39,6 @@ public class ValueDefenderBeater extends Player {
             actions.add(new Action(p,target,1000));
          }
       }
-      
-      
-      
    }
 
    @Override

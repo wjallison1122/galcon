@@ -2,6 +2,7 @@ package human;
 
 import galaxy.Action;
 import galaxy.Planet;
+import human.MeatSackAI.FutureAction;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -83,7 +84,7 @@ public class MeatSackDisplay extends JPanel {
       controls.add(unitCount);
       
       sendUnitsButton = new EButton("Send", () -> {
-         player.addAction(new Action(selectedPlanet, destinationPlanet, 
+         player.addAction(new FutureAction(selectedPlanet, destinationPlanet, 
                Integer.parseInt(unitCount.getText().replaceAll("[^0-9]", ""))));
       });
       sendUnitsButton.setEnabled(false);
