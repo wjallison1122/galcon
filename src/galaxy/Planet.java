@@ -137,8 +137,8 @@ public class Planet extends Unit
    }
 
    Fleet sendFleet(Planet target, int numSent) {
+      numSent = Math.min(numSent, numUnits);
       if (numSent > 0) {
-         numSent = Math.min(numSent, numUnits);
          numUnits -= numSent;
          return new Fleet(numSent, owner, target, getCoords());
       } else {

@@ -23,6 +23,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import ais.PlanetUtils;
+
 public class MeatSackDisplay extends JPanel {
    private JFrame myframe;
    private MeatSackAI player;
@@ -81,15 +83,13 @@ public class MeatSackDisplay extends JPanel {
       controls.add(unitCount);
       
       sendUnitsButton = new EButton("Send", () -> {
-         System.out.println("Text: " + unitCount.getText() + " " + unitCount.getText().replaceAll("[^0-9]", ""));
          player.addAction(new Action(selectedPlanet, destinationPlanet, 
                Integer.parseInt(unitCount.getText().replaceAll("[^0-9]", ""))));
-         System.out.println("Adding Action");
       });
       sendUnitsButton.setEnabled(false);
       controls.add(sendUnitsButton);
       controls.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-      controls.add(new EButton("Finish Turn", () -> player.finishTurn()));
+      controls.add(new EButton("Finish Turn", () -> player.finishTurns(1)));
       
       final EButton autoAdvanceButton = new EButton(player.getAutoAdvance() ? "Turn Auto Advance Off" : "Turn Auto Advance On");
       autoAdvanceButton.addAction(() -> {
@@ -97,6 +97,16 @@ public class MeatSackDisplay extends JPanel {
          autoAdvanceButton.setText(player.getAutoAdvance() ? "Turn Auto Advance Off" : "Turn Auto Advance On");
       });
       controls.add(autoAdvanceButton);
+      
+      controls.add(new EButton("Finish 20 turns", () -> {
+         player.finishTurns(20);
+      }));
+      
+      controls.add(new EButton("list unowned planets", () -> {
+         for (Planet p : PlanetUtils.getOpponentsPlanets(player.getPlanets(), player)) {
+            System.out.println(p.getNumUnits());
+         }
+      }));
       
       return controls;
    }
@@ -191,6 +201,7 @@ public class MeatSackDisplay extends JPanel {
          
          drawPointer(selectedPlanet, destinationPlanet.getCoords()[0] * SCALE, destinationPlanet.getCoords()[1] * SCALE, g);
       }
+      
       return frame;
    }
    
@@ -268,5 +279,11 @@ public class MeatSackDisplay extends JPanel {
    private void setState(State state) {
       this.interfaceState = state;
       sendUnitsButton.setEnabled(state == State.FOUND);
+   }
+   
+   public void newGame() {
+      setState(State.NONE);
+      selectedPlanet = null;
+      destinationPlanet = null;
    }
 }

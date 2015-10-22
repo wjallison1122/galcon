@@ -13,6 +13,9 @@ import java.util.TimerTask;
 import stats.DefaultStats;
 import visualizers.DefaultVisualizer;
 import ais.BasicAI;
+import ais.CaptureNearestAI;
+import ais.ValueDefenderAI;
+import ais.ValuePlanetsAI;
 
 /***************************************************************************
  * ATCS AI Challenge: Galcon
@@ -45,7 +48,7 @@ class Main {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new BasicAI(), new MeatSackAI()};
+   static Player [] players = {new MeatSackAI(), new ValueDefenderAI()};
 
    static final int[] DIMENSIONS = {1280, 800};
 
@@ -58,7 +61,7 @@ class Main {
    static final int PLAYERS_PER_GAME = 2;
    static final int NUM_ROUNDS = 5000;
 
-   static final int FRAME_TIME = 33;
+   static final int FRAME_TIME = 10;
    private static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
    private Director director = new Director();
    private static boolean pause = false;
@@ -78,7 +81,8 @@ class Main {
       debug("Starting creation " + NUM_PLANETS);
 
       if (visualizer != null) {
-         new Timer().scheduleAtFixedRate(new TimerTask() {
+         Timer timer = new Timer();
+         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                if (!director.done()) {

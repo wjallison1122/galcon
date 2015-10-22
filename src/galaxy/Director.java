@@ -44,6 +44,7 @@ class Director {
       LinkedList<SimpleEntry<Player, LinkedList<Action>>> actions = new LinkedList<SimpleEntry<Player, LinkedList<Action>>>();
       for (Player p : active) {
          debug("Turn of: " + p.NAME);
+         Action.currentTurn = p;
          p.doTurn();
          actions.add(new SimpleEntry<Player, LinkedList<Action>>(p, p.getActions()));
       }

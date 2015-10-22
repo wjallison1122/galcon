@@ -13,19 +13,22 @@ public class MeatSackAI extends Player {
    
    private List<Action> pendingActions = new ArrayList<>();
    private boolean autoAdvance = false;
-   private boolean singleAdvance = false;
+   private int turnsToFinish = 0;
+   private MeatSackDisplay display;
 
    public MeatSackAI() {
       super(Color.CYAN, "Fleshling");
-      new MeatSackDisplay(this);
+      display = new MeatSackDisplay(this);
    }
 
    @Override
    public void turn() {
+      display.updateBase();
+      actions.addAll(pendingActions);
       pendingActions.clear();
       
       if (!autoAdvance) {
-         while (!singleAdvance && !autoAdvance) {
+         while (turnsToFinish == 0 && !autoAdvance) {
             try {
                Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -35,11 +38,11 @@ public class MeatSackAI extends Player {
          }
          
       }
-      singleAdvance = false;
+      if (turnsToFinish > 0) turnsToFinish--;
    }
    
-   public void finishTurn() {
-      singleAdvance = true;
+   public void finishTurns(int amt) {
+      turnsToFinish = amt;
    }
    
    public Planet[] getPlanets() {
@@ -47,7 +50,7 @@ public class MeatSackAI extends Player {
    }
    
    public void addAction(Action action) {
-      actions.add(action);
+      pendingActions.add(action);
    }
    
    //for testing
@@ -65,8 +68,7 @@ public class MeatSackAI extends Player {
 
    @Override
    protected void newGame() {
-      // TODO Auto-generated method stub
-      
+      display.newGame();
    }
 
    @Override
