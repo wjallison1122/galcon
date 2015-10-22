@@ -24,8 +24,8 @@ public class Action {
       NUM_UNITS = numUnits;
    }
 
-   void doAction(Player p, int tic) {
-      if (Unit.unitOwnedBy(START, p) && TARGET != null) {
+   void doAction(int tic) {
+      if (START != null && TARGET != null) {
          START.sendFleet(TARGET, NUM_UNITS);
       }
    }

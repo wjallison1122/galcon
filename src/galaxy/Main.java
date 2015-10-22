@@ -21,8 +21,8 @@ class Main extends GameSettings {
             @Override
             public void run() {
                if (!director.done()) {
-                  visualizer.update();
                   next();
+                  visualizer.update();
                }
             }
          }, 0, FRAME_TIME);

@@ -1,6 +1,5 @@
 package galaxy;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedList;
 
 
@@ -40,21 +39,16 @@ class Director {
    }
 
    void next() {
-      debug("Running... " + tic);
-      LinkedList<SimpleEntry<Player, LinkedList<Action>>> actions = new LinkedList<SimpleEntry<Player, LinkedList<Action>>>();
       for (Player p : active) {
-         debug("Turn of: " + p.NAME);
          p.doTurn();
-         actions.add(new SimpleEntry<Player, LinkedList<Action>>(p, p.getActions()));
       }
 
-      for (SimpleEntry<Player, LinkedList<Action>> turn : actions) {
-         LinkedList<Action> acts = turn.getValue();
-         for (Action a : acts) {
-            a.doAction(turn.getKey(), tic);
+      for (Player p : active) {
+         for (Action a : p.getActions()) {
+            a.doAction(tic);
          }
       }
-      
+
       Galaxy.update();
 
       Player winner = Galaxy.isGameOver();
@@ -71,13 +65,13 @@ class Director {
 
       Galaxy.clear();
       Galaxy.generateRandomMap(active);
-      
+
       for (Player p : active) {
          p.nextGame();
       }
-      
+
       Main.resetVisualizer();
-      
+
       mm.update();
       tic = 0;
    }
