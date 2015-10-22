@@ -29,7 +29,7 @@ public class BasicAI extends Player {
       }
 
       if (hitter != null && hitted != null) {
-         actions.add(new Action(hitter, hitted, (int) (Math.random() * hitter.getNumUnits() / 4)));
+         addAction(hitter, hitted, (int) (Math.random() * hitter.getNumUnits() / 4));
       }
    }
 
