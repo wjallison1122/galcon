@@ -7,13 +7,15 @@ import galaxy.Visualizer;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -21,43 +23,67 @@ import java.awt.event.MouseWheelEvent;
  */
 public class Display extends Visualizer {
 
-   public Display() {
-      super(800, 600, 3);
-      //this.addMouseMotionListener(ma);
-      //this.addMouseListener(ma);
-      //this.addMouseWheelListener(ma);
-      //this.addKeyListener(ka);
-     // this.setFocusable(true);
-      //this.setBackground(Color.black);
-     // displayCamera = new Camera(new Vector(0, 0, -100000));
+   public Display(int[] dimensions) {
+      super(1600, 900, 3);
+      this.addMouseMotionListener(ma);
+      this.addMouseListener(ma);
+      this.addMouseWheelListener(ma);
+      this.addKeyListener(ka);
+      this.setFocusable(true);
+      this.setBackground(Color.black);
+      displayCamera = new Camera(new Vector(-1700, 0, 475));
+      displayCamera.vRot = -Math.PI / 16;
+      GraphicHolder.DIMESIONS = dimensions;
+      
+      Timer timer = new Timer();
+      timer.schedule(new TimerTask() {
+         @Override
+         public void run() {
+            if (autoRotate) {
+               autoRotatePosition += AUTO_ROTATE_SPEED;
+               displayCamera.location = new Vector(
+                     -1700 * Math.cos(autoRotatePosition), 
+                     -1700 * Math.sin(autoRotatePosition),
+                     475);
+               displayCamera.vRot = -Math.PI / 10;
+               displayCamera.hRot = -autoRotatePosition;
+            } else {
+               displayCamera.moveCamera(Vector.scale(cameraSpeed, .005));
+            }
+         }
+      }, 0, 10);
    }
 
- //  public Camera displayCamera;
- //  public double scrollSpeed = 100000;
- /////  private Vector cameraSpeed = new Vector(0, 0, 0);
- //  private boolean autoTurn = false;
- //  private int mousex, mousey;
- //  private boolean mouseDown = false;
-   /*
+   public Camera displayCamera;
+   public double scrollSpeed = 10000;
+   private Vector cameraSpeed = new Vector(0, 0, 0);
+   private int mousex, mousey;
+   private boolean mouseDown = false;
+   private boolean autoRotate = true;
+   private double autoRotatePosition = 0.0;
+   private static final double AUTO_ROTATE_SPEED = 0.001;
+
    private MouseAdapter ma = new MouseAdapter() {
       @Override
       public void mouseDragged(MouseEvent me) {
-         if (mouseDown) {
-            displayCamera.hRot += (me.getX() - mousex) / (displayCamera.zoom / 3.0);
-            displayCamera.vRot += (me.getY() - mousey) / (displayCamera.zoom / 3.0);
-            if (displayCamera.vRot > Math.PI / 2) {
-               displayCamera.vRot = Math.PI / 2;
+         if (!autoRotate) {
+            if (mouseDown) {
+               displayCamera.hRot += (me.getX() - mousex) / (displayCamera.zoom / 3.0);
+               displayCamera.vRot += (me.getY() - mousey) / (displayCamera.zoom / 3.0);
+               if (displayCamera.vRot > Math.PI / 2) {
+                  displayCamera.vRot = Math.PI / 2;
+               }
+               if (displayCamera.vRot < -Math.PI / 2) {
+                  displayCamera.vRot = -Math.PI / 2;
+               }
+               mousex = me.getX();
+               mousey = me.getY();
+               repaint();
+            } else {
+               mousex = me.getX();
+               mousey = me.getY();
+               mouseDown = true;
             }
-            if (displayCamera.vRot < -Math.PI / 2) {
-               displayCamera.vRot = -Math.PI / 2;
-            }
-            mousex = me.getX();
-            mousey = me.getY();
-            repaint();
-         } else {
-            mousex = me.getX();
-            mousey = me.getY();
-            mouseDown = true;
          }
       }
 
@@ -70,7 +96,6 @@ public class Display extends Visualizer {
 
       @Override
       public void mousePressed(MouseEvent me) {
-
          requestFocus(true);
       }
 
@@ -88,24 +113,34 @@ public class Display extends Visualizer {
    public KeyAdapter ka = new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
+         System.out.println(e.getKeyCode());
          switch (e.getKeyCode()) {
          case 37: // right
+            //go right
             cameraSpeed.x = -scrollSpeed;
             break;
          case 38: // down
+            //go back
             cameraSpeed.y = -scrollSpeed;
             break;
          case 39: // left
+            //go left
             cameraSpeed.x = scrollSpeed;
             break;
          case 40: // up
+            //go forwards
             cameraSpeed.y = scrollSpeed;
             break;
-         case 16: // in (RShift)
+         case 16: // in (Shift)
+            //go up
             cameraSpeed.z = -scrollSpeed;
             break;
-         case 17: // out (LShift)
+         case 17: // out (Ctrl)
+            //go down
             cameraSpeed.z = scrollSpeed;
+            break;
+         case 10: // enter
+            autoRotate = !autoRotate;
             break;
          }
       }
@@ -133,16 +168,10 @@ public class Display extends Visualizer {
             break;
          }
       }
-   };*/
+   };
    
-   /*
-      displayCamera.setMouseLocation(new Vector(mousex, mousey, 0));
-      if (autoTurn) {
-         displayCamera.hRot += .003;
-      }
-      displayCamera.moveCamera(Vector.scale(cameraSpeed, .01));
-      repaint();
-    */
+   private List<Planet> planets;
+   private List<Fleet> fleets;
    
    @Override
    protected void newGame() {
@@ -152,31 +181,31 @@ public class Display extends Visualizer {
 
    @Override
    protected void drawPlanet(Planet p, Graphics g) {
-      // TODO Auto-generated method stub
-      
+      planets.add(p);
    }
 
    @Override
    protected void drawFleet(Fleet f, Graphics g) {
-      // TODO Auto-generated method stub
-      
+      fleets.add(f);
    }
 
    @Override
    protected void drawBackground(Graphics g) {
-      // TODO Auto-generated method stub
-      
+      planets = new ArrayList<>();
+      fleets = new ArrayList<>();
    }
 
    @Override
    protected void drawPlayerInfo(Player[] players, Graphics g) {
       // TODO Auto-generated method stub
-      
    }
 
    @Override
    protected void drawOther(Graphics g) {
-      //displayCamera.draw(planets, g, getWidth() / 2, getHeight());
+      g.setColor(Color.BLACK);
+      g.fillRect(0, 0, getWidth(), getHeight());
+      g.drawLine(0, 0, 10, 10);
+      displayCamera.draw(planets, fleets, g, getWidth() / 2, getHeight() / 2);
    }
 
    @Override

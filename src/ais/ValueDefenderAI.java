@@ -13,9 +13,13 @@ public class ValueDefenderAI extends Player {
    public ValueDefenderAI() {
       super(new Color(40,0,0), "Value Defender AI");
    }
+   
+   public ValueDefenderAI(Color c) {
+      super(c, "Value Defender AI");
+   }
 
    public double getValue(Planet p) {
-      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 2000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 800.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
    @Override

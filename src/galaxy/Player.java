@@ -46,8 +46,8 @@ public abstract class Player {
       turn();
    }
    
-   protected final Action addAction(Planet start, Planet target, int numUnits) {
-      return new Action(start, target, numUnits, this);
+   protected void addAction(Planet start, Planet target, int numUnits) {
+      actions.add(new Action(start, target, numUnits, this));
    }
    
    protected final void clearActions() {
