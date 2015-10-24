@@ -103,15 +103,21 @@ public class Planet extends Unit {
       Iterator<Planet> iter = planets.iterator();
       Player winner = null;
 
-      while ((winner = iter.next().owner) == null);
+      while (iter.hasNext() && (winner = iter.next().owner) == null);
+
+      if (winner == null) {
+         
+      }
 
       while (iter.hasNext()) {
          if (iter.next().ownedByOpponentOf(winner)) {
             return null;
          }
       }
+      
+      
 
-      return winner; 
+      return Fleet.checkWinner(winner) ? winner : null; 
    }
 
    void hitBy(Fleet f) {

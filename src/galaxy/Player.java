@@ -22,32 +22,40 @@ public abstract class Player {
       COLOR = c;
       NAME = name;
    }
-   
+
    protected final void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);
       }
    }
-   
+
    final void nextGame() {
       planets = Planet.getAllPlanets();
       newGame();
    }
-   
+
    protected abstract void newGame();
 
    final LinkedList<Action> getActions() {
       return actions == null ? new LinkedList<Action>() : actions;
    }
-   
+
    final void doTurn() {
       actions = new LinkedList<Action>();
       fleets = Fleet.getAllFleets();
       turn();
    }
    
-   protected abstract void turn();
+   protected void addAction(Planet start, Planet target, int numUnits) {
+      actions.add(new Action(start, target, numUnits, this));
+   }
    
+   protected final void clearActions() {
+      actions.clear();
+   }
+
+   protected abstract void turn();
+
    protected abstract String storeSelf();
 
    /**
@@ -63,11 +71,11 @@ public abstract class Player {
    protected static final int numUnitsOwnedBy(Player p) {
       return Galaxy.numUnitsOwnedBy(p);
    }
-   
+
    protected static final int numUnitsInPlanets(Player p) {
       return Planet.getNumUnitsInPlanets(p);
    }
-   
+
    protected static final int numUnitsInFleets(Player p) {
       return Fleet.getNumUnitsInFleets(p);
    }

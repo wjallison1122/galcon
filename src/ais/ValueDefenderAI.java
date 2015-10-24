@@ -13,9 +13,13 @@ public class ValueDefenderAI extends Player {
    public ValueDefenderAI() {
       super(new Color(40,0,0), "Value Defender AI");
    }
+   
+   public ValueDefenderAI(Color c) {
+      super(c, "Value Defender AI");
+   }
 
    public double getValue(Planet p) {
-      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 2000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 800.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
    @Override
@@ -60,12 +64,12 @@ public class ValueDefenderAI extends Player {
             int contribution = p.getNumUnits() - PlanetUtils.getIncomingFleetCount(p, fleets) - MIN_DEFENSE;
             
             if (available + contribution > needed) {
-               actions.add(new Action(p, target, needed - available));
+               addAction(p, target, needed - available);
                available += contribution;
                break;
             }
             available += contribution;
-            actions.add(new Action(p, target, contribution));
+            addAction(p, target, contribution);
          }
       }
       

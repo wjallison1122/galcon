@@ -26,10 +26,6 @@ public class MeatSackAI extends Player {
          this.destination = destination;
          this.count = count;
       }
-      
-      public Action toAction() {
-         return new Action(source, destination, count);
-      }
    }
 
    public MeatSackAI() {
@@ -40,7 +36,7 @@ public class MeatSackAI extends Player {
    @Override
    public void turn() {
       display.updateBase();
-      pendingActions.forEach((action) -> actions.add(action.toAction()));
+      pendingActions.forEach((action) -> addAction(action.source, action.destination, action.count));
       pendingActions.clear();
       
       if (!autoAdvance) {

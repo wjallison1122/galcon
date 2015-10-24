@@ -2,6 +2,7 @@ package galaxy;
 
 import human.MeatSackAI;
 
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -10,6 +11,7 @@ import java.util.Date;
 
 import stats.DefaultStats;
 import visualizers.DefaultVisualizer;
+import visualizersthreedee.Display;
 import ais.*;
 
 class GameSettings {
@@ -17,11 +19,11 @@ class GameSettings {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new MeatSackAI(), new ValueDefenderAI()};
+   static Player [] players = {new ValueDefenderAI(new Color(0,40,0)), new ValueDefenderAI()};
 
-   static final int[] DIMENSIONS = {1280, 800};
+   static final int[] DIMENSIONS = {1000, 1000, 1000};
 
-   static final int PLANET_DENSITY = 64000; // Planets per volume units
+   static final int PLANET_DENSITY = 6400000; // Planets per volume units
    static final int NUM_PLANETS = worldSize() / PLANET_DENSITY;//16;
    static final int FLEET_SPEED = 2;
 
@@ -29,7 +31,7 @@ class GameSettings {
    static final int NUM_ROUNDS = 5000;
 
    static final int FRAME_TIME = 10;
-   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
+   static Visualizer visualizer = new Display(DIMENSIONS);
    Director director = new Director();
 
    static Stats createStats(Player p) {

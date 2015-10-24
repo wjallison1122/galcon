@@ -103,12 +103,6 @@ public class MeatSackDisplay extends JPanel {
          player.finishTurns(20);
       }));
       
-      controls.add(new EButton("list unowned planets", () -> {
-         for (Planet p : PlanetUtils.getOpponentsPlanets(player.getPlanets(), player)) {
-            System.out.println(p.getNumUnits());
-         }
-      }));
-      
       return controls;
    }
    

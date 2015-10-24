@@ -28,7 +28,7 @@ public class CaptureNearestAI extends Player {
             if (p.getNumUnits() - PlanetUtils.getIncomingFleetCount(p, fleets) > 3 * pOther.getNumUnits()) {
                int currentCount = PlanetUtils.getPlayersIncomingFleetCount(pOther, fleets, this);
                if (currentCount == 0) {
-                  actions.add(new Action(p, pOther, 2 * pOther.getNumUnits()));
+                  addAction(p, pOther, 2 * pOther.getNumUnits());
                   break;
                }
             }

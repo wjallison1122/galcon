@@ -30,13 +30,13 @@ public class ValueDefenderBeater extends Player {
       
       if (!sentFleet) {
          sentFleet = true;
-         actions.add(new Action(myPlanets.get(0), smallestUnoccupied, smallestUnoccupied.getNumUnits() + 1));
+         addAction(myPlanets.get(0), smallestUnoccupied, smallestUnoccupied.getNumUnits() + 1);
       }
       
       if (opponentsPlanets.size() == 1) {
          Planet target = opponentsPlanets.get(0);
          for (Planet p : myPlanets) {
-            actions.add(new Action(p,target,1000));
+            addAction(p,target,1000);
          }
       }
    }

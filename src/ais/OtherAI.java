@@ -31,7 +31,7 @@ public class OtherAI extends Player {
 
       if (hitter != null && hitted != null) {
          debug("Made an action!");
-         actions.add(new Action(hitter, hitted, (int) (Math.random() * hitter.getNumUnits() / 4)));         
+         addAction(hitter, hitted, (int) (Math.random() * hitter.getNumUnits() / 4));
       } else {
          debug("Something..." + (hitter == null) + " ? " + (hitted == null));
       }

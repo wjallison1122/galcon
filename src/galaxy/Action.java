@@ -4,10 +4,8 @@ public class Action {
    private final Planet START;
    private final Planet TARGET;
    private final int NUM_UNITS;
-
-   static Player currentTurn;
-
-   public Action(Planet start, Planet target, int numUnits) throws InvalidActionException {
+   
+   Action(Planet start, Planet target, int numUnits, Player current) throws InvalidActionException {
 
       if (start == null) {
          throw new InvalidActionException("Attempted to make action to send fleet from null planet.");
@@ -17,7 +15,7 @@ public class Action {
          throw new InvalidActionException("Attempted to make action to send fleet to null planet.");
       }
 
-      if (!start.ownedBy(currentTurn)) {
+      if (!start.ownedBy(current)) {
          throw new InvalidActionException("Player attempted to make an action for a planet not owned by them.");
       }
 
@@ -26,8 +24,8 @@ public class Action {
       NUM_UNITS = numUnits;
    }
 
-   void doAction(Player p, int tic) {
-      if (Unit.unitOwnedBy(START, p) && TARGET != null) {
+   void doAction(int tic) {
+      if (START != null && TARGET != null) {
          START.sendFleet(TARGET, NUM_UNITS);
       }
    }

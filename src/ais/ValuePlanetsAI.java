@@ -42,12 +42,12 @@ public class ValuePlanetsAI extends Player {
          int contribution = p.getNumUnits() - PlanetUtils.getIncomingFleetCount(p, fleets) - MIN_DEFENSE;
          
          if (available + contribution > needed) {
-            actions.add(new Action(p, target, needed - available));
+            addAction(p, target, needed - available);
             available += contribution;
             break;
          }
          available += contribution;
-         actions.add(new Action(p, target, contribution));
+         addAction(p, target, contribution);
       }
       
       if (available < needed) {

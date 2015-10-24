@@ -14,7 +14,6 @@ class Main extends GameSettings {
 
    private Main() {
       debug("Starting creation " + NUM_PLANETS);
-
       if (visualizer != null) {
          Timer timer = new Timer();
          timer.schedule(new TimerTask() {
