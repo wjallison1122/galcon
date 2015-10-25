@@ -27,6 +27,7 @@ public class GraphicHolder {
         name = new Integer(planet.getNumUnits()).toString();
         radius = planet.RADIUS;
         drawColor = planet.getColor();
+        units = planet.getNumUnits();
     }
    
    public GraphicHolder(Fleet fleet) {
@@ -41,12 +42,14 @@ public class GraphicHolder {
       name = new Integer(fleet.getNumUnits()).toString();
       radius = Math.pow(fleet.getNumUnits(), 1.0/3.0);
       drawColor = fleet.getColor();
+      units = fleet.getNumUnits();
    }
    
     public String name;
     public Vector location;
     public double radius;
     public Color drawColor;
+    public int units;
     public double screenRadius;
     public Vector screenLocation;
 }
