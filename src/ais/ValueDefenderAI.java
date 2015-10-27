@@ -18,13 +18,13 @@ public class ValueDefenderAI extends Player {
    }
 
    public double getValue(Planet p) {
-      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 2000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 800.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
    @Override
    protected void turn() {
-      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+      List<Planet> myPlanets = PlanetUtils.getPlanetsOwnedByPlayer(planets, this);
+      List<Planet> otherPlanets = PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this);
       
 //      boolean defending = false;
       
@@ -32,9 +32,9 @@ public class ValueDefenderAI extends Player {
       int needed = 0;
       for (Planet p : myPlanets) {
          needed = 
-               PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this) -
+               PlanetUtils.getOpponentsIncomingFleetCount(p, fleets, this) -
                p.getNumUnits() -
-               PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) +
+               PlanetUtils.getPlayersIncomingFleetCount(p, fleets, this) +
                MIN_DEFENSE;
          if (needed > 0) {
 //            defending = true;
@@ -48,7 +48,7 @@ public class ValueDefenderAI extends Player {
          for (Planet p : otherPlanets) {
             double value = getValue(p);
             if (value > best) {
-               if (PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) == 0) {
+               if (PlanetUtils.getPlayersIncomingFleetCount(p, fleets, this) == 0) {
                   target = p;
                   best = value;
                }
@@ -60,7 +60,7 @@ public class ValueDefenderAI extends Player {
       int available = 0;
       for (Planet p : myPlanets) {
          if (p != target) {
-            int contribution = p.getNumUnits() - PlayerUtils.getIncomingFleetCount(p, fleets) - MIN_DEFENSE;
+            int contribution = p.getNumUnits() - PlanetUtils.getIncomingFleetCount(p, fleets) - MIN_DEFENSE;
             
             if (available + contribution > needed) {
                addAction(p, target, needed - available);

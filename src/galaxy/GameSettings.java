@@ -16,27 +16,23 @@ class GameSettings {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new DistanceValueDefenderAI(Color.cyan), new DistanceValueDefenderAI(Color.magenta)};
+   static Player [] players = {new ValueDefenderAI(new Color(0,40,0)), new ValueDefenderAI()};
 
-   /* 2D game settings
-   static final int[] DIMENSIONS = {1280, 800};
-   static final int PLANET_DENSITY = 64000; // Planets per volume units
-   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
-   //*/
-   
-   //* 3D game settings
-   static final int[] DIMENSIONS = {1000, 1000, 1000};
-   static final int PLANET_SPARSITY = 6400000; // Planets per units of volume
-   static final int NUM_PLANETS = worldSize() / PLANET_SPARSITY;
-   static Visualizer visualizer = new Display(DIMENSIONS);
-   
+      static final int[] DIMENSIONS = {1000, 1000, 1000};
+      static final int NUM_PLANETS = 16;
+      static Visualizer visualizer = new Display(DIMENSIONS);
+
+//   static final int[] DIMENSIONS = {1280, 720};
+//   static final int NUM_PLANETS = 16;
+//   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
+
+
    static final int FLEET_SPEED = 2;
 
    static final int PLAYERS_PER_GAME = 2;
    static final int NUM_ROUNDS = 5000;
 
    static final int FRAME_TIME = 10;
-   
    Director director = new Director();
 
    static Stats createStats(Player p) {
