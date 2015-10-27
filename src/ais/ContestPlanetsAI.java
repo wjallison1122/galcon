@@ -1,37 +1,29 @@
 package ais;
 
-import galaxy.Action;
 import galaxy.Planet;
 import galaxy.Player;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import ais.PlayerUtils.Location;
 
-public class CopyOfDistanceValueDefenderV2 extends Player {
-   /* defeats aggressively tuned value defender
-   private static final int MIN_AGGRESSIVE_DEFENSE = 50;
-   private static final int MIN_DEFENSIVE_DEFENSE = 2;
-   private static final double BASE_DISTANCE_FACTOR = 1000;
-   private static final double DISTANCE_WEIGHTING = 0.3;
-   private static final double AGGRESSION = 1.2;
-   //*/
-   
-   //* defeats value defender beater
+public class ContestPlanetsAI extends Player {
    private static final int MIN_AGGRESSIVE_DEFENSE = 10;
    private static final int MIN_DEFENSIVE_DEFENSE = 0;
    private static final double BASE_DISTANCE_FACTOR = 10;
-   private static final double DISTANCE_WEIGHTING = 1;
+   private static final double DISTANCE_WEIGHTING = 0.3;
    private static final double AGGRESSION = 3;
-   //*/
    
-   public CopyOfDistanceValueDefenderV2() {
-      super(new Color(40,0,0), "Value Defender AI");
+   private boolean contest;
+   
+   public ContestPlanetsAI() {
+      this(Color.GREEN);
    }
    
-   public CopyOfDistanceValueDefenderV2(Color c) {
-      super(c, "Value Defender AI");
+   public ContestPlanetsAI(Color c) {
+      super(c, "Contest Planets AI");
    }
 
    public double getValue(Planet p, Location averageLocation, double variance) {
@@ -41,6 +33,11 @@ public class CopyOfDistanceValueDefenderV2 extends Player {
    
    @Override
    protected void turn() {
+      if (contest) {
+         contest();
+         return;
+      }
+      
       List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
       if (myPlanets.size() == 0) {
          return;
@@ -102,10 +99,20 @@ public class CopyOfDistanceValueDefenderV2 extends Player {
          actions.clear();
       }
    }
+   
+   private void contest() {
+      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+      if (myPlanets.size() == 0) {
+         return;
+      }
+      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+      
+      
+   }
 
    @Override
    protected void newGame() {
-      
+      contest = true;
    }
 
    @Override
