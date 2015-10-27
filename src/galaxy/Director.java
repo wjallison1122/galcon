@@ -64,7 +64,8 @@ class Director {
       active = mm.getPlayers();
 
       Galaxy.clear();
-      Galaxy.generateRandomMap(active);
+      //Galaxy.generateRandomMap(active);
+      Galaxy.generateSymmetricMap();
 
       Player[] activeArray = new Player[active.size()];
       int i = 0;

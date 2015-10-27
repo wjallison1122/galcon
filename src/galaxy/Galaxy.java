@@ -36,6 +36,16 @@ class Galaxy {
    static void generateSymmetricMap(SymmetryType symmetry) {
 
    }
+   
+   static void generateSymmetricMap() {
+	  Planet.generateCenterPlanet();
+	  Planet.generateSymmetricStartingPlanets();
+      for (int i = 0; i < Main.NUM_PLANETS / Main.players.length; i++) {
+         Planet.generateSymmetricPlanets();
+      }
+
+      debug("Made planets");
+   }
 
    static Player isGameOver() {
       return Planet.isGameOver();
