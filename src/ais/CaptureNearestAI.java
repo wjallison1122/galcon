@@ -1,6 +1,5 @@
 package ais;
 
-import galaxy.Action;
 import galaxy.Planet;
 import galaxy.Player;
 

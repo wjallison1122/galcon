@@ -66,11 +66,14 @@ class Director {
       Galaxy.clear();
       Galaxy.generateRandomMap(active);
 
+      Player[] activeArray = new Player[active.size()];
+      int i = 0;
       for (Player p : active) {
          p.nextGame();
+         activeArray[i++] = p;
       }
 
-      Main.resetVisualizer();
+      Main.resetVisualizer(activeArray);
 
       mm.update();
       tic = 0;

@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 public abstract class Visualizer extends JPanel implements KeyListener, MouseListener {
    private BufferedImage bufferImage;
    private Planet[] planets = Planet.getAllPlanets();
+   private Player[] players;
    protected final int WIN_WIDTH, WIN_HEIGHT;
    private JFrame frame;
 
@@ -39,15 +40,17 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
          setContentPane(face);
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
          setBackground(Color.GRAY);
-         setResizable(false);
+         setResizable(true);
          setVisible(true);
          addKeyListener(face);
          addMouseListener(face);
       }};
    }
 
-   void nextGame() {
+   final void nextGame(Player[] active) {
       planets = Planet.getAllPlanets();
+      players = active;
+      newGame();
    }
 
    protected abstract void newGame();
@@ -57,16 +60,11 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
       Graphics g = image.getGraphics();
 
       drawBackground(g);
-
-      for (Planet p : planets) {
-         drawPlanet(p, g);
-      }
-
-      for (Fleet f : Fleet.getAllFleets()) {
-         drawFleet(f, g);
-      }
-
+      drawPlanets(planets, g);
+      drawFleets(Fleet.getAllFleets(), g);
+      drawPlayerInfo(players, g);
       drawOther(g);
+      
 
       bufferImage = image;
       frame.repaint();
@@ -85,15 +83,16 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
       return Galaxy.numUnitsOwnedBy(p);
    }
 
-   protected abstract void drawPlanet(Planet p, Graphics g);
-
-   protected abstract void drawFleet(Fleet f, Graphics g);
-
    protected abstract void drawBackground(Graphics g);
+
+   protected abstract void drawPlanets(Planet[] planets, Graphics g);
+
+   protected abstract void drawFleets(Fleet[] fleets, Graphics g);
 
    protected abstract void drawPlayerInfo(Player[] players, Graphics g);
 
    protected abstract void drawOther(Graphics g);
+
 
    protected abstract void keystroke(KeyEvent e);
 

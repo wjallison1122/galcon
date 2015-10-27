@@ -1,11 +1,10 @@
 package ais;
 
-import java.awt.Color;
-import java.util.List;
-
-import galaxy.Action;
 import galaxy.Planet;
 import galaxy.Player;
+
+import java.awt.Color;
+import java.util.List;
 
 public class ValueDefenderBeater extends Player {
 
