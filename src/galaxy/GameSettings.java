@@ -19,7 +19,7 @@ class GameSettings {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new DistanceValueDefenderAI(Color.cyan), new DistanceValueDefenderAI(Color.magenta)};
+   static Player [] players = {new ContestPlanetsAI(Color.cyan), new TotalWarAI()};
 
    /* 2D game settings
    static final int[] DIMENSIONS = {1280, 800};

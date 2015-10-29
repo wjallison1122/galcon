@@ -164,4 +164,8 @@ public class Planet extends Unit {
       }
       return count;
    }
+   
+   public int getUpdateCount() {
+      return updateCnt;
+   }
 }

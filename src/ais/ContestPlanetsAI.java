@@ -1,13 +1,18 @@
 package ais;
 
+import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import visualizersthreedee.GraphicHolder;
 import ais.PlayerUtils.Location;
+import ais.PlayerUtils.PlanetOwner;
 
 public class ContestPlanetsAI extends Player {
    private static final int MIN_AGGRESSIVE_DEFENSE = 10;
@@ -102,17 +107,163 @@ public class ContestPlanetsAI extends Player {
    
    private void contest() {
       List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-      if (myPlanets.size() == 0) {
+      List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+      
+      if (myPlanets.size() > 1 || theirPlanets.size() > 1) {
+         contest = false;
          return;
       }
-      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
       
+      if (take != null) {
+         int toSendToTake = 0;
+         while (!isEventualOwner(take, (int) Math.ceil(myPlanets.get(0).distanceTo(take) / Fleet.SPEED), toSendToTake)) {
+            toSendToTake++;
+         }
+         if (toSendToTake > 0) {
+            addAction(myPlanets.get(0), take, toSendToTake);
+         }
+      }
       
+      for (Fleet fleet : PlayerUtils.getOpponentsFleets(fleets, this)) {
+         if (retake.contains(fleet.getDestination())) {
+            int distance = (int) Math.ceil(myPlanets.get(0).distanceTo(fleet.getDestination()) / Fleet.SPEED);
+            int fleetDistance = (int) Math.ceil(fleet.distanceLeft()/Fleet.SPEED);
+            if (distance > fleetDistance) {
+               int toSend = 0;
+               while (!isEventualOwner(fleet.getDestination(), distance, toSend)) toSend++;
+               if (toSend > 0) {
+                  addAction(myPlanets.get(0), fleet.getDestination(), toSend);
+               }
+            }
+         }
+      }
    }
-
+   
+   private static class PlanetAction {
+      public int time;
+      public int amount;
+      public PlanetOwner owner;
+   }
+   
+   private boolean isEventualOwner(Planet p, int time, int amount) {
+      PlanetOwner current;
+      if (p.ownedBy(this)) {
+         current = PlanetOwner.PLAYER;
+      } else if (p.ownedByOpponentOf(this)) {
+         current = PlanetOwner.OPPONENT;
+      } else {
+         current = PlanetOwner.NOBODY;
+      }
+      int updateCount = p.getUpdateCount() % p.PRODUCTION_TIME;
+      int previousUnits = 0;
+      int unitCount = p.getNumUnits();
+      int currentTime = 0;
+      List<PlanetAction> actions = new ArrayList<>();
+      for (Fleet f : Arrays.asList(fleets).stream()
+            .filter((fleet) -> fleet.getDestination() == p)
+            .collect(Collectors.toList())) {
+               PlanetAction action = new PlanetAction();
+               action.time = (int) Math.ceil(f.distanceLeft()/Fleet.SPEED);
+               action.amount = f.getNumUnits();
+               if (f.ownedBy(this)) {
+                  action.owner = PlanetOwner.PLAYER;
+               } else {
+                  action.owner = PlanetOwner.OPPONENT;
+               }
+               actions.add(action);
+            }
+      PlanetAction player = new PlanetAction();
+      player.amount = amount;
+      player.time = time;
+      player.owner = PlanetOwner.PLAYER;
+      actions.add(player);
+      actions.sort((a, b) -> Integer.compare(a.time, b.time));
+      for (PlanetAction pa : actions) {
+         int passingTime = pa.time - currentTime;
+         if (current != PlanetOwner.NOBODY) {
+            updateCount += passingTime;
+            int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;
+            previousUnits += unitsToAdd;
+            unitCount += unitsToAdd;
+         }
+         if (pa.owner == current) {
+            unitCount += pa.amount;
+         } else {
+            unitCount -= pa.amount;
+            if (unitCount == 0) {
+               current = PlanetOwner.NOBODY;
+            }
+            if (unitCount < 0) {
+               unitCount = -unitCount;
+               current = pa.owner;
+            }
+         }
+         currentTime += passingTime;
+      }
+      return current == PlanetOwner.PLAYER;
+   }
+   
+   Planet take;
+   List<Planet> retake;
+   
    @Override
    protected void newGame() {
       contest = true;
+      
+      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+      List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+      List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
+      
+      if (myPlanets.size() != 1 || theirPlanets.size() != 1) {
+         throw new RuntimeException("Unexpected starting situation");
+      }
+      
+      Planet me = myPlanets.get(0);
+      Planet them = theirPlanets.get(0);
+      
+      
+      
+      int distance = (int) Math.ceil(me.distanceTo(them) / Fleet.SPEED);
+      int distanceProduction = distance / me.PRODUCTION_TIME;
+      
+      Planet best = null;
+      double bestValue = Double.MIN_VALUE;
+      
+      for (Planet p : unownedPlanets) {
+         int toMe = (int) Math.ceil(p.distanceTo(me) / Fleet.SPEED);
+         int toThem = (int) Math.ceil(p.distanceTo(them) / Fleet.SPEED);
+         if (toMe <= toThem) {
+            int takenContribution = 0;
+            if (distance - toMe * 2 > 0) {
+               takenContribution = (int) Math.floor((distance - toMe * 2) / p.PRODUCTION_TIME);
+            }
+            System.out.println("Cost: " + (p.getNumUnits() + 1 - takenContribution) + " Available:" + distanceProduction);
+            if (p.getNumUnits() + 1 - takenContribution < distanceProduction) {
+               double value = 1.0 / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+               if (value > bestValue) {
+                  bestValue = value;
+                  best = p;
+               }
+            }
+         }
+      }
+      take = best;
+      
+      retake = new ArrayList<>(unownedPlanets);
+      
+      for (Planet p : unownedPlanets) {
+         int toMe = (int) Math.ceil(p.distanceTo(me) / Fleet.SPEED);
+         int toThem = (int) Math.ceil(p.distanceTo(them) / Fleet.SPEED);
+         if (toMe >= toThem) {
+            int takenContribution = 0;
+            if (distance - toThem * 2 > 0) {
+               takenContribution = (int) Math.floor((distance - toThem * 2) / p.PRODUCTION_TIME);
+            }
+            if (p.getNumUnits() + 1 - takenContribution < distanceProduction) {
+               retake.remove(p);
+            }
+         }
+      }
    }
 
    @Override

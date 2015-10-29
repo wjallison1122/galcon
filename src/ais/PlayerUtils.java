@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlayerUtils {
    
@@ -275,5 +276,74 @@ public class PlayerUtils {
          return Double.compare(a.distanceTo(planet), b.distanceTo(planet));
       });
       return rtn;
+   }
+   
+   public static List<Fleet> getMyFleets(Fleet[] fleets, Player player) {
+      return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player)).collect(Collectors.toList());
+   }
+   
+   public static List<Fleet> getOpponentsFleets(Fleet[] fleets, Player player) {
+      return Arrays.asList(fleets).stream().filter((fleet) -> !fleet.ownedBy(player)).collect(Collectors.toList());
+   }
+   
+   public static int getMyUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
+      return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player)).collect(Collectors.summingInt((fleet) -> fleet.getNumUnits())) +
+            Arrays.asList(planets).stream().filter((planet) -> planet.ownedBy(player)).collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
+   }
+   
+   public static int getOpponentUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
+      return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedByOpponentOf(player)).collect(Collectors.summingInt((fleet) -> fleet.getNumUnits())) +
+            Arrays.asList(planets).stream().filter((planet) -> planet.ownedByOpponentOf(player)).collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
+   }
+   
+   public static enum PlanetOwner {
+      NOBODY,
+      PLAYER,
+      OPPONENT;
+   }
+   
+   public static PlanetOwner getCurrentEventualOwner(Planet p, Fleet[] fleets, Player player) {
+      PlanetOwner current;
+      if (p.ownedBy(player)) {
+         current = PlanetOwner.PLAYER;
+      } else if (p.ownedByOpponentOf(player)) {
+         current = PlanetOwner.OPPONENT;
+      } else {
+         current = PlanetOwner.NOBODY;
+      }
+      int updateCount = p.getUpdateCount() % p.PRODUCTION_TIME;
+      int previousUnits = 0;
+      int unitCount = p.getNumUnits();
+      int currentTime = 0;
+      for (Fleet f : Arrays.asList(fleets).stream()
+            .filter((fleet) -> fleet.getDestination() == p)
+            .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft()))
+            .collect(Collectors.toList())) {
+         int passingTime = (int) Math.ceil(f.distanceLeft()/Fleet.SPEED) - currentTime;
+         if (current != PlanetOwner.NOBODY) {
+            updateCount += passingTime;
+            int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;
+            previousUnits += unitsToAdd;
+            unitCount += unitsToAdd;
+         }
+         if ((f.ownedBy(player) && current == PlanetOwner.PLAYER) || (f.ownedByOpponentOf(player) && current == PlanetOwner.OPPONENT)) {
+            unitCount += f.getNumUnits();
+         } else {
+            unitCount -= f.getNumUnits();
+            if (unitCount == 0) {
+               current = PlanetOwner.NOBODY;
+            }
+            if (unitCount < 0) {
+               unitCount = -unitCount;
+               if (f.ownedBy(player)) {
+                  current = PlanetOwner.PLAYER;
+               } else {
+                  current = PlanetOwner.OPPONENT;
+               }
+            }
+         }
+         currentTime += passingTime;
+      }
+      return current;
    }
 }
