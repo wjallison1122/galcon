@@ -9,15 +9,14 @@ import java.util.Date;
 
 import stats.DefaultStats;
 import visualizers.DefaultVisualizer;
-import ais.ContestPlanetsAI;
-import ais.TotalWarAI;
+import ais.*;
 
 class GameSettings {
    static boolean debugMode = false, logGame = false;
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new ContestPlanetsAI(Color.cyan), new TotalWarAI()};
+   static Player [] players = {new ContestPlanetsAI(Color.cyan), new ValueDefenderAI()};
    
 //      static final int[] DIMENSIONS = {1000, 1000, 1000};
 //      static final int NUM_PLANETS = 16;

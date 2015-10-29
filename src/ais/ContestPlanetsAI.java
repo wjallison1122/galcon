@@ -16,9 +16,9 @@ import ais.PlayerUtils.PlanetOwner;
 
 public class ContestPlanetsAI extends Player {
    private static final int MIN_AGGRESSIVE_DEFENSE = 10;
-   private static final int MIN_DEFENSIVE_DEFENSE = 0;
+   private static final int MIN_DEFENSIVE_DEFENSE = 1;
    private static final double BASE_DISTANCE_FACTOR = 10;
-   private static final double DISTANCE_WEIGHTING = 0.3;
+   private static final double DISTANCE_WEIGHTING = 0.1;
    private static final double AGGRESSION = 3;
    
    private boolean contest;
@@ -32,7 +32,7 @@ public class ContestPlanetsAI extends Player {
    }
 
    public double getValue(Planet p, Location averageLocation, double variance) {
-      double distanceFactor = (variance + BASE_DISTANCE_FACTOR) / averageLocation.distance(p);
+      double distanceFactor = (variance + BASE_DISTANCE_FACTOR) / (averageLocation.distance(p) + BASE_DISTANCE_FACTOR);
       return (p.getColor().equals(Color.GRAY) ? 1.0 : AGGRESSION) * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
@@ -101,7 +101,7 @@ public class ContestPlanetsAI extends Player {
       }
       
       if (available < needed) {
-         actions.clear();
+         clearActions();
       }
    }
    
@@ -221,8 +221,6 @@ public class ContestPlanetsAI extends Player {
       Planet me = myPlanets.get(0);
       Planet them = theirPlanets.get(0);
       
-      
-      
       int distance = (int) Math.ceil(me.distanceTo(them) / Fleet.SPEED);
       int distanceProduction = distance / me.PRODUCTION_TIME;
       
@@ -237,7 +235,6 @@ public class ContestPlanetsAI extends Player {
             if (distance - toMe * 2 > 0) {
                takenContribution = (int) Math.floor((distance - toMe * 2) / p.PRODUCTION_TIME);
             }
-            System.out.println("Cost: " + (p.getNumUnits() + 1 - takenContribution) + " Available:" + distanceProduction);
             if (p.getNumUnits() + 1 - takenContribution < distanceProduction) {
                double value = 1.0 / p.PRODUCTION_TIME / (100 + p.getNumUnits());
                if (value > bestValue) {

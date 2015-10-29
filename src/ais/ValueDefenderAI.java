@@ -18,7 +18,7 @@ public class ValueDefenderAI extends Player {
    }
 
    public double getValue(Planet p) {
-      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 800.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.ownedByOpponentOf(this) ? 1400.0 : 1000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
    @Override

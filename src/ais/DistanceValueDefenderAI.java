@@ -99,7 +99,7 @@ public class DistanceValueDefenderAI extends Player {
       }
       
       if (available < needed) {
-         actions.clear();
+         clearActions();
       }
    }
 
