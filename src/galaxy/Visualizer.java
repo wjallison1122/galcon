@@ -1,6 +1,7 @@
 package galaxy;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -18,6 +19,15 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
    private Player[] players;
    protected final int WIN_WIDTH, WIN_HEIGHT;
    private JFrame frame;
+   
+   private static final Font mouseOverFont = new Font("Monospaced", Font.PLAIN, 12);
+   private MouseOverInfo mouseOverInfo;
+   
+   class MouseOverInfo {
+      String text;
+      int coords[];
+      int timeToLive; //in frames
+   }
 
    protected final void debug(String str) {
       if (Main.debugMode) {
@@ -45,6 +55,8 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
          addKeyListener(face);
          addMouseListener(face);
       }};
+      
+      mouseOverInfo = new MouseOverInfo();
    }
 
    final void nextGame(Player[] active) {
@@ -64,6 +76,7 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
       drawFleets(Fleet.getAllFleets(), g);
       drawPlayerInfo(players, g);
       drawOther(g);
+      drawMouseOverText(g);
 
       bufferImage = image;
       frame.repaint();
@@ -72,6 +85,15 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
    @Override
    public final void paint(Graphics g) {
       g.drawImage(bufferImage,0,0,this);
+   }
+   
+   protected void drawMouseOverText(Graphics g) {
+      if(mouseOverInfo.timeToLive > 0) {
+         mouseOverInfo.timeToLive--;
+         g.setFont(mouseOverFont);
+         g.setColor(Color.LIGHT_GRAY);
+         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0], mouseOverInfo.coords[1]);
+      }
    }
 
    protected final boolean checkRecentlyConquered(Planet p) {
@@ -91,7 +113,6 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
    protected abstract void drawPlayerInfo(Player[] players, Graphics g);
 
    protected abstract void drawOther(Graphics g);
-
 
    protected abstract void keystroke(KeyEvent e);
 
@@ -120,7 +141,22 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
    @Override
    public void mouseExited(MouseEvent e){}
    @Override
-   public void mousePressed(MouseEvent e){}
+   public void mousePressed(MouseEvent e) {
+      if(Main.DIMENSIONS.length != 2) {
+         return;
+      }
+      
+      //Minuses are to offset it to the tip of the mouse pointer
+      int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
+      for(Planet p : planets) {
+         double tempCoords[] = {mouseCoords[0], mouseCoords[1] - p.RADIUS/2};
+         if(p.distanceTo(tempCoords) < p.RADIUS) {
+            mouseOverInfo.coords = mouseCoords;
+            mouseOverInfo.text = "Production: " + p.PRODUCTION_TIME;
+            mouseOverInfo.timeToLive = 120;
+         }
+      }
+   }
    @Override
    public void mouseReleased(MouseEvent e){}
 }
