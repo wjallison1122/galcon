@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import stats.DefaultStats;
+import visualizers.DefaultVisualizer;
 import visualizersthreedee.Display;
 import ais.ValueDefenderAI;
 
@@ -18,13 +19,13 @@ class GameSettings {
 
    static Player [] players = {new ValueDefenderAI(new Color(0,40,0)), new ValueDefenderAI()};
 
-      static final int[] DIMENSIONS = {1000, 1000, 1000};
-      static final int NUM_PLANETS = 16;
-      static Visualizer visualizer = new Display(DIMENSIONS);
+//      static final int[] DIMENSIONS = {1000, 1000, 1000};
+//      static final int NUM_PLANETS = 16;
+//      static Visualizer visualizer = new Display(DIMENSIONS);
 
-//   static final int[] DIMENSIONS = {1280, 720};
-//   static final int NUM_PLANETS = 16;
-//   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
+   static final int[] DIMENSIONS = {1280, 720};
+   static final int NUM_PLANETS = 16;
+   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
 
 
    static final int FLEET_SPEED = 2;

@@ -215,6 +215,11 @@ public class DefaultVisualizer extends Visualizer {
 
       int offset = 1;
       for (Player p : players) {
+         g.setColor(Color.DARK_GRAY);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset - 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset + 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10 - 1, FONT_HEIGHT * offset);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10 + 1, FONT_HEIGHT * offset);
          g.setColor(p.COLOR);
          g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset++);
       }
