@@ -71,16 +71,19 @@ class Main extends GameSettings {
    }
 
    static void writeToLog(String str) {
-      try {
-         gameLog.write(str);
-      } catch (IOException e) {
-         System.err.println("Couldn't write to log file.");
+      if (logGame) {
+         try {
+            gameLog.write(str);
+         } catch (IOException e) {
+            System.err.println("Couldn't write to log file.");
+         }
       }
+
    }
 
-   static void resetVisualizer() {
+   static void resetVisualizer(Player[] active) {
       if (visualizer != null) {
-         visualizer.nextGame();
+         visualizer.nextGame(active);
       }
    }
 }

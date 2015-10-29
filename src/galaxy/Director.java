@@ -64,13 +64,17 @@ class Director {
       active = mm.getPlayers();
 
       Galaxy.clear();
-      Galaxy.generateRandomMap(active);
+      //Galaxy.generateRandomMap(active);
+      Galaxy.generateSymmetricMap();
 
+      Player[] activeArray = new Player[active.size()];
+      int i = 0;
       for (Player p : active) {
          p.nextGame();
+         activeArray[i++] = p;
       }
 
-      Main.resetVisualizer();
+      Main.resetVisualizer(activeArray);
 
       mm.update();
       tic = 0;

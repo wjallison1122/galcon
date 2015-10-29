@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,6 +21,7 @@ import java.util.TimerTask;
  *
  * @author Jono
  */
+@SuppressWarnings("serial")
 public class Display extends Visualizer {
 
    public Display(int[] dimensions) {
@@ -34,7 +35,7 @@ public class Display extends Visualizer {
       displayCamera = new Camera(new Vector(-1700, 0, 475));
       displayCamera.vRot = -Math.PI / 16;
       GraphicHolder.DIMESIONS = dimensions;
-      
+
       Timer timer = new Timer();
       timer.schedule(new TimerTask() {
          @Override
@@ -55,7 +56,7 @@ public class Display extends Visualizer {
    }
 
    public Camera displayCamera;
-   public double scrollSpeed = 1000;
+   public double scrollSpeed = 10000;
    private Vector cameraSpeed = new Vector(0, 0, 0);
    private int mousex, mousey;
    private boolean mouseDown = false;
@@ -113,6 +114,7 @@ public class Display extends Visualizer {
    public KeyAdapter ka = new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
+         System.out.println(e.getKeyCode());
          switch (e.getKeyCode()) {
          case 37: // right
             //go right
@@ -168,31 +170,36 @@ public class Display extends Visualizer {
          }
       }
    };
-   
+
    private List<Planet> planets;
    private List<Fleet> fleets;
-   
+
    @Override
    protected void newGame() {
       // TODO Auto-generated method stub
-      
+
    }
 
    @Override
-   protected void drawPlanet(Planet p, Graphics g) {
-      planets.add(p);
+   protected void drawPlanets(Planet[] p, Graphics g) {
+      planets = new LinkedList<Planet>();
+      for (Planet pl : p) {
+         planets.add(pl);
+      }
    }
 
    @Override
-   protected void drawFleet(Fleet f, Graphics g) {
-      fleets.add(f);
+   protected void drawFleets(Fleet[] f, Graphics g) {
+      fleets = new LinkedList<Fleet>();
+      for (Fleet fl : f) {
+         fleets.add(fl);
+      }
    }
 
    @Override
    protected void drawBackground(Graphics g) {
-      
-      planets = new ArrayList<>();
-      fleets = new ArrayList<>();
+      //      planets = new ArrayList<>();
+      //      fleets = new ArrayList<>();
    }
 
    @Override
@@ -210,6 +217,6 @@ public class Display extends Visualizer {
 
    @Override
    protected void keystroke(KeyEvent e) {
-      
+
    }
 }

@@ -27,7 +27,13 @@ public class DefaultVisualizer extends Visualizer {
    private static final Font FONT = new Font("Monospaced", Font.BOLD, 18);
 
    @Override
-   protected void drawPlanet(Planet p, Graphics g) {
+   protected void drawPlanets(Planet[] planets, Graphics g) {
+      for (Planet p : planets) {
+         drawPlanet(p, g);
+      }
+   }
+
+   private void drawPlanet(Planet p, Graphics g) {
       double[] coords = p.getCoords();
       final int X = (int)coords[0], Y = (int)coords[1];
       Color c = p.getColor();
@@ -45,12 +51,18 @@ public class DefaultVisualizer extends Visualizer {
    }
 
    @Override
-   protected void drawFleet(Fleet f, Graphics g) {
+   protected void drawFleets(Fleet[] fleets, Graphics g) {
+      for (Fleet f : fleets) {
+         drawFleet(f, g);
+      }
+   }
+
+   private void drawFleet(Fleet f, Graphics g) {
       if (f == null) {
          debug("wft?)')");
       }
-      
-      
+
+
       int arbitraryRadius = 10 + f.getNumUnits() / 5;
       double[] coords = f.getCoords();
       final int X = (int)coords[0], Y = (int)coords[1];
@@ -203,11 +215,16 @@ public class DefaultVisualizer extends Visualizer {
 
       int offset = 1;
       for (Player p : players) {
+         g.setColor(Color.DARK_GRAY);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset - 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset + 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10 - 1, FONT_HEIGHT * offset);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10 + 1, FONT_HEIGHT * offset);
          g.setColor(p.COLOR);
          g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset++);
       }
    }
-   
+
    @Override
    protected void newGame() {
       Explosion.clear();
