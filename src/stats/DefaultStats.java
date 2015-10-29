@@ -5,7 +5,7 @@ import galaxy.Stats;
 
 import java.util.LinkedList;
 
-public class DefaultStats extends Stats {
+public final class DefaultStats extends Stats {
    int wins = 0, losses = 0;
 
    public DefaultStats(Player p) {

@@ -4,9 +4,8 @@ public class Action {
    private final Planet START;
    private final Planet TARGET;
    private final int NUM_UNITS;
-   
-   Action(Planet start, Planet target, int numUnits, Player current) throws InvalidActionException {
 
+   Action(Planet start, Planet target, int numUnits, Player current) {
       if (start == null) {
          throw new InvalidActionException("Attempted to make action to send fleet from null planet.");
       }
@@ -24,14 +23,14 @@ public class Action {
       NUM_UNITS = numUnits;
    }
 
-   void doAction(int tic) {
+   final void doAction(int tic) {
       if (START != null && TARGET != null) {
          START.sendFleet(TARGET, NUM_UNITS);
       }
    }
 
    @Override
-   public String toString() {
+   public final String toString() {
       return START.ID + " " + NUM_UNITS + " " + TARGET.ID;
    }
 

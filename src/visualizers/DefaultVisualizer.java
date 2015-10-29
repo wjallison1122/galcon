@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -90,11 +89,6 @@ public class DefaultVisualizer extends Visualizer {
    protected void drawOther(Graphics g) {
       Explosion.drawAll(g);
       Explosion.updateAll();
-   }
-
-   @Override
-   protected void keystroke(KeyEvent e) {
-
    }
 
    Color invertColor(Color c) {

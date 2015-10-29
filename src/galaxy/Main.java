@@ -13,10 +13,8 @@ class Main extends GameSettings {
    static boolean skipGame = false;
 
    private Main() {
-      debug("Starting creation " + NUM_PLANETS);
       if (visualizer != null) {
-         Timer timer = new Timer();
-         timer.schedule(new TimerTask() {
+         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                if (!director.done()) {

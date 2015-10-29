@@ -10,7 +10,7 @@ enum SymmetryType {
    RADIAL,
 }
 
-class Galaxy {
+final class Galaxy {
    private static void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);

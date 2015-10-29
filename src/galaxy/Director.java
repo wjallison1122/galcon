@@ -3,7 +3,7 @@ package galaxy;
 import java.util.LinkedList;
 
 
-class Director {
+final class Director {
    private Player[] players = Main.players;
    private int rounds = 0, tic = 0;
    private Matcher mm = null;

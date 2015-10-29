@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public class Planet extends Unit {
+public final class Planet extends Unit {
    public static final int MAX_RADIUS = 50;
    public static final int MIN_RADIUS = 12;
    public static final int MAX_NEUTRAL_UNITS = 50;
