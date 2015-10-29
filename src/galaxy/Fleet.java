@@ -5,6 +5,8 @@ import java.util.LinkedList;
 
 public class Fleet extends Unit {
    public static final double SPEED = Main.FLEET_SPEED;
+   private static int id = 0;
+   public final int ID = id++;
 
    private final Planet DESTINATION;
 
