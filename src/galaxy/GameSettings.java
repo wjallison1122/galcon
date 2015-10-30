@@ -41,13 +41,13 @@ class GameSettings {
 
 
 
-   void debug(String str) {
+   final void debug(String str) {
       if (debugMode) {
          System.out.println(str);
       }
    }
 
-   static BufferedWriter makeLogFile(String filename) {
+   final static BufferedWriter makeLogFile(String filename) {
       try {
          return new BufferedWriter(new FileWriter(new File(filename)));
       } catch (IOException e) {
@@ -57,13 +57,13 @@ class GameSettings {
       }
    }
 
-   static String formatDate(Date date) {
+   final static String formatDate(Date date) {
       String str = "";
       str += date.getTime();
       return str;
    }
 
-   static int worldSize() {
+   final static int worldSize() {
       int prod = 1;
       for (int i : DIMENSIONS) {
          prod *= i;
