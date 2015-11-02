@@ -28,6 +28,7 @@ public class GraphicHolder {
         radius = planet.RADIUS;
         drawColor = planet.getColor();
         units = planet.getNumUnits();
+        production = planet.PRODUCTION_TIME;
     }
    
    public GraphicHolder(Fleet fleet) {
@@ -50,6 +51,7 @@ public class GraphicHolder {
     public double radius;
     public Color drawColor;
     public int units;
+    public int production;
     public double screenRadius;
     public Vector screenLocation;
 }

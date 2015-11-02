@@ -6,6 +6,7 @@ import galaxy.Planet;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class Camera {
     private double screenX;
     private double screenY;
     private Vector normal = new Vector();
-    private GraphicHolder[] drawList;
+    public GraphicHolder[] drawList;
     private Vector lateral = new Vector();
     private Vector horizontal = new Vector();
 
@@ -78,8 +79,8 @@ public class Camera {
                 g.setColor(Color.CYAN);
                 g.setFont(new Font("Arial", Font.PLAIN, fontSize));
                 g.drawString(unitStr,
-                		(int) (gh.screenLocation.x - fontXOffset * unitStr.length()) + x,
-                        (int) (gh.screenLocation.y + (fontSize - 1)/ 2) + y);
+                      (int) (gh.screenLocation.x - fontXOffset * unitStr.length()) + x,
+                      (int) (gh.screenLocation.y + (fontSize - 1)/ 2) + y);
             }
         }
     }
@@ -142,5 +143,6 @@ public class Camera {
         location = Vector.add(Vector.scale(normal, amt.y), location);
         location = Vector.add(Vector.scale(horizontal, amt.z), location);
     }
+    
 }
 
