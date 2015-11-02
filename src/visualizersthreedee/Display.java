@@ -66,7 +66,6 @@ public class Display extends Visualizer {
    private static final double AUTO_ROTATE_SPEED = 0.001;
    
    protected void drawMouseOverText(Graphics g) {
-      System.out.println(mouseOverInfo.timeToLive);
       if(mouseOverInfo.timeToLive > 0) {
          mouseOverInfo.timeToLive--;
          g.setFont(mouseOverFont);
@@ -130,7 +129,6 @@ public class Display extends Visualizer {
                mouseOverInfo.coords = mouseCoords;
                mouseOverInfo.text = "Production: " + gh.production;
                mouseOverInfo.timeToLive = 120;
-               System.out.println("FOUND");
                return;
             }
          }

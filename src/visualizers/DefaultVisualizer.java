@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -223,5 +224,11 @@ public class DefaultVisualizer extends Visualizer {
    @Override
    protected void newGame() {
       Explosion.clear();
+   }
+
+   @Override
+   protected void keystroke(KeyEvent e) {
+      // TODO Auto-generated method stub
+      
    }
 }
