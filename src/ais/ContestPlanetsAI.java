@@ -7,21 +7,24 @@ import galaxy.Player;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import visualizersthreedee.GraphicHolder;
 import ais.PlayerUtils.Location;
 import ais.PlayerUtils.PlanetOwner;
 
 public class ContestPlanetsAI extends Player {
-   private static final int MIN_AGGRESSIVE_DEFENSE = 10;
+   private static final int MIN_AGGRESSIVE_DEFENSE = 25;
    private static final int MIN_DEFENSIVE_DEFENSE = 1;
    private static final double BASE_DISTANCE_FACTOR = 10;
-   private static final double DISTANCE_WEIGHTING = 0.1;
+   private static final double DISTANCE_WEIGHTING = 0.2;
    private static final double AGGRESSION = 3;
    
    private boolean contest;
+   
+   private Set<Planet> mine;
    
    public ContestPlanetsAI() {
       this(Color.GREEN);
@@ -33,7 +36,7 @@ public class ContestPlanetsAI extends Player {
 
    public double getValue(Planet p, Location averageLocation, double variance) {
       double distanceFactor = (variance + BASE_DISTANCE_FACTOR) / (averageLocation.distance(p) + BASE_DISTANCE_FACTOR);
-      return (p.getColor().equals(Color.GRAY) ? 1.0 : AGGRESSION) * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.getColor().equals(Color.GRAY) ? 1.0 : AGGRESSION) * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.PRODUCTION_TIME / (10 + p.getNumUnits());
    }
    
    @Override
@@ -44,6 +47,11 @@ public class ContestPlanetsAI extends Player {
       }
       
       List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+      for (Planet p : myPlanets) {
+         if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) == PlayerUtils.PlanetOwner.PLAYER) {
+            mine.add(p);
+         }
+      }
       if (myPlanets.size() == 0) {
          return;
       }
@@ -52,13 +60,14 @@ public class ContestPlanetsAI extends Player {
       boolean defending = false;
       Planet target = null;
       int needed = 0;
-      for (Planet p : myPlanets) {
-         needed = 
-               PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this) -
-               p.getNumUnits() -
-               PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) +
-               MIN_DEFENSIVE_DEFENSE;
-         if (needed > 0) {
+      for (Planet p : mine) {
+         if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) != PlayerUtils.PlanetOwner.PLAYER) {
+            needed = 
+                  PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this) -
+                  p.getNumUnits() -
+                  PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) +
+                  MIN_DEFENSIVE_DEFENSE;
+            needed = Math.max(needed, 2);
             target = p;
             defending = true;
             break;
@@ -208,6 +217,7 @@ public class ContestPlanetsAI extends Player {
    
    @Override
    protected void newGame() {
+      mine = new HashSet<>();
       contest = true;
       
       List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
@@ -215,7 +225,7 @@ public class ContestPlanetsAI extends Player {
       List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
       
       if (myPlanets.size() != 1 || theirPlanets.size() != 1) {
-         throw new RuntimeException("Unexpected starting situation");
+         throw new RuntimeException("Unexpected starting situation MyPlanets: " + myPlanets.size() + " TheirPlanets: " + theirPlanets.size());
       }
       
       Planet me = myPlanets.get(0);

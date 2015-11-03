@@ -194,9 +194,7 @@ public class PlayerUtils {
    }
    
    public static List<Planet> getOpponentsPlanets(Planet[] planets, Player player) {
-      List<Planet> rtn = getOwnedPlanets(planets);
-      rtn.removeAll(getPlanetsOwnedByPlayer(planets,player));
-      return rtn;
+      return Arrays.asList(planets).stream().filter((p) -> p.ownedByOpponentOf(player)).collect(Collectors.toList());
    }
    
    public static Planet getNearestPlanet(Planet[] planets, Planet planet) {

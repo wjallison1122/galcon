@@ -2,6 +2,7 @@ package visualizersthreedee;
 
 import galaxy.Fleet;
 import galaxy.Planet;
+import galaxy.Unit;
 
 import java.awt.Color;
 
@@ -14,6 +15,7 @@ public class GraphicHolder {
    public static int[] DIMESIONS;
    
    public GraphicHolder(Planet planet) {
+        unit = planet;
         if (planet.getCoords().length == 2) {
            location = new Vector(
                  planet.getCoords()[0] - DIMESIONS[0] / 2,
@@ -32,6 +34,7 @@ public class GraphicHolder {
     }
    
    public GraphicHolder(Fleet fleet) {
+      unit = fleet;
       if (fleet.getCoords().length == 2) {
          location = new Vector(fleet.getCoords()[0] - DIMESIONS[0] / 2,
                fleet.getCoords()[1] - DIMESIONS[1] / 2, 0);
@@ -46,6 +49,7 @@ public class GraphicHolder {
       units = fleet.getNumUnits();
    }
    
+    public Unit unit;
     public String name;
     public Vector location;
     public double radius;
