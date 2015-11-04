@@ -3,6 +3,7 @@ package ais;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
+import galaxy.Unit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,10 @@ public class PlayerUtils {
       
       public Location(Planet p) {
          this(p.getCoords());
+      }
+      
+      public Location(Location other) {
+         this(other.coords);
       }
       
       public Location(double[] coords) {
@@ -298,6 +303,16 @@ public class PlayerUtils {
       NOBODY,
       PLAYER,
       OPPONENT;
+      
+      public static PlanetOwner getOwner(Unit u, Player p) {
+         if (u.ownedBy(p)) {
+            return PLAYER;
+         } else if (u.ownedByOpponentOf(p)) {
+            return OPPONENT;
+         } else {
+            return NOBODY;
+         }
+      }
    }
    
    public static PlanetOwner getCurrentEventualOwner(Planet p, Fleet[] fleets, Player player) {

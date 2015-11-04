@@ -27,11 +27,11 @@ public class DistanceValueDefenderAI extends Player {
    //*/
    
    public DistanceValueDefenderAI() {
-      super(new Color(40,0,0), "Value Defender AI");
+      super(new Color(40,0,0), "Distance Value Defender AI");
    }
    
    public DistanceValueDefenderAI(Color c) {
-      super(c, "Value Defender AI");
+      super(c, "Distance Value Defender AI");
    }
 
    public double getValue(Planet p, Location averageLocation, double variance) {
