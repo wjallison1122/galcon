@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import visualizersthreedee.GraphicHolder;
 import ais.PlayerUtils;
 import ais.PlayerUtils.Location;
 import ais.PlayerUtils.PlanetOwner;
@@ -108,7 +107,7 @@ public class CopyOfContestPlanetsAI extends Player {
    
    private void contest() {
       List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+//      List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
       
       if (take != null) {
          int toSendToTake = 0;

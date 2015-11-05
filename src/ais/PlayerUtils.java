@@ -1,5 +1,6 @@
 package ais;
 
+import galaxy.DimensionMismatchException;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
@@ -12,37 +13,36 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PlayerUtils {
-   
+
    public static class Location {
       private double[] coords;
-      public static class DimensionMismatchException extends RuntimeException {}
-      
+
       public Location(Planet p) {
          this(p.getCoords());
       }
-      
+
       public Location(Location other) {
          this(other.coords);
       }
-      
+
       public Location(double[] coords) {
          this.coords = new double[coords.length];
          for (int i = 0; i < coords.length; i++) {
             this.coords[i] = coords[i];
          }
       }
-      
+
       public Location(int dimension) {
          coords = new double[dimension];
          for (int i = 0; i < coords.length; i++) {
             coords[i] = 0;
          }
       }
-      
+
       public double distance(Planet other) {
          return distance(new Location(other));
       }
-      
+
       public double distance(Location other) {
          verifyMatchingDimensions(other);
          double sum = 0;
@@ -51,11 +51,11 @@ public class PlayerUtils {
          }
          return Math.sqrt(sum);
       }
-      
+
       public Location sum(Planet other) {
          return sum(new Location(other));
       }
-      
+
       public Location sum(Location other) {
          verifyMatchingDimensions(other);
          Location rtn = new Location(this.coords.length);
@@ -64,11 +64,11 @@ public class PlayerUtils {
          }
          return rtn;
       }
-      
+
       public Location difference(Planet other) {
          return difference(new Location(other));
       }
-      
+
       public Location difference(Location other) {
          verifyMatchingDimensions(other);
          Location rtn = new Location(this.coords.length);
@@ -77,7 +77,7 @@ public class PlayerUtils {
          }
          return rtn;
       }
-      
+
       public String toString() {
          StringBuilder rtn = new StringBuilder();
          rtn.append("<Location: ");
@@ -86,7 +86,7 @@ public class PlayerUtils {
          }
          return rtn.substring(0, rtn.length() - 3) + ">";
       }
-      
+
       public static Location center(@SuppressWarnings("rawtypes") List list) {
          Location[] locations = new Location[list.size()];
          for (int i = 0; i < list.size(); i++) {
@@ -100,7 +100,7 @@ public class PlayerUtils {
          }
          return center(locations);
       }
-      
+
       public static Location center(Location ... locations) {
          if (locations.length == 0) return null; //whoever would do this, screw you
          Location rtn = new Location(locations[0].coords.length);
@@ -115,7 +115,7 @@ public class PlayerUtils {
          }
          return rtn;
       }
-      
+
       public static double variance(@SuppressWarnings("rawtypes") List list) {
          Location[] locations = new Location[list.size()];
          for (int i = 0; i < list.size(); i++) {
@@ -129,7 +129,7 @@ public class PlayerUtils {
          }
          return variance(locations);
       }
-      
+
       public static double variance(Location ... locations) {
          Location average = center(locations);
          if (average == null) return 0;
@@ -150,14 +150,14 @@ public class PlayerUtils {
          }
          return Math.sqrt(rtn);
       }
-      
+
       private void verifyMatchingDimensions(Location other) {
          if (this.coords.length != other.coords.length) {
             throw new DimensionMismatchException();
          }
       }
    }
-   
+
    public static List<Planet> getPlanetsOwnedByPlayer(Planet[] planets, Player player) {
       ArrayList<Planet> rtn = new ArrayList<>();
       for (Planet p : planets) {
@@ -167,7 +167,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static List<Planet> getPlanetsNotOwnedByPlayer(Planet[] planets, Player player) {
       ArrayList<Planet> rtn = new ArrayList<>();
       for (Planet p : planets) {
@@ -177,7 +177,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static List<Planet> getUnoccupiedPlanets(Planet[] planets) {
       ArrayList<Planet> rtn = new ArrayList<>();
       for (Planet p : planets) {
@@ -187,7 +187,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static List<Planet> getOwnedPlanets(Planet[] planets) {
       ArrayList<Planet> rtn = new ArrayList<>();
       for (Planet p : planets) {
@@ -197,24 +197,24 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static List<Planet> getOpponentsPlanets(Planet[] planets, Player player) {
       return Arrays.asList(planets).stream().filter((p) -> p.ownedByOpponentOf(player)).collect(Collectors.toList());
    }
-   
+
    public static Planet getNearestPlanet(Planet[] planets, Planet planet) {
       double bestDistance = Double.MAX_VALUE;
       Planet rtn = null;
       for (Planet p : planets) {
          double thisDistance = planet.distanceTo(p);
          if (thisDistance < bestDistance) {
-             bestDistance = thisDistance;
-             rtn = p;
+            bestDistance = thisDistance;
+            rtn = p;
          }
       }
       return rtn;
    }
-   
+
    public static Planet getNearestNotOwnedPlanet(Planet[] planets, Planet planet, Player player) {
       double bestDistance = Double.MAX_VALUE;
       Planet rtn = null;
@@ -229,20 +229,20 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static Planet getNearestEnemyPlanet(Planet[] planets, Planet planet, Player player) {
       double bestDistance = Double.MAX_VALUE;
       Planet rtn = null;
       for (Planet p : getOpponentsPlanets(planets, player)) {
          double thisDistance = p.distanceTo(planet);
          if (thisDistance < bestDistance) {
-             bestDistance = thisDistance;
-             rtn = p;
+            bestDistance = thisDistance;
+            rtn = p;
          }
       }
       return rtn;
    }
-   
+
    public static int getIncomingFleetCount(Planet p, Fleet[] fleets) {
       int rtn = 0;
       for (Fleet f : fleets) {
@@ -252,7 +252,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static int getPlayersIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
       int rtn = 0;
       for (Fleet f : fleets) {
@@ -262,7 +262,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static int getOpponentsIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
       int rtn = 0;
       for (Fleet f : fleets) {
@@ -272,7 +272,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static List<Planet> sortByDistance(List<Planet> planets, Planet planet) {
       List<Planet> rtn = new ArrayList<Planet>(planets);
       Collections.sort(rtn, (a, b) -> {
@@ -280,30 +280,30 @@ public class PlayerUtils {
       });
       return rtn;
    }
-   
+
    public static List<Fleet> getMyFleets(Fleet[] fleets, Player player) {
       return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player)).collect(Collectors.toList());
    }
-   
+
    public static List<Fleet> getOpponentsFleets(Fleet[] fleets, Player player) {
       return Arrays.asList(fleets).stream().filter((fleet) -> !fleet.ownedBy(player)).collect(Collectors.toList());
    }
-   
+
    public static int getMyUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
       return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player)).collect(Collectors.summingInt((fleet) -> fleet.getNumUnits())) +
             Arrays.asList(planets).stream().filter((planet) -> planet.ownedBy(player)).collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
    }
-   
+
    public static int getOpponentUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
       return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedByOpponentOf(player)).collect(Collectors.summingInt((fleet) -> fleet.getNumUnits())) +
             Arrays.asList(planets).stream().filter((planet) -> planet.ownedByOpponentOf(player)).collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
    }
-   
+
    public static enum PlanetOwner {
       NOBODY,
       PLAYER,
       OPPONENT;
-      
+
       public static PlanetOwner getOwner(Unit u, Player p) {
          if (u.ownedBy(p)) {
             return PLAYER;
@@ -314,7 +314,7 @@ public class PlayerUtils {
          }
       }
    }
-   
+
    public static PlanetOwner getCurrentEventualOwner(Planet p, Fleet[] fleets, Player player) {
       PlanetOwner current;
       if (p.ownedBy(player)) {
@@ -359,7 +359,7 @@ public class PlayerUtils {
       }
       return current;
    }
-   
+
    public static Planet getNearestOwnedPlanet(Planet[] planets, Planet planet, Player player) {
       double bestDistance = Double.MAX_VALUE;
       Planet rtn = null;
@@ -375,7 +375,7 @@ public class PlayerUtils {
       }
       return rtn;
    }
-   
+
    public static int getEnemyUnitsOnPlanets(Planet[] planets, Player player) {
       int unitCount = 0;
       for(Planet p: planets) {
@@ -385,7 +385,7 @@ public class PlayerUtils {
       }
       return unitCount;
    }
-   
+
    public static int getMyUnitsOnPlanets(Planet[] planets, Player player) {
       int unitCount = 0;
       for(Planet p: planets) {
@@ -395,7 +395,7 @@ public class PlayerUtils {
       }
       return unitCount;
    }
-   
+
    public static int getEnemyUnitsInFleets(Fleet[] fleets, Player player) {
       int unitCount = 0;
       for(Fleet f: fleets) {
@@ -405,7 +405,7 @@ public class PlayerUtils {
       }
       return unitCount;
    }
-   
+
    public static int getMyUnitsInFleets(Fleet[] fleets, Player player) {
       int unitCount = 0;
       for(Fleet f: fleets) {

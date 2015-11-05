@@ -1,4 +1,4 @@
-package visualizersthreedee;
+package visualizers.threedimensiondefault;
 
 import galaxy.Fleet;
 import galaxy.Planet;
@@ -6,7 +6,6 @@ import galaxy.Planet;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**

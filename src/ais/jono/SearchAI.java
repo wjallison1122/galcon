@@ -6,19 +6,17 @@ import galaxy.Player;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerUtils;
 import ais.PlayerUtils.Location;
 import ais.PlayerUtils.PlanetOwner;
-import alphabeta.AlphaBeta;
-import alphabeta.Move;
-import alphabeta.Position;
+import ais.alphabeta.AlphaBeta;
+import ais.alphabeta.Move;
+import ais.alphabeta.Position;
 
 public class SearchAI extends Player {
    

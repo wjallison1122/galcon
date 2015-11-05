@@ -1,8 +1,6 @@
-package human;
+package ais.human;
 
-import galaxy.Action;
 import galaxy.Planet;
-import human.MeatSackAI.FutureAction;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -24,8 +22,9 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ais.PlayerUtils;
+import ais.human.MeatSackAI.FutureAction;
 
+@SuppressWarnings("serial")
 public class MeatSackDisplay extends JPanel {
    private JFrame myframe;
    private MeatSackAI player;

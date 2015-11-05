@@ -1,4 +1,4 @@
-package visualizersthreedee;
+package visualizers.threedimensiondefault;
 
 import java.awt.Color;
 

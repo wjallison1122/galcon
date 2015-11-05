@@ -1,21 +1,20 @@
-package ais;
+package ais.cody;
 
-import java.awt.Color;
-import java.util.List;
-import java.util.ArrayList;
-import visualizersthreedee.Vector;
-
+import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
-import galaxy.Main;
-import galaxy.Fleet;
+
+import java.awt.Color;
+import java.util.ArrayList;
+
+import ais.PlayerUtils;
 
 
 public class ValueCapture extends Player {
 	private static final double FUTURE_COEFFICIENT = 0;
 	private static final double DISTANCE_COEFFICIENT = 0;
-	private double health;
-	private Vector heart; 
+//	private double health;
+//	private Vector heart; 
 
    public ValueCapture() {
       super(new Color(255,255,255), "ValueCapture");
@@ -25,44 +24,44 @@ public class ValueCapture extends Player {
       super(c, "ValueCapture");
    }
    
-   private double planetValue(Planet p) {
-	   return p.getNumUnits() + FUTURE_COEFFICIENT * p.getProductionFrequency();
-   }
+//   private double planetValue(Planet p) {
+//	   return p.getNumUnits() + FUTURE_COEFFICIENT * p.getProductionFrequency();
+//   }
    
-   private void calculateHealth() {
-	   double[] planetPosition;
-	   Vector planetVector;
-	   Vector center = new Vector(0.,0.,0.);
-	   
-	   health = 0;
-	   heart = new Vector(0.,0.,0.);
-	   
-	   for (Planet p : this.planets) {
-		   this.health += planetValue(p);
-		   
-		   planetPosition = p.getCoords();
-		   planetVector = new Vector(planetPosition[0], planetPosition[1], planetPosition[2]);
-		   center = Vector.add(center, planetVector);
-		   planetVector = Vector.scale(planetVector, p.getNumUnits());
-		   heart = Vector.add(heart, planetVector);
-	   }
-	   
-	   heart = Vector.scale(heart, 1. / health);
-	   
-	   for (Planet p : this.planets) {
-		   this.health += p.getNumUnits();
-		   
-		   planetPosition = p.getCoords();
-		   planetVector = new Vector(planetPosition[0], planetPosition[1], planetPosition[2]);
-		   planetVector = Vector.scale(planetVector, p.getNumUnits());
-		   heart = Vector.add(heart, planetVector);
-	   }
-   }
+//   private void calculateHealth() {
+//	   double[] planetPosition;
+//	   Vector planetVector;
+//	   Vector center = new Vector(0.,0.,0.);
+//	   
+//	   health = 0;
+//	   heart = new Vector(0.,0.,0.);
+//	   
+//	   for (Planet p : this.planets) {
+//		   this.health += planetValue(p);
+//		   
+//		   planetPosition = p.getCoords();
+//		   planetVector = new Vector(planetPosition[0], planetPosition[1], planetPosition[2]);
+//		   center = Vector.add(center, planetVector);
+//		   planetVector = Vector.scale(planetVector, p.getNumUnits());
+//		   heart = Vector.add(heart, planetVector);
+//	   }
+//	   
+//	   heart = Vector.scale(heart, 1. / health);
+//	   
+//	   for (Planet p : this.planets) {
+//		   this.health += p.getNumUnits();
+//		   
+//		   planetPosition = p.getCoords();
+//		   planetVector = new Vector(planetPosition[0], planetPosition[1], planetPosition[2]);
+//		   planetVector = Vector.scale(planetVector, p.getNumUnits());
+//		   heart = Vector.add(heart, planetVector);
+//	   }
+//   }
    
    @Override
    protected void turn() {
       ArrayList<Planet> myPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsOwnedByPlayer(planets, this));
-      ArrayList<Planet> otherPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this));
+//      ArrayList<Planet> otherPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this));
       ArrayList<Planet> opponentsPlanets = new ArrayList<Planet>(PlayerUtils.getOpponentsPlanets(planets, this));
       ArrayList<Planet> neutralPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this));
       Planet target = null;
@@ -116,9 +115,9 @@ public class ValueCapture extends Player {
 	   return cost;
    }
    
-   private boolean alreadyAttacked(Planet target) {
-	   return (planetStrength(target) < 0);
-   }
+//   private boolean alreadyAttacked(Planet target) {
+//	   return (planetStrength(target) < 0);
+//   }
 
    private int planetStrength(Planet planet) {
 	   int myStrength;

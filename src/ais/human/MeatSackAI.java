@@ -1,12 +1,10 @@
-package human;
+package ais.human;
 
-import galaxy.Action;
 import galaxy.Planet;
 import galaxy.Player;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MeatSackAI extends Player {

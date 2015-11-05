@@ -1,4 +1,4 @@
-package visualizersthreedee;
+package visualizers.threedimensiondefault;
 
 import galaxy.Planet;
 

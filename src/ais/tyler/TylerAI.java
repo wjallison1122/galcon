@@ -1,10 +1,12 @@
-package ais;
+package ais.tyler;
 
 import java.awt.Color;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ais.PlayerUtils;
+import ais.PlayerUtils.PlanetOwner;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;

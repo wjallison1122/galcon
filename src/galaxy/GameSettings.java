@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.Date;
 
 import stats.DefaultStats;
-import visualizersthreedee.Display;
-import ais.ValueCapture;
+import visualizers.threedimensiondefault.Display;
+import ais.cody.ValueCapture;
 import ais.jono.DistanceValueDefenderAI;
 
 class GameSettings {

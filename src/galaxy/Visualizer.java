@@ -33,7 +33,7 @@ public abstract class Visualizer extends JPanel implements KeyListener, MouseLis
 
    protected Visualizer(int winWidth, int winHeight, int dimensions) {
       if (dimensions != Main.DIMENSIONS.length) {
-         throw new RuntimeException("Visualizer does not match galaxy dimension space.");
+         throw new DimensionMismatchException("Visualizer does not match galaxy dimension space.");
       }
 
       WIN_WIDTH = winWidth;
