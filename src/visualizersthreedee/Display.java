@@ -15,8 +15,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  *
@@ -27,6 +25,7 @@ public class Display extends Visualizer {
 
    public Display(int[] dimensions) {
       super(1600, 900, 3);
+      mouseOverInfo = mouseOver;
       this.addMouseMotionListener(ma);
       this.addMouseListener(ma);
       this.addMouseWheelListener(ma);
@@ -59,18 +58,28 @@ public class Display extends Visualizer {
    private double autoRotatePosition = 0.0;
    private static final double AUTO_ROTATE_SPEED = 0.001;
    
-   protected void drawMouseOverText(Graphics g) {
-      if(mouseOverInfo.timeToLive > 0) {
-         mouseOverInfo.timeToLive--;
-         g.setFont(mouseOverFont);
-         g.setColor(Color.WHITE);
-         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0] - 1, mouseOverInfo.coords[1]);
-         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0], mouseOverInfo.coords[1] - 1);
-         g.setColor(Color.LIGHT_GRAY);
-         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0], mouseOverInfo.coords[1]);
+   MouseOver mouseOver = new MouseOver();
+   
+   class MouseOver implements MouseOverInfo {
+      private Font mouseOverFont = new Font("Monospaced", Font.PLAIN, 12);
+      String text;
+      int coords[];
+      int timeToLive; //in frames
+
+      @Override
+      public void draw(Graphics g) {
+         if(timeToLive > 0) {
+            timeToLive--;
+            g.setFont(mouseOverFont);
+            g.setColor(Color.WHITE);
+            g.drawString(text, coords[0] - 1, coords[1]);
+            g.drawString(text, coords[0], coords[1] - 1);
+            g.setColor(Color.LIGHT_GRAY);
+            g.drawString(text, coords[0], coords[1]);
+         }
       }
    }
-
+   
    private MouseAdapter ma = new MouseAdapter() {
       @Override
       public void mouseDragged(MouseEvent me) {
@@ -120,14 +129,14 @@ public class Display extends Visualizer {
             distance = Math.sqrt(distance);
             
             if(distance < gh.screenRadius) {
-               mouseOverInfo.coords = mouseCoords;
-               mouseOverInfo.text = "Production: " + gh.production;
-               mouseOverInfo.timeToLive = 120;
+               mouseOver.coords = mouseCoords;
+               mouseOver.text = "Production: " + gh.production;
+               mouseOver.timeToLive = 120;
                return;
             }
          }
          //If no planet was clicked on remove any text that still exists
-         mouseOverInfo.timeToLive = 0;
+         mouseOver.timeToLive = 0;
       }
 
       @Override

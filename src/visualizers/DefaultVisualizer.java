@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -18,8 +18,28 @@ import javax.swing.ImageIcon;
 @SuppressWarnings("serial")
 public class DefaultVisualizer extends Visualizer {
 
+   class MouseOver implements MouseOverInfo {
+      private Font mouseOverFont = new Font("Monospaced", Font.PLAIN, 12);
+      String text;
+      int coords[];
+      int timeToLive; //in frames
+
+      @Override
+      public void draw(Graphics g) {
+         if(timeToLive > 0) {
+            timeToLive--;
+            g.setFont(mouseOverFont);
+            g.setColor(Color.LIGHT_GRAY);
+            g.drawString(text, coords[0], coords[1]);
+         }
+      }
+   }
+
+   MouseOver mouseOver = new MouseOver();
+
    public DefaultVisualizer(int [] dimensions) {
       super(dimensions[0], dimensions[1], 2);
+      mouseOverInfo = mouseOver;
    }
 
    private static final Image STAR_BACKGROUND = new ImageIcon("SpacePic.jpg").getImage();
@@ -48,8 +68,8 @@ public class DefaultVisualizer extends Visualizer {
       g.setColor(invertColor(c));
       g.setFont(FONT);
       g.drawString("" + p.getNumUnits(), (int)(X - 0.7 * Planet.MIN_RADIUS), (int)(Y + 0.7 * Planet.MIN_RADIUS));
-      
-      
+
+
       if (checkRecentlyConquered(p)) {
          new Explosion(coords[0], coords[1], p.RADIUS);
       }
@@ -226,9 +246,23 @@ public class DefaultVisualizer extends Visualizer {
       Explosion.clear();
    }
 
+
    @Override
-   protected void keystroke(KeyEvent e) {
-      // TODO Auto-generated method stub
-      
+   public void mousePress(MouseEvent e, Planet[] planets){
+      //Minuses are to offset it to the tip of the mouse pointer
+      int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
+
+      for(Planet p : planets) {
+         double tempCoords[] = {mouseCoords[0], mouseCoords[1] - p.RADIUS/2};
+         if(p.distanceTo(tempCoords) < p.RADIUS) {
+            mouseOver.coords = mouseCoords;
+            mouseOver.text = "Production: " + p.PRODUCTION_TIME;
+            mouseOver.timeToLive = 120;
+            return;
+         }
+      }
+
+      //If no planet was clicked on remove any text that still exists
+      mouseOver.timeToLive = 0;
    }
 }
