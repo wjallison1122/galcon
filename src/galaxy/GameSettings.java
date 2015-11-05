@@ -17,7 +17,7 @@ class GameSettings {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new DistanceValueDefenderAI(new Color(50,100,0)), new DistanceValueDefenderAI()};
+   static Player [] players = {new DistanceValueDefenderAI(new Color(50,100,0)), new ValueCapture()};
    
    static final int[] DIMENSIONS = {1000, 1000, 1000};
    static final int NUM_PLANETS = 16;

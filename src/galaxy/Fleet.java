@@ -31,7 +31,7 @@ public final class Fleet extends Unit {
       return distanceTo(DESTINATION);
    }
 
-   static Fleet[] getAllFleets() {
+   public static Fleet[] getAllFleets() {
       Fleet[] armada = new Fleet[fleets.size()];
       int i = 0;
       for (Fleet f : fleets) {
