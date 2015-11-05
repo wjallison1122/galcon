@@ -17,11 +17,11 @@ import ais.PlayerUtils.Location;
 import ais.PlayerUtils.PlanetOwner;
 
 public class ContestPlanetsAI extends Player {
-   private static final int MIN_AGGRESSIVE_DEFENSE = 25;
-   private static final int MIN_DEFENSIVE_DEFENSE = 1;
-   private static final double BASE_DISTANCE_FACTOR = 10;
+   private static final int MIN_AGGRESSIVE_DEFENSE = 10;
+   private static final int MIN_DEFENSIVE_DEFENSE = 2;
+   private static final double BASE_DISTANCE_FACTOR = 20;
    private static final double DISTANCE_WEIGHTING = 0.2;
-   private static final double AGGRESSION = 3;
+   private static final double AGGRESSION = 2.5;
    
    private boolean contest;
    
@@ -42,11 +42,6 @@ public class ContestPlanetsAI extends Player {
    
    @Override
    protected void turn() {
-      if (contest) {
-         contest();
-         return;
-      }
-      
       List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
       for (Planet p : myPlanets) {
          if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) == PlayerUtils.PlanetOwner.PLAYER) {
@@ -72,6 +67,13 @@ public class ContestPlanetsAI extends Player {
             target = p;
             defending = true;
             break;
+         }
+      }
+      
+      if (!defending) {
+         if (contest) {
+            contest();
+            return;
          }
       }
       
@@ -144,6 +146,8 @@ public class ContestPlanetsAI extends Player {
                if (toSend > 0) {
                   addAction(myPlanets.get(0), fleet.getDestination(), toSend);
                }
+               retake.remove(fleet.getDestination());
+               mine.add(fleet.getDestination());
             }
          }
       }
