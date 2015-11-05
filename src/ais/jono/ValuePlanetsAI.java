@@ -1,10 +1,12 @@
-package ais;
+package ais.jono;
 
 import galaxy.Planet;
 import galaxy.Player;
 
 import java.awt.Color;
 import java.util.List;
+
+import ais.PlanetUtils;
 
 public class ValuePlanetsAI extends Player {
    private static int MIN_DEFENSE = 15;

@@ -1,4 +1,4 @@
-package ais;
+package ais.jono;
 
 import galaxy.Fleet;
 import galaxy.Planet;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import ais.PlayerUtils;
 import ais.PlayerUtils.Location;
 import ais.PlayerUtils.PlanetOwner;
 import alphabeta.AlphaBeta;
