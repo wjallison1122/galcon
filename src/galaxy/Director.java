@@ -3,7 +3,7 @@ package galaxy;
 import java.util.LinkedList;
 
 
-class Director {
+final class Director {
    private Player[] players = Main.players;
    private int rounds = 0, tic = 0;
    private Matcher mm = null;
@@ -65,12 +65,16 @@ class Director {
 
       Galaxy.clear();
       Galaxy.generateRandomMap(active);
+      //Galaxy.generateSymmetricMap();
 
+      Player[] activeArray = new Player[active.size()];
+      int i = 0;
       for (Player p : active) {
          p.nextGame();
+         activeArray[i++] = p;
       }
 
-      Main.resetVisualizer();
+      Main.resetVisualizer(activeArray);
 
       mm.update();
       tic = 0;

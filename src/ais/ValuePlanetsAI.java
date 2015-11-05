@@ -1,12 +1,10 @@
 package ais;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-
-import galaxy.Action;
 import galaxy.Planet;
 import galaxy.Player;
+
+import java.awt.Color;
+import java.util.List;
 
 public class ValuePlanetsAI extends Player {
    private static int MIN_DEFENSE = 15;
@@ -51,7 +49,7 @@ public class ValuePlanetsAI extends Player {
       }
       
       if (available < needed) {
-         actions.clear();
+         clearActions();
       }
    }
 

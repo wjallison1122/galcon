@@ -1,7 +1,5 @@
 package galaxy;
 
-import human.MeatSackAI;
-
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +9,7 @@ import java.util.Date;
 
 import stats.DefaultStats;
 import visualizers.DefaultVisualizer;
-import visualizersthreedee.Display;
+import visualizersthreedee.*;
 import ais.*;
 
 class GameSettings {
@@ -19,19 +17,24 @@ class GameSettings {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new CaptureNearestAI(), new Cucucachu()};//new ValueDefenderAI()};
-
+   static Player [] players = {new DistanceValueDefenderAI(new Color(50,100,0)), new DistanceValueDefenderAI()};
+   
    static final int[] DIMENSIONS = {1000, 1000, 1000};
+   static final int NUM_PLANETS = 16;
+   static Visualizer visualizer = new Display(DIMENSIONS);
 
-   static final int PLANET_DENSITY = 25600000; // Planets per volume units
-   static final int NUM_PLANETS = worldSize() / PLANET_DENSITY;//16;
+//   static final int[] DIMENSIONS = {1280, 720};
+//   static final int NUM_PLANETS = 16;
+//   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
+
+
+
    public static final int FLEET_SPEED = 2;
 
    static final int PLAYERS_PER_GAME = 2;
    static final int NUM_ROUNDS = 5000;
 
    static final int FRAME_TIME = 10;
-   static Visualizer visualizer = new Display(DIMENSIONS);
    Director director = new Director();
 
    static Stats createStats(Player p) {
@@ -40,13 +43,13 @@ class GameSettings {
 
 
 
-   void debug(String str) {
+   final void debug(String str) {
       if (debugMode) {
          System.out.println(str);
       }
    }
 
-   static BufferedWriter makeLogFile(String filename) {
+   final static BufferedWriter makeLogFile(String filename) {
       try {
          return new BufferedWriter(new FileWriter(new File(filename)));
       } catch (IOException e) {
@@ -56,13 +59,13 @@ class GameSettings {
       }
    }
 
-   static String formatDate(Date date) {
+   final static String formatDate(Date date) {
       String str = "";
       str += date.getTime();
       return str;
    }
 
-   static int worldSize() {
+   final static int worldSize() {
       int prod = 1;
       for (int i : DIMENSIONS) {
          prod *= i;

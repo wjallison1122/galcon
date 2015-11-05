@@ -11,7 +11,7 @@ public abstract class Player {
 
    protected Planet[] planets = Planet.getAllPlanets();
    protected Fleet[] fleets;
-   protected LinkedList<Action> actions;
+   private LinkedList<Action> actions = new LinkedList<Action>();
 
 
    /*
@@ -37,7 +37,7 @@ public abstract class Player {
    protected abstract void newGame();
 
    final LinkedList<Action> getActions() {
-      return actions == null ? new LinkedList<Action>() : actions;
+      return actions;
    }
 
    final void doTurn() {
@@ -46,8 +46,10 @@ public abstract class Player {
       turn();
    }
    
-   protected void addAction(Planet start, Planet target, int numUnits) {
-      actions.add(new Action(start, target, numUnits, this));
+   protected final Action addAction(Planet start, Planet target, int numUnits) {
+      Action a = new Action(start, target, numUnits, this);
+      actions.add(a);
+      return a;
    }
    
    protected final void clearActions() {

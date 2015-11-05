@@ -27,7 +27,13 @@ public class DefaultVisualizer extends Visualizer {
    private static final Font FONT = new Font("Monospaced", Font.BOLD, 18);
 
    @Override
-   protected void drawPlanet(Planet p, Graphics g) {
+   protected void drawPlanets(Planet[] planets, Graphics g) {
+      for (Planet p : planets) {
+         drawPlanet(p, g);
+      }
+   }
+
+   private void drawPlanet(Planet p, Graphics g) {
       double[] coords = p.getCoords();
       final int X = (int)coords[0], Y = (int)coords[1];
       Color c = p.getColor();
@@ -42,15 +48,26 @@ public class DefaultVisualizer extends Visualizer {
       g.setColor(invertColor(c));
       g.setFont(FONT);
       g.drawString("" + p.getNumUnits(), (int)(X - 0.7 * Planet.MIN_RADIUS), (int)(Y + 0.7 * Planet.MIN_RADIUS));
+      
+      
+      if (checkRecentlyConquered(p)) {
+         new Explosion(coords[0], coords[1], p.RADIUS);
+      }
    }
 
    @Override
-   protected void drawFleet(Fleet f, Graphics g) {
+   protected void drawFleets(Fleet[] fleets, Graphics g) {
+      for (Fleet f : fleets) {
+         drawFleet(f, g);
+      }
+   }
+
+   private void drawFleet(Fleet f, Graphics g) {
       if (f == null) {
          debug("wft?)')");
       }
-      
-      
+
+
       int arbitraryRadius = 10 + f.getNumUnits() / 5;
       double[] coords = f.getCoords();
       final int X = (int)coords[0], Y = (int)coords[1];
@@ -71,12 +88,8 @@ public class DefaultVisualizer extends Visualizer {
 
    @Override
    protected void drawOther(Graphics g) {
-
-   }
-
-   @Override
-   protected void keystroke(KeyEvent e) {
-
+      Explosion.drawAll(g);
+      Explosion.updateAll();
    }
 
    Color invertColor(Color c) {
@@ -100,8 +113,6 @@ public class DefaultVisualizer extends Visualizer {
       public static final double DELTA_RADIUS_MIN = 0.05;
       public static final double DELTA_RADIUS_MAX = 0.2;
 
-      final int X, Y, RADIUS;
-
       /**
        * Creates an explosion at x, y. 
        * Explosions are a collection of particles created from x, y
@@ -117,14 +128,11 @@ public class DefaultVisualizer extends Visualizer {
        * @param y Y coord of planet
        * @param radius Radius of planet
        */
-      Explosion(int x, int y, int radius) {
-         X = x;
-         Y = y;
-         RADIUS = radius;
+      Explosion(double x, double y, int radius) {
          int numParticles = (MAX_PARTICLES_PER_EXPLOSION - MIN_PARTICLES_PER_EXPLOSION) * 
-               (RADIUS - Planet.MIN_RADIUS) / (Planet.MAX_RADIUS - Planet.MIN_RADIUS);
+               (radius - Planet.MIN_RADIUS) / (Planet.MAX_RADIUS - Planet.MIN_RADIUS);
          while (numParticles-- > 0) {
-            new Particle();
+            new Particle(x, y, radius);
          }
          explosions.add(this);
       }
@@ -167,12 +175,12 @@ public class DefaultVisualizer extends Visualizer {
       private class Particle {
          private double x, y, dx, dy, radius, dradius;
 
-         Particle() {
+         Particle(double px, double py, int pRad) {
             double theta = Math.random() * 2 * Math.PI;
-            double pRad = Math.random() * RADIUS;
+            double rad = Math.random() * pRad;
             double pSpeed = Math.random() * (PARTICLE_SPEED_MAX - PARTICLE_SPEED_MIN) + PARTICLE_SPEED_MIN;
-            x = X + pRad * Math.cos(theta);
-            y = Y + pRad * Math.sin(theta);
+            x = px + rad * Math.cos(theta);
+            y = py + rad * Math.sin(theta);
             dx = pSpeed * Math.cos(theta);
             dy = pSpeed * Math.sin(theta);
             radius = Math.random() * (RADIUS_MAX - RADIUS_MIN) + RADIUS_MIN;
@@ -203,13 +211,24 @@ public class DefaultVisualizer extends Visualizer {
 
       int offset = 1;
       for (Player p : players) {
+         g.setColor(Color.DARK_GRAY);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset - 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset + 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10 - 1, FONT_HEIGHT * offset);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10 + 1, FONT_HEIGHT * offset);
          g.setColor(p.COLOR);
          g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset++);
       }
    }
-   
+
    @Override
    protected void newGame() {
       Explosion.clear();
+   }
+
+   @Override
+   protected void keystroke(KeyEvent e) {
+      // TODO Auto-generated method stub
+      
    }
 }

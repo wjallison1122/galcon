@@ -6,13 +6,14 @@ import galaxy.Player;
 import galaxy.Visualizer;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,6 +22,7 @@ import java.util.TimerTask;
  *
  * @author Jono
  */
+@SuppressWarnings("serial")
 public class Display extends Visualizer {
 
    public Display(int[] dimensions) {
@@ -31,27 +33,21 @@ public class Display extends Visualizer {
       this.addKeyListener(ka);
       this.setFocusable(true);
       this.setBackground(Color.black);
-      displayCamera = new Camera(new Vector(-1700, 0, 475));
+      displayCamera = new Camera(new Vector(-1700, 0, 475), () -> {
+         if (autoRotate) {
+            autoRotatePosition += AUTO_ROTATE_SPEED;
+            displayCamera.location = new Vector(
+                  -1700 * Math.cos(autoRotatePosition), 
+                  -1700 * Math.sin(autoRotatePosition),
+                  475);
+            displayCamera.vRot = -Math.PI / 10;
+            displayCamera.hRot = -autoRotatePosition;
+         } else {
+            displayCamera.moveCamera(Vector.scale(cameraSpeed, .005));
+         }
+      });
       displayCamera.vRot = -Math.PI / 16;
       GraphicHolder.DIMESIONS = dimensions;
-      
-      Timer timer = new Timer();
-      timer.schedule(new TimerTask() {
-         @Override
-         public void run() {
-            if (autoRotate) {
-               autoRotatePosition += AUTO_ROTATE_SPEED;
-               displayCamera.location = new Vector(
-                     -1700 * Math.cos(autoRotatePosition), 
-                     -1700 * Math.sin(autoRotatePosition),
-                     475);
-               displayCamera.vRot = -Math.PI / 10;
-               displayCamera.hRot = -autoRotatePosition;
-            } else {
-               displayCamera.moveCamera(Vector.scale(cameraSpeed, .005));
-            }
-         }
-      }, 0, 10);
    }
 
    public Camera displayCamera;
@@ -62,6 +58,18 @@ public class Display extends Visualizer {
    private boolean autoRotate = true;
    private double autoRotatePosition = 0.0;
    private static final double AUTO_ROTATE_SPEED = 0.001;
+   
+   protected void drawMouseOverText(Graphics g) {
+      if(mouseOverInfo.timeToLive > 0) {
+         mouseOverInfo.timeToLive--;
+         g.setFont(mouseOverFont);
+         g.setColor(Color.WHITE);
+         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0] - 1, mouseOverInfo.coords[1]);
+         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0], mouseOverInfo.coords[1] - 1);
+         g.setColor(Color.LIGHT_GRAY);
+         g.drawString(mouseOverInfo.text, mouseOverInfo.coords[0], mouseOverInfo.coords[1]);
+      }
+   }
 
    private MouseAdapter ma = new MouseAdapter() {
       @Override
@@ -93,10 +101,33 @@ public class Display extends Visualizer {
          mousey = me.getY();
          mouseDown = false;
       }
-
+      
       @Override
-      public void mousePressed(MouseEvent me) {
+      public void mousePressed(MouseEvent e) {
          requestFocus(true);
+
+         //Minuses are to offset it to the tip of the mouse pointer
+         int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
+         for(GraphicHolder gh : displayCamera.drawList) {
+            double tempCoords[] = {mouseCoords[0], mouseCoords[1] - gh.screenRadius/2};
+            double scrLoc[] = {gh.screenLocation.x + 780, gh.screenLocation.y + 400};
+            
+            //Calculate distance
+            double distance = 0;
+            for (int i = 0; i < 2; i++) {
+               distance += Math.pow(scrLoc[i] - tempCoords[i], 2);
+            }
+            distance = Math.sqrt(distance);
+            
+            if(distance < gh.screenRadius) {
+               mouseOverInfo.coords = mouseCoords;
+               mouseOverInfo.text = "Production: " + gh.production;
+               mouseOverInfo.timeToLive = 120;
+               return;
+            }
+         }
+         //If no planet was clicked on remove any text that still exists
+         mouseOverInfo.timeToLive = 0;
       }
 
       @Override
@@ -169,35 +200,54 @@ public class Display extends Visualizer {
          }
       }
    };
-   
+
    private List<Planet> planets;
    private List<Fleet> fleets;
-   
+
    @Override
    protected void newGame() {
       // TODO Auto-generated method stub
-      
+
    }
 
    @Override
-   protected void drawPlanet(Planet p, Graphics g) {
-      planets.add(p);
+   protected void drawPlanets(Planet[] p, Graphics g) {
+      planets = new LinkedList<Planet>();
+      for (Planet pl : p) {
+         planets.add(pl);
+      }
    }
 
    @Override
-   protected void drawFleet(Fleet f, Graphics g) {
-      fleets.add(f);
+   protected void drawFleets(Fleet[] f, Graphics g) {
+      fleets = new LinkedList<Fleet>();
+      for (Fleet fl : f) {
+         fleets.add(fl);
+      }
    }
 
    @Override
    protected void drawBackground(Graphics g) {
-      planets = new ArrayList<>();
-      fleets = new ArrayList<>();
+      //      planets = new ArrayList<>();
+      //      fleets = new ArrayList<>();
    }
 
    @Override
    protected void drawPlayerInfo(Player[] players, Graphics g) {
-      // TODO Auto-generated method stub
+      final int FONT_HEIGHT = 40;
+      Font font = new Font("Monospaced", Font.PLAIN, FONT_HEIGHT);
+      g.setFont (font);
+      
+      int offset = 1;
+      for (Player p : players) {
+         g.setColor(Color.DARK_GRAY);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset - 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset + 1);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 9, FONT_HEIGHT * offset);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 11, FONT_HEIGHT * offset);
+         g.setColor(p.COLOR);
+         g.drawString(p.NAME + ": " + numUnitsOwnedBy(p), 10, FONT_HEIGHT * offset++);
+      }
    }
 
    @Override
@@ -210,6 +260,6 @@ public class Display extends Visualizer {
 
    @Override
    protected void keystroke(KeyEvent e) {
-      
+
    }
 }

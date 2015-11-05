@@ -1,6 +1,5 @@
 package ais;
 
-import galaxy.Action;
 import galaxy.Planet;
 import galaxy.Player;
 
@@ -19,7 +18,7 @@ public class ValueDefenderAI extends Player {
    }
 
    public double getValue(Planet p) {
-      return (p.getColor().equals(Color.GRAY) ? 1000.0 : 800.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
+      return (p.ownedByOpponentOf(this) ? 1400.0 : 1000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
    }
    
    @Override
@@ -27,7 +26,7 @@ public class ValueDefenderAI extends Player {
       List<Planet> myPlanets = PlanetUtils.getPlanetsOwnedByPlayer(planets, this);
       List<Planet> otherPlanets = PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this);
       
-      boolean defending = false;
+//      boolean defending = false;
       
       Planet target = null;
       int needed = 0;
@@ -38,7 +37,7 @@ public class ValueDefenderAI extends Player {
                PlanetUtils.getPlayersIncomingFleetCount(p, fleets, this) +
                MIN_DEFENSE;
          if (needed > 0) {
-            defending = true;
+//            defending = true;
             target = p;
             break;
          }
@@ -74,7 +73,7 @@ public class ValueDefenderAI extends Player {
       }
       
       if (available < needed) {
-         actions.clear();
+         clearActions();
       }
    }
 

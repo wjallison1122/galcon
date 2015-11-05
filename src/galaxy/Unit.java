@@ -2,10 +2,11 @@ package galaxy;
 
 import java.awt.Color;
 
-abstract class Unit {
+public abstract class Unit {
    Player owner;
    private double[] coords;
    int numUnits;
+   public Color debugColor = null;
 
    Unit(Player owner, int numUnits, double ... coords) {
       this.owner = owner;
@@ -13,7 +14,7 @@ abstract class Unit {
       this.coords = coords;
    }
 
-   protected void debug(String str) {
+   protected final void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);
       }
@@ -23,34 +24,34 @@ abstract class Unit {
       return owner;
    }
 
-   public double[] getCoords() {
+   public final double[] getCoords() {
       return coords.clone();
    }
 
-   void setCoords(double ... coords) {
+   final void setCoords(double ... coords) {
       if (coords.length != Main.DIMENSIONS.length) {
          throw new RuntimeException("Invalid dimensions of coordinates given.");
       }
       this.coords = coords.clone();
    }
 
-   public Color getColor() {
-      return owner == null ? Color.GRAY : owner.COLOR;
+   public final Color getColor() {
+      return Main.debugMode && debugColor != null ? debugColor : (owner == null ? Color.GRAY : owner.COLOR);
    }
 
-   public int getNumUnits() {
+   public final int getNumUnits() {
       return numUnits;
    }
 
-   public boolean ownedBy(Player player) {
+   public final boolean ownedBy(Player player) {
       return Player.areEqual(owner, player);
    }
    
-   public boolean ownedByOpponentOf(Player p) {
+   public final boolean ownedByOpponentOf(Player p) {
       return !isNeutral() && !ownedBy(p);
    }
    
-   public boolean isNeutral() {
+   public final boolean isNeutral() {
       return owner == null;
    }
 
@@ -60,15 +61,15 @@ abstract class Unit {
     * @param player
     * @return
     */
-   public static boolean unitOwnedBy(Unit u, Player p) {
+   public final static boolean unitOwnedBy(Unit u, Player p) {
       return u == null ? false : u.ownedBy(p);
    }
 
-   public static boolean unitOwnedByOpponentOf(Unit u, Player p) {
+   public final static boolean unitOwnedByOpponentOf(Unit u, Player p) {
       return u == null ? false : u.ownedByOpponentOf(p);
    }
 
-   public double distanceTo(double ... otherCoords) {
+   public final double distanceTo(double ... otherCoords) {
       double sum = 0;
       for (int i = 0; i < Main.DIMENSIONS.length; i++) {
          sum += Math.pow(coords[i] - otherCoords[i], 2);
@@ -76,7 +77,7 @@ abstract class Unit {
       return Math.sqrt(sum);
    }
 
-   public double distanceTo(Unit u) {
+   public final double distanceTo(Unit u) {
       return distanceTo(u.getCoords());
    }
 }

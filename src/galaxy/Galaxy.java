@@ -10,7 +10,7 @@ enum SymmetryType {
    RADIAL,
 }
 
-class Galaxy {
+final class Galaxy {
    private static void debug(String str) {
       if (Main.debugMode) {
          System.out.println(str);
@@ -35,6 +35,16 @@ class Galaxy {
 
    static void generateSymmetricMap(SymmetryType symmetry) {
 
+   }
+   
+   static void generateSymmetricMap() {
+	  Planet.generateCenterPlanet();
+	  Planet.generateSymmetricStartingPlanets();
+      for (int i = 0; i < Main.NUM_PLANETS / Main.players.length; i++) {
+         Planet.generateSymmetricPlanets();
+      }
+
+      debug("Made planets");
    }
 
    static Player isGameOver() {

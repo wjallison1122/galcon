@@ -4,7 +4,9 @@ import galaxy.Fleet;
 import galaxy.Planet;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
@@ -24,16 +26,21 @@ public class Camera {
     private double screenX;
     private double screenY;
     private Vector normal = new Vector();
-    private GraphicHolder[] drawList;
+    public GraphicHolder[] drawList;
     private Vector lateral = new Vector();
     private Vector horizontal = new Vector();
+    private Runnable onDraw;
 
-    public Camera(Vector _location) {
+    public Camera(Vector _location, Runnable onDraw) {
         location = _location;
+        this.onDraw = onDraw;
     }
 
     public void draw(List<Planet> planetList, List<Fleet> fleetList, Graphics g, int x, int y) {
+        onDraw.run();
         precalcDrawing();
+        int fontSize = 12;
+        double fontXOffset = fontSize / 3;
         drawList = new GraphicHolder[planetList.size() + fleetList.size()];
         for (int i = 0; i < planetList.size(); i++) {
             GraphicHolder h = new GraphicHolder(planetList.get(i));
@@ -70,6 +77,13 @@ public class Camera {
                         (int) (gh.screenLocation.y - gh.screenRadius) + y,
                         (int) (gh.screenRadius * 2),
                         (int) (gh.screenRadius * 2));
+                //draw unit value
+                String unitStr = Integer.toString(gh.units);
+                g.setColor(Color.CYAN);
+                g.setFont(new Font("Arial", Font.PLAIN, fontSize));
+                g.drawString(unitStr,
+                      (int) (gh.screenLocation.x - fontXOffset * unitStr.length()) + x,
+                      (int) (gh.screenLocation.y + (fontSize - 1)/ 2) + y);
             }
         }
     }
@@ -132,5 +146,6 @@ public class Camera {
         location = Vector.add(Vector.scale(normal, amt.y), location);
         location = Vector.add(Vector.scale(horizontal, amt.z), location);
     }
+    
 }
 

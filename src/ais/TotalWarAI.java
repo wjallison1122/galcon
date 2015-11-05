@@ -6,10 +6,10 @@ import galaxy.Player;
 import java.awt.Color;
 import java.util.List;
 
-public class ValueDefenderBeater extends Player {
+public class TotalWarAI extends Player {
 
-   public ValueDefenderBeater() {
-      super(Color.BLUE, "Value Defender Beater");
+   public TotalWarAI() {
+      super(Color.WHITE, "Total War AI");
    }
 
    @Override
@@ -21,9 +21,9 @@ public class ValueDefenderBeater extends Player {
 
    @Override
    protected void turn() {
-      List<Planet> myPlanets = PlanetUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> otherPlanets = PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this);
-      List<Planet> opponentsPlanets = PlanetUtils.getOpponentsPlanets(planets, this);
+      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+      List<Planet> opponentsPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
       
       Planet smallestUnoccupied = otherPlanets.stream().min((a,b) -> Integer.compare(a.getNumUnits(), b.getNumUnits())).get();
       
@@ -32,7 +32,7 @@ public class ValueDefenderBeater extends Player {
          addAction(myPlanets.get(0), smallestUnoccupied, smallestUnoccupied.getNumUnits() + 1);
       }
       
-      if (opponentsPlanets.size() == 1) {
+      if (opponentsPlanets.size() > 0) {
          Planet target = opponentsPlanets.get(0);
          for (Planet p : myPlanets) {
             addAction(p,target,1000);
