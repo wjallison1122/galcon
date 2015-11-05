@@ -110,7 +110,7 @@ public class ValueCapture extends Player {
 	   }
 	   else {
 		   if (target.getNumUnits() < attacker.getNumUnits()) {
-			   cost = ((double)planetStrength(target) + 1) + (target.getProductionFrequency() * (target.distanceTo(attacker.getCoords()) / Main.FLEET_SPEED));
+			   cost = ((double)planetStrength(target) + 1) + (target.getProductionFrequency() * (target.distanceTo(attacker.getCoords()) / Fleet.SPEED));
 		   }
 	   }
 	   return cost;

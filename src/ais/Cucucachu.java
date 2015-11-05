@@ -3,8 +3,9 @@ package ais;
 import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
-import visualizersthreedee.Vector;
 
+import visualizersthreedee.Vector;
+import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 import galaxy.Main;
@@ -90,7 +91,7 @@ public class Cucucachu extends Player {
    private double costOfPlanet(Planet attacker, Planet target) {
 	   if (target.getNumUnits() >= attacker.getNumUnits())
 		   return Double.MAX_VALUE;
-	   return (target.getNumUnits() + 1) * target.PRODUCTION_TIME + (target.distanceTo(attacker.getCoords()) * Main.FLEET_SPEED);
+	   return (target.getNumUnits() + 1) * target.PRODUCTION_TIME + (target.distanceTo(attacker.getCoords()) * Fleet.SPEED);
    }
 
    @Override

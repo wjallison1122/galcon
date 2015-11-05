@@ -7,7 +7,7 @@ public abstract class Player {
    public final Color COLOR;
    public final String NAME;
    private static int currentId = 0;
-   final int ID = currentId++;
+   public final int ID = currentId++;
 
    protected Planet[] planets = Planet.getAllPlanets();
    protected Fleet[] fleets;
@@ -45,7 +45,7 @@ public abstract class Player {
       fleets = Fleet.getAllFleets();
       turn();
    }
-   
+
    protected final Action addAction(Planet start, Planet target, int numUnits) {
       Action a = new Action(start, target, numUnits, this);
       actions.add(a);

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Main extends GameSettings {
+public final class Main extends GameSettings {
    public static void main(String[] args) {
       new Main();
    }

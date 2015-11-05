@@ -6,7 +6,7 @@ public abstract class Unit {
    Player owner;
    private double[] coords;
    int numUnits;
-   public Color debugColor = null;
+   public Color debugColor;
 
    Unit(Player owner, int numUnits, double ... coords) {
       this.owner = owner;
@@ -20,7 +20,7 @@ public abstract class Unit {
       }
    }
 
-   Player getOwner() {
+   public final Player getOwner() {
       return owner;
    }
 
@@ -35,6 +35,7 @@ public abstract class Unit {
       this.coords = coords.clone();
    }
 
+   @SuppressWarnings("unused")
    public final Color getColor() {
       return Main.debugMode && debugColor != null ? debugColor : (owner == null ? Color.GRAY : owner.COLOR);
    }

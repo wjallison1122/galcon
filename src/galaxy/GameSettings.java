@@ -8,13 +8,12 @@ import java.io.IOException;
 import java.util.Date;
 
 import stats.DefaultStats;
-import visualizers.DefaultVisualizer;
-import visualizersthreedee.*;
-import ais.*;
-import ais.jono.*;
+import visualizersthreedee.Display;
+import ais.ValueCapture;
+import ais.jono.DistanceValueDefenderAI;
 
 class GameSettings {
-   static boolean debugMode = false, logGame = false;
+   static final boolean debugMode = false, logGame = false;
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
@@ -30,27 +29,27 @@ class GameSettings {
 
 
 
-   public static final int FLEET_SPEED = 2;
+   static final int FLEET_SPEED = 2;
 
    static final int PLAYERS_PER_GAME = 2;
    static final int NUM_ROUNDS = 5000;
 
    static final int FRAME_TIME = 10;
-   Director director = new Director();
+   static final Director director = new Director();
 
-   static Stats createStats(Player p) {
+   static final Stats createStats(Player p) {
       return new DefaultStats(p);
    }
 
 
 
-   final void debug(String str) {
+   static final void debug(String str) {
       if (debugMode) {
          System.out.println(str);
       }
    }
 
-   final static BufferedWriter makeLogFile(String filename) {
+   static final BufferedWriter makeLogFile(String filename) {
       try {
          return new BufferedWriter(new FileWriter(new File(filename)));
       } catch (IOException e) {
@@ -60,13 +59,13 @@ class GameSettings {
       }
    }
 
-   final static String formatDate(Date date) {
+   static final String formatDate(Date date) {
       String str = "";
       str += date.getTime();
       return str;
    }
 
-   final static int worldSize() {
+   static final int worldSize() {
       int prod = 1;
       for (int i : DIMENSIONS) {
          prod *= i;
