@@ -50,7 +50,7 @@ public class MeatSackDisplay extends JPanel {
    public MeatSackDisplay(MeatSackAI ai) {
       this.player = ai;
       
-      MeatSackDisplay display = this;
+      final MeatSackDisplay display = this;
       
       myframe = new JFrame() {{
          this.setSize((int) (1280 * SCALE), (int) (800 * SCALE) + 32);
