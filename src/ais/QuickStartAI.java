@@ -48,8 +48,8 @@ public class QuickStartAI extends Player {
    }
    
    public double getValue(Planet p) {
-      Planet nearestEnemy = PlanetUtils.getNearestEnemyPlanet(planets, p, this);
-      Planet nearestOwn = PlanetUtils.getNearestOwnedPlanet(planets, p, this);
+      Planet nearestEnemy = PlayerUtils.getNearestEnemyPlanet(planets, p, this);
+      Planet nearestOwn = PlayerUtils.getNearestOwnedPlanet(planets, p, this);
       double distToAlly = nearestOwn != null ? p.distanceTo(nearestOwn) : 9999;
       double distToEnemy = nearestEnemy != null ? p.distanceTo(nearestEnemy) : 9999;
       double value;
@@ -76,10 +76,10 @@ public class QuickStartAI extends Player {
    
    @Override
    protected void turn() {
-      List<Planet> myPlanets = PlanetUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> enemyPlanets = PlanetUtils.getOpponentsPlanets(planets, this);
-      List<Planet> otherPlanets = PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this);
-      List<Planet> unnocPlanets = PlanetUtils.getUnoccupiedPlanets(planets);
+      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+      List<Planet> enemyPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+      List<Planet> unnocPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
       List<Planet> sortedByValue;
       double safety;
       double threat;
@@ -88,10 +88,10 @@ public class QuickStartAI extends Player {
       int totalNeededUnits = 0;
       int totalExtraUnits = 0;
       
-      int myTotalPlanetUnits = PlanetUtils.getMyUnitsOnPlanets(planets, this);
-      int myTotalFleetUnits = PlanetUtils.getMyUnitsInFleets(fleets, this);
-      int enemyTotalPlanetUnits = PlanetUtils.getEnemyUnitsOnPlanets(planets, this);
-      int enemyTotalFleetUnits = PlanetUtils.getEnemyUnitsInFleets(fleets, this);
+      int myTotalPlanetUnits = PlayerUtils.getMyUnitsOnPlanets(planets, this);
+      int myTotalFleetUnits = PlayerUtils.getMyUnitsInFleets(fleets, this);
+      int enemyTotalPlanetUnits = PlayerUtils.getEnemyUnitsOnPlanets(planets, this);
+      int enemyTotalFleetUnits = PlayerUtils.getEnemyUnitsInFleets(fleets, this);
       myTotalUnits = myTotalPlanetUnits + myTotalFleetUnits;
       enemyTotalUnits = enemyTotalPlanetUnits + enemyTotalFleetUnits;
       

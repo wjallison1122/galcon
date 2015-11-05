@@ -24,7 +24,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ais.PlanetUtils;
+import ais.PlayerUtils;
 
 public class MeatSackDisplay extends JPanel {
    private JFrame myframe;

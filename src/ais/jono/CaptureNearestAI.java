@@ -6,7 +6,7 @@ import galaxy.Player;
 import java.awt.Color;
 import java.util.List;
 
-import ais.PlanetUtils;
+import ais.PlayerUtils;
 
 public class CaptureNearestAI extends Player {
 
@@ -21,13 +21,13 @@ public class CaptureNearestAI extends Player {
 
    @Override
    protected void turn() {
-      List<Planet> myPlanets = PlanetUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> otherPlanets = PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this);
+      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
       
       for (Planet p : myPlanets) {
-         for (Planet pOther : PlanetUtils.sortByDistance(otherPlanets, p)) {
-            if (p.getNumUnits() - PlanetUtils.getIncomingFleetCount(p, fleets) > 3 * pOther.getNumUnits()) {
-               int currentCount = PlanetUtils.getPlayersIncomingFleetCount(pOther, fleets, this);
+         for (Planet pOther : PlayerUtils.sortByDistance(otherPlanets, p)) {
+            if (p.getNumUnits() - PlayerUtils.getIncomingFleetCount(p, fleets) > 3 * pOther.getNumUnits()) {
+               int currentCount = PlayerUtils.getPlayersIncomingFleetCount(pOther, fleets, this);
                if (currentCount == 0) {
                   addAction(p, pOther, 2 * pOther.getNumUnits());
                   break;

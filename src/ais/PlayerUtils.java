@@ -359,4 +359,60 @@ public class PlayerUtils {
       }
       return current;
    }
+   
+   public static Planet getNearestOwnedPlanet(Planet[] planets, Planet planet, Player player) {
+      double bestDistance = Double.MAX_VALUE;
+      Planet rtn = null;
+      for (Planet p : planets) {
+         //Get the nearest owned planet that is not the planet being checked
+         if (p.ownedBy(player) && !p.equals(planet)) {
+            double thisDistance = planet.distanceTo(p);
+            if (thisDistance < bestDistance) {
+               bestDistance = thisDistance;
+               rtn = p;
+            }
+         }
+      }
+      return rtn;
+   }
+   
+   public static int getEnemyUnitsOnPlanets(Planet[] planets, Player player) {
+      int unitCount = 0;
+      for(Planet p: planets) {
+         if(!p.ownedBy(player) && !p.isNeutral()) {
+            unitCount += p.getNumUnits();
+         }
+      }
+      return unitCount;
+   }
+   
+   public static int getMyUnitsOnPlanets(Planet[] planets, Player player) {
+      int unitCount = 0;
+      for(Planet p: planets) {
+         if(p.ownedBy(player)) {
+            unitCount += p.getNumUnits();
+         }
+      }
+      return unitCount;
+   }
+   
+   public static int getEnemyUnitsInFleets(Fleet[] fleets, Player player) {
+      int unitCount = 0;
+      for(Fleet f: fleets) {
+         if(!f.ownedBy(player) && !f.isNeutral()) {
+            unitCount += f.getNumUnits();
+         }
+      }
+      return unitCount;
+   }
+   
+   public static int getMyUnitsInFleets(Fleet[] fleets, Player player) {
+      int unitCount = 0;
+      for(Fleet f: fleets) {
+         if(f.ownedBy(player)) {
+            unitCount += f.getNumUnits();
+         }
+      }
+      return unitCount;
+   }
 }

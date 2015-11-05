@@ -59,10 +59,10 @@ public class Cucucachu extends Player {
    
    @Override
    protected void turn() {
-      ArrayList<Planet> myPlanets = new ArrayList<Planet>(PlanetUtils.getPlanetsOwnedByPlayer(planets, this));
-      ArrayList<Planet> otherPlanets = new ArrayList<Planet>(PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this));
-      ArrayList<Planet> opponentsPlanets = new ArrayList<Planet>(PlanetUtils.getOpponentsPlanets(planets, this));
-      ArrayList<Planet> neutralPlanets = new ArrayList<Planet>(PlanetUtils.getPlanetsNotOwnedByPlayer(planets, this));
+      ArrayList<Planet> myPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsOwnedByPlayer(planets, this));
+      ArrayList<Planet> otherPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this));
+      ArrayList<Planet> opponentsPlanets = new ArrayList<Planet>(PlayerUtils.getOpponentsPlanets(planets, this));
+      ArrayList<Planet> neutralPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this));
       Planet target = null;
       Planet attacker = null;
       double least;
