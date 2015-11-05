@@ -29,12 +29,15 @@ public class Camera {
     public GraphicHolder[] drawList;
     private Vector lateral = new Vector();
     private Vector horizontal = new Vector();
+    private Runnable onDraw;
 
-    public Camera(Vector _location) {
+    public Camera(Vector _location, Runnable onDraw) {
         location = _location;
+        this.onDraw = onDraw;
     }
 
     public void draw(List<Planet> planetList, List<Fleet> fleetList, Graphics g, int x, int y) {
+        onDraw.run();
         precalcDrawing();
         int fontSize = 12;
         double fontXOffset = fontSize / 3;

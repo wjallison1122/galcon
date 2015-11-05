@@ -13,12 +13,7 @@ public class EButton extends JButton {
    
    public EButton(String text, Runnable action) {
       super(text);
-      this.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            action.run();
-         }
-      });
+      addAction(action);
    }
    
    public void addAction(Runnable action) {

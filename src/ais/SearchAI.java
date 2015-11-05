@@ -6,7 +6,9 @@ import galaxy.Player;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +20,12 @@ import alphabeta.Move;
 import alphabeta.Position;
 
 public class SearchAI extends Player {
+   
+   private static enum Limit {TIME, DEPTH};
+   private static final Limit LIMIT = Limit.TIME;
+   private static final int SEARCH_DEPTH = 6;
+   private static final int SEARCH_TIME_MILLIS = 1000;
+   private static final int FORCE_UPDATE_DELAY = 1000;
    
    private Set<Integer> knownFleets;
    
@@ -34,30 +42,58 @@ public class SearchAI extends Player {
 
       @Override
       public List<Move> getMoves() {
+         int myUnits = 0;
+         int theirUnits = 0;
+         for (SearchPlanet p : planets) {
+            if (p.owner.equals(PlanetOwner.PLAYER)) {
+               myUnits += p.units;
+            }
+            if (p.owner.equals(PlanetOwner.OPPONENT)) {
+               theirUnits += p.units;
+            }
+         }
+         for (FutureAction fa : actions) {
+            if (fa != null) {
+               if (fa.owner.equals(PlanetOwner.PLAYER)) {
+                  myUnits += fa.count;
+               }
+               if (fa.owner.equals(PlanetOwner.OPPONENT)) {
+                  theirUnits += fa.count;
+               }
+            }
+         }
+         if (myUnits == 0 || theirUnits == 0) {
+            return new ArrayList<>();
+         }
          List<Move> potentialMoves = new ArrayList<>();
          potentialMoves.add(null);
          for (SearchPlanet p : planets) {
             if (playersTurn ? p.owner.equals(PlanetOwner.PLAYER) : p.owner.equals(PlanetOwner.OPPONENT)) {
                for (int i = 0; i < planets.size(); i++) {
-                  if (!p.equals(planets.get(i))) {
-                     if (p.units > 1) {
+                  final int finali = i;
+                  if (planets.get(i).owner.equals(PlanetOwner.NOBODY) && !actions.stream().anyMatch(fa -> fa != null && fa.target == finali)) {
+                     if (p.units > planets.get(i).units + 1) {
+                        potentialMoves.add(new FutureAction(p.base, i, p.owner, planets.get(i).units + 1, 
+                              (int) Math.ceil(p.location.distance(planets.get(i).location) / Fleet.SPEED)));
+                     }
+                  } else if (!p.equals(planets.get(i))) {
+                     if (p.units > 0) {
                         potentialMoves.add(new FutureAction(p.base, i, p.owner, 1,
-                              (int) Math.ceil(p.location.distance(planets.get(i).location)/Fleet.SPEED)));
-                        if (p.units > 10) {
-                           potentialMoves.add(new FutureAction(p.base, i, p.owner, 10,
-                                 (int) Math.ceil(p.location.distance(planets.get(i).location)/Fleet.SPEED)));
-                           potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units - 1,
-                                 (int) Math.ceil(p.location.distance(planets.get(i).location)/Fleet.SPEED)));
-                        }
-                        if (p.units > 50) {
-                           potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units / 2,
-                                 (int) Math.ceil(p.location.distance(planets.get(i).location)/Fleet.SPEED)));
-                        }
+                              (int) Math.ceil(p.location.distance(planets.get(i).location) / Fleet.SPEED)));
+                     }
+                     if (p.units > 1) {
+                        potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units,
+                              (int) Math.ceil(p.location.distance(planets.get(i).location) / Fleet.SPEED)));
+                     }
+                     if (p.units > 40) {
+                        potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units / 2,
+                              (int) Math.ceil(p.location.distance(planets.get(i).location) / Fleet.SPEED)));
                      }
                   }
                }
             }
          }
+         
          return potentialMoves;
       }
 
@@ -111,42 +147,13 @@ public class SearchAI extends Player {
                }
             }
          }
-         return (int) ((myProduction - theirProduction) * 10000000) + myUnits - theirUnits;
-      }
-      
-      public int evaluate(boolean dummy) {
-         double myProduction = 0;
-         double theirProduction = 0;
-         for (int i = 0; i < planets.size(); i++) {
-            PlanetOwner eventualOwner = getEventualOwner(planets.get(i), i, actions, dummy);
-            System.out.println("Eventual owner of " + i + " is: " + eventualOwner + ". Actions length: " + actions.size());
-            if (eventualOwner.equals(PlanetOwner.PLAYER)) {
-               myProduction += 1.0 / planets.get(i).productionDelay;
-            } else if (eventualOwner.equals(PlanetOwner.OPPONENT)) {
-               theirProduction += 1.0 / planets.get(i).productionDelay;
-            }
+         if (myUnits == 0) {
+            return -1000000000;
          }
-         int myUnits = 0;
-         int theirUnits = 0;
-         for (SearchPlanet p : planets) {
-            if (p.owner.equals(PlanetOwner.PLAYER)) {
-               myUnits += p.units;
-            }
-            if (p.owner.equals(PlanetOwner.OPPONENT)) {
-               theirUnits += p.units;
-            }
+         if (theirUnits == 0) {
+            return 1000000000;
          }
-         for (FutureAction fa : actions) {
-            if (fa != null) {
-               if (fa.owner.equals(PlanetOwner.PLAYER)) {
-                  myUnits += fa.count;
-               }
-               if (fa.owner.equals(PlanetOwner.OPPONENT)) {
-                  theirUnits += fa.count;
-               }
-            }
-         }
-         return (int) ((myProduction - theirProduction) * 10000000) + myUnits - theirUnits;
+         return (int) ((myProduction - theirProduction) * 100000) + myUnits - theirUnits;
       }
 
       @Override
@@ -231,44 +238,6 @@ public class SearchAI extends Player {
       }
    }
    
-   private static PlanetOwner getEventualOwner(SearchPlanet p, int index, List<FutureAction> actions, boolean dummy) {
-      PlanetOwner current = p.owner;
-      int updateCount = p.updateCount % p.productionDelay;
-      int previousUnits = 0;
-      int unitCount = p.units;
-      int currentTime = 0;
-      for (FutureAction a : actions) {
-         System.out.println("Action target: " + a.target + " index: " + index);
-      }
-      actions = actions.stream().filter(fa -> fa != null && fa.target == index).sorted((a, b) -> Integer.compare(a.time, b.time)).collect(Collectors.toList());
-      System.out.println("Relevant actions length: " + actions.size());
-      for (FutureAction fa : actions) {
-         if (fa != null) {
-            int passingTime = fa.time - currentTime;
-            if (current != PlanetOwner.NOBODY) {
-               updateCount += passingTime;
-               int unitsToAdd = (updateCount + p.productionDelay - 1) / p.productionDelay - previousUnits;
-               previousUnits += unitsToAdd;
-               unitCount += unitsToAdd;
-            }
-            if (fa.owner == current) {
-               unitCount += fa.count;
-            } else {
-               unitCount -= fa.count;
-               if (unitCount == 0) {
-                  current = PlanetOwner.NOBODY;
-               }
-               if (unitCount < 0) {
-                  unitCount = -unitCount;
-                  current = fa.owner;
-               }
-            }
-            currentTime += passingTime;
-         }
-      }
-      return current;
-   }
-   
    private static PlanetOwner getEventualOwner(SearchPlanet p, int index, List<FutureAction> actions) {
       PlanetOwner current = p.owner;
       int updateCount = p.updateCount % p.productionDelay;
@@ -331,7 +300,20 @@ public class SearchAI extends Player {
          }
       }
       
-      if (analyzeTickTime++ % 1000 == 0) {
+      Iterator<Integer> iter = knownFleets.iterator();
+      IteratorLoop:
+      while (iter.hasNext()) {
+         int fleetId = iter.next();
+         for (Fleet f : fleets) {
+            if (f.ID == fleetId) {
+               continue IteratorLoop;
+            }
+         }
+         analyzeTickTime = 0;
+         iter.remove();
+      }
+      
+      if (analyzeTickTime++ % FORCE_UPDATE_DELAY == 0) {
          List<SearchPlanet> searchPlanets = new ArrayList<>();
          for (Planet p : planets) {
             searchPlanets.add(new SearchPlanet(p, this));
@@ -344,7 +326,12 @@ public class SearchAI extends Player {
          GamePosition position = new GamePosition(searchPlanets, actions);
          System.out.println("Starting analysis. Eval " + ++count + ": " + position.evaluate());
          AlphaBeta ab = new AlphaBeta(position);
-         FutureAction fa = (FutureAction) ab.analyzeDepth(8);
+         FutureAction fa;
+         if (LIMIT == Limit.TIME) {
+            fa = (FutureAction) ab.analyze(SEARCH_TIME_MILLIS);
+         } else {
+            fa = (FutureAction) ab.analyzeDepth(SEARCH_DEPTH);
+         }
          System.out.println("Analysis Complete");
          if (fa != null) {
             analyzeTickTime = 0;

@@ -33,27 +33,21 @@ public class Display extends Visualizer {
       this.addKeyListener(ka);
       this.setFocusable(true);
       this.setBackground(Color.black);
-      displayCamera = new Camera(new Vector(-1700, 0, 475));
+      displayCamera = new Camera(new Vector(-1700, 0, 475), () -> {
+         if (autoRotate) {
+            autoRotatePosition += AUTO_ROTATE_SPEED;
+            displayCamera.location = new Vector(
+                  -1700 * Math.cos(autoRotatePosition), 
+                  -1700 * Math.sin(autoRotatePosition),
+                  475);
+            displayCamera.vRot = -Math.PI / 10;
+            displayCamera.hRot = -autoRotatePosition;
+         } else {
+            displayCamera.moveCamera(Vector.scale(cameraSpeed, .005));
+         }
+      });
       displayCamera.vRot = -Math.PI / 16;
       GraphicHolder.DIMESIONS = dimensions;
-
-      Timer timer = new Timer();
-      timer.schedule(new TimerTask() {
-         @Override
-         public void run() {
-            if (autoRotate) {
-               autoRotatePosition += AUTO_ROTATE_SPEED;
-               displayCamera.location = new Vector(
-                     -1700 * Math.cos(autoRotatePosition), 
-                     -1700 * Math.sin(autoRotatePosition),
-                     475);
-               displayCamera.vRot = -Math.PI / 10;
-               displayCamera.hRot = -autoRotatePosition;
-            } else {
-               displayCamera.moveCamera(Vector.scale(cameraSpeed, .005));
-            }
-         }
-      }, 0, 10);
    }
 
    public Camera displayCamera;

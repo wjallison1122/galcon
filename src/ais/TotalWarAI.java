@@ -9,7 +9,7 @@ import java.util.List;
 public class TotalWarAI extends Player {
 
    public TotalWarAI() {
-      super(Color.WHITE, "Value Defender Beater");
+      super(Color.WHITE, "Total War AI");
    }
 
    @Override

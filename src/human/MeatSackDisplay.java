@@ -90,7 +90,6 @@ public class MeatSackDisplay extends JPanel {
       sendUnitsButton.setEnabled(false);
       controls.add(sendUnitsButton);
       controls.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-      controls.add(new EButton("Finish Turn", () -> player.finishTurns(1)));
       
       final EButton autoAdvanceButton = new EButton(player.getAutoAdvance() ? "Turn Auto Advance Off" : "Turn Auto Advance On");
       autoAdvanceButton.addAction(() -> {
@@ -99,7 +98,9 @@ public class MeatSackDisplay extends JPanel {
       });
       controls.add(autoAdvanceButton);
       
-      controls.add(new EButton("Finish 20 turns", () -> {
+      controls.add(new EButton("Finish Turn", () -> player.finishTurns(1)));
+      
+      controls.add(new EButton("Finish 20", () -> {
          player.finishTurns(20);
       }));
       
