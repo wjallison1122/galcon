@@ -10,7 +10,7 @@ import galaxy.Player;
 public class ValueDefenderBeater extends Player {
 
    public ValueDefenderBeater() {
-      super(Color.WHITE, "Value Defender Beater");
+      super(Color.BLUE, "Value Defender Beater");
    }
 
    @Override

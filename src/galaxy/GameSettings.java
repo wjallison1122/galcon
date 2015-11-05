@@ -19,13 +19,13 @@ class GameSettings {
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
 
-   static Player [] players = {new ValueDefenderAI(new Color(0,40,0)), new ValueDefenderAI()};
+   static Player [] players = {new CaptureNearestAI(), new Cucucachu()};//new ValueDefenderAI()};
 
    static final int[] DIMENSIONS = {1000, 1000, 1000};
 
-   static final int PLANET_DENSITY = 6400000; // Planets per volume units
+   static final int PLANET_DENSITY = 25600000; // Planets per volume units
    static final int NUM_PLANETS = worldSize() / PLANET_DENSITY;//16;
-   static final int FLEET_SPEED = 2;
+   public static final int FLEET_SPEED = 2;
 
    static final int PLAYERS_PER_GAME = 2;
    static final int NUM_ROUNDS = 5000;

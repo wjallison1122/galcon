@@ -134,6 +134,10 @@ public class Planet extends Unit {
          }
       }
    }
+   
+   public double getProductionFrequency() {
+	  return 1. / (double)this.PRODUCTION_TIME;
+   }
 
    boolean checkRecentlyConquered() {
       boolean recent = recentlyConquered;
