@@ -11,6 +11,7 @@ import stats.DefaultStats;
 import visualizers.DefaultVisualizer;
 import visualizersthreedee.*;
 import ais.*;
+import ais.jono.*;
 
 class GameSettings {
    static boolean debugMode = false, logGame = false;
