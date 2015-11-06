@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import ais.PlayerUtils;
-import ais.PlayerUtils.PlanetOwner;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
@@ -24,6 +23,10 @@ public class TylerAI extends Player {
 
    public TylerAI() {
       super(Color.GREEN, "Tyler");
+   }
+   
+   public TylerAI(Color c) {
+      super(c, "Tyler");
    }
    
    @Override
@@ -89,7 +92,11 @@ public class TylerAI extends Player {
    
    // The higher the value, the better the planet is
    private int planetValue(Planet p) {
-      return -p.getNumUnits();
+      //return -p.getNumUnits();
+      
+      int value1 = (int) (p.PRODUCTION_TIME + p.getNumUnits() * 5);// + p.distanceTo(p1) / 5);
+      value1 += p.getColor().equals(Color.GRAY) ? 0 : 2;
+      return -value1;
    }
 
    ///////////////////////
@@ -145,37 +152,6 @@ public class TylerAI extends Player {
          }
       }
    }
-   
-   private void pseudoRandomAI() {
-      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
-      
-      greedySort(otherPlanets);
-      
-      for (Planet p : myPlanets) {
-         if (p.getNumUnits() > 10) {
-            int rand = (int)(Math.random() * 2);
-            int index = 0;
-            while (rand % 2 != 0) {
-               index++;
-               rand = (int)(Math.random() * 2);
-            }
-            if (otherPlanets.size() > 0) {
-               addAction(p, otherPlanets.get(index % otherPlanets.size()), 1);
-            }
-         }
-      }
-   }
-   
-//   private void randomAI() {
-//      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-//      
-//      for (Planet p : myPlanets) {
-//         if (p.getNumUnits() > 10) {
-//            addAction(p, planets[(int)(Math.random() * planets.length)], 1);
-//         }
-//      }
-//   }
 
    ///////////////////////
    //     UTILITES      //
