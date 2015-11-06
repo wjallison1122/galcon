@@ -10,19 +10,19 @@ import java.util.ArrayList;
 import ais.PlayerUtils;
 
 
-public class ValueCapture extends Player {
+public class TheGeneral extends Player {
 	private static final double FUTURE_COEFFICIENT = 1;
 	private static final double DISTANCE_COEFFICIENT = .3;
 	private static final double ATTACK_THRESHOLD = 0;
 //	private double health;
 //	private Vector heart; 
 
-   public ValueCapture() {
-      super(new Color(255,255,255), "ValueCapture");
+   public TheGeneral() {
+      super(Color.ORANGE, "The General");
    }
    
-   public ValueCapture(Color c) {
-      super(c, "ValueCapture");
+   public TheGeneral(Color c) {
+      super(c, "The General");
    }
    
 //   private double planetValue(Planet p) {
