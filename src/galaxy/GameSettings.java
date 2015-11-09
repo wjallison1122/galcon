@@ -9,15 +9,16 @@ import java.util.Date;
 
 import stats.DefaultStats;
 import visualizers.threedimensiondefault.Display;
-import ais.cody.ValueCapture;
+import ais.cody.*;
 import ais.jono.DistanceValueDefenderAI;
 
 class GameSettings {
    static final boolean debugMode = false, logGame = false;
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
-
-   static Player [] players = {new DistanceValueDefenderAI(new Color(50,100,0)), new ValueCapture()};
+   static Player p1 = new DistanceValueDefenderAI(new Color(50, 100, 0));
+   static Player p2 = new TheGeneral();
+   static Player [] players = {p1, p2};
    
    static final int[] DIMENSIONS = {1000, 1000, 1000};
    static final int NUM_PLANETS = 16;
