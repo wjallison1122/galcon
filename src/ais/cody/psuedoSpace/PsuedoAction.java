@@ -16,5 +16,9 @@ public class PsuedoAction {
 		   return new PsuedoFleet(this);
 	   }
 	   
+	   public String toString() {
+		   return "Sending " + numUnits + " from " + from.strength + " to " + to.strength;
+	   }
+	   
 }
 

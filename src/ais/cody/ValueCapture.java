@@ -24,10 +24,6 @@ public class ValueCapture extends Player {
       super(c, "ValueCapture");
    }
    
-//   private double planetValue(Planet p) {
-//	   return p.getNumUnits() + FUTURE_COEFFICIENT * p.getProductionFrequency();
-//   }
-   
    private void calculateHealth() {
 	   double[] planetPosition;
 	   Vector planetVector;

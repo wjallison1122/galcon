@@ -76,4 +76,8 @@ public class Vector {
     public String toString(){
         return "{"+x+", "+y+", "+z+"}";
     }
+    
+    public boolean equals(Vector other) {
+    	return (x == other.x && y == other.y && z == other.z);
+    }
 }

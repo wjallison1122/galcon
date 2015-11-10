@@ -6,6 +6,7 @@ import galaxy.Player;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import ais.PlayerUtils;
 import ais.cody.psuedoSpace.PsuedoPlanet;
@@ -19,9 +20,11 @@ public class TheGeneral extends Player {
 	private double health;
 	private Vector heart; 
 	private PsuedoGalaxy psuedoGalaxy;
+	private ArrayList<Move> potentialMoves;
 	
    public TheGeneral() {
       super(Color.ORANGE, "The General");
+	  potentialMoves = new ArrayList<Move>();
    }
    
 //   private double planetValue(Planet p) {
@@ -52,10 +55,16 @@ public class TheGeneral extends Player {
       
       calculateHealth();
       psuedoGalaxy = new PsuedoGalaxy(planets, fleets, this);
-      findBestActions();
+      //System.out.println(psuedoGalaxy);
+      findBestActions(psuedoGalaxy);
+      if (potentialMoves.size() > 0) {
+    	  potentialMoves.get(0).commit();
+    	  //System.out.println("Picked move: " + potentialMoves.get(0));
+      }
+      
    }
    
-   private void findBestActions() {
+   private void findBestAction(PsuedoGalaxy psuedoGalaxy) {
       PsuedoPlanet target = null;
       ArrayList<PsuedoPlanet> attackers = new ArrayList<PsuedoPlanet>();      
       int[] unitsToSend;
@@ -121,7 +130,82 @@ public class TheGeneral extends Player {
 	  }
 	  
 	  move.commit();
-   }
+   }   
+   
+   private void findBestActions(PsuedoGalaxy psuedoGalaxy) {
+      ArrayList<PsuedoPlanet> attackers;      
+      int[] unitsToSend;
+      int i;
+      double distance;
+      double cost;
+      double weightedCost;
+      double targetCost = 0;
+      int strength;
+      int totalToSend;
+      boolean canAttack;
+      Move move;
+      potentialMoves = new ArrayList<Move>();
+      
+	  for (PsuedoPlanet to : psuedoGalaxy.psuedoPlanets) {
+		  totalToSend = 0;
+		  move = new Move();
+		  cost = costOfPlanet(to);
+		  weightedCost = cost;
+		  distance = to.distanceTo(Vector.getCoords(heart));
+		  weightedCost += DISTANCE_COEFFICIENT * distance;
+		  weightedCost -= (FUTURE_COEFFICIENT * to.productionFrequency);
+		  move.weightedCost = weightedCost;
+	  
+		  // determine who should send units
+		  if (cost >= 0) {
+			  attackers = new ArrayList<PsuedoPlanet>();
+			  //System.out.print("New possible move:");
+		      targetCost = costOfPlanet(to);
+	    	  for (PsuedoPlanet from : psuedoGalaxy.myPlanets()) {
+	    		  if (psuedoGalaxy.psuedoPlanetStrength(from) < -1) {
+	    			  attackers.add(from);
+	    		  }
+	    	  }
+	    	  
+			  if (!attackers.isEmpty()) {
+				  unitsToSend = new int[attackers.size()];
+		    	  canAttack = true;
+				  while (totalToSend <= targetCost && canAttack) {
+		    		  canAttack = false;
+		    		  i = 0;
+
+			    	  for (PsuedoPlanet from : attackers) {
+			    		  if (!from.equals(to)) {
+				    		  strength = psuedoGalaxy.psuedoPlanetStrength(from);
+				    		  if (-strength - unitsToSend[i] > 2) {
+				    			  unitsToSend[i]++;
+				    			  totalToSend++;
+				    			  canAttack = true;
+				    		  }
+			    		  }
+			    		  i++;
+			    	  }
+		    	  }
+				  
+				  if (canAttack && totalToSend > targetCost) {
+		    		  i = 0;
+		    		  for (PsuedoPlanet from : attackers) {
+		    			  move.addPsuedoAction(new PsuedoAction(from, to, -(unitsToSend[i])));
+		    			  i++;
+		    		  }
+		    		  move.unitsSent = totalToSend;
+		    		  //System.out.println(move);
+					  potentialMoves.add(move);
+				  }
+			  }
+		  }
+	  }
+
+	  Collections.sort(potentialMoves);
+	  for (Move potentialMove : potentialMoves)
+		  if (potentialMove.weightedCost <= 0)
+			  potentialMoves.remove(potentialMove);
+	}
    
    // How many units will it take to capture a planet?
    private double costOfPlanet(PsuedoPlanet target) {
@@ -153,8 +237,11 @@ public class TheGeneral extends Player {
       return null;
    }
   
-   private class Move {
+   private class Move implements Comparable<Move> {
 	   ArrayList<PsuedoAction> psuedoActions;
+	   PsuedoPlanet to;
+	   double weightedCost;
+	   int unitsSent;
 	   	   
 	   public Move() {
 		   psuedoActions = new ArrayList<PsuedoAction>();
@@ -162,13 +249,24 @@ public class TheGeneral extends Player {
 	   
 	   public void addPsuedoAction(PsuedoAction psuedoAction) {
 		   psuedoActions.add(psuedoAction);
+		   to = psuedoAction.to;
 	   }
 	   
 	   public void commit() {
 		   for (PsuedoAction psuedoAction: psuedoActions) {
+			   //System.out.println("  Commiting action " + psuedoAction);
 			   addAction(psuedoAction.from.realPlanet, psuedoAction.to.realPlanet, -psuedoAction.numUnits);
 		   }
 	   }
+
+		@Override
+		public int compareTo(Move other) {
+			return (int)this.weightedCost - (int)other.weightedCost;
+		}
+		
+		public String toString() {
+			return "Send " + unitsSent + " units to planet with " + to.strength + " units"; 
+		}
    }
    
 }

@@ -38,4 +38,8 @@ public class PsuedoFleet {
 	public boolean mine() {
 		return strength < 0;
 	}
+	
+	public String toString() {
+		return "Fleet: Sending " + strength + " units to planet " + target.strength;
+	}
 }

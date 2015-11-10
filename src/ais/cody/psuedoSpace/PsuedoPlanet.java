@@ -63,4 +63,12 @@ public class PsuedoPlanet {
 	   public boolean mine() {
 		   return strength < 0;
 	   }
+	   
+	   public String toString() {
+		   return "Planet: strength " + strength;
+	   }
+	   
+	   public boolean equals(PsuedoPlanet other) {
+		   return (position.equals(other.position) && strength == other.strength);
+	   }
 }
