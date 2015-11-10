@@ -115,6 +115,44 @@ public class PlayerUtils {
          }
          return rtn;
       }
+      
+      public static Location getProductionWeightedCenter(List<Planet> list) {
+         if (list.size() == 0) return null; //whoever would do this, screw you
+         Location rtn = new Location(list.get(0).getCoords().length);
+         double weights = 0;
+         for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < rtn.coords.length; j++) {
+               rtn.coords[j] += list.get(i).getCoords()[j] * list.get(i).getProductionFrequency();
+               weights += list.get(i).getProductionFrequency();
+            }
+         }
+         if (weights == 0) {
+            weights = 1;
+         }
+         for (int j = 0; j < rtn.coords.length; j++) {
+            rtn.coords[j] = rtn.coords[j] / list.size() / weights;
+         }
+         return rtn;
+      }
+
+      public static Location getUnitCountWeightedCenter(List<Planet> list) {
+         if (list.size() == 0) return null; //whoever would do this, screw you
+         Location rtn = new Location(list.get(0).getCoords().length);
+         double weights = 0;
+         for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < rtn.coords.length; j++) {
+               rtn.coords[j] += list.get(i).getCoords()[j] * list.get(i).getNumUnits();
+               weights += list.get(i).getNumUnits();
+            }
+         }
+         if (weights == 0) {
+            weights = 1;
+         }
+         for (int j = 0; j < rtn.coords.length; j++) {
+            rtn.coords[j] = rtn.coords[j] / list.size() / weights;
+         }
+         return rtn;
+      }
 
       public static double variance(@SuppressWarnings("rawtypes") List list) {
          Location[] locations = new Location[list.size()];
@@ -143,12 +181,20 @@ public class PlayerUtils {
             }
          }
          double rtn = 0.0;
-         if (locations.length > 2) {
+         if (locations.length >= 2) {
             for (int i = 0; i < values.length; i++) {
                rtn += values[i] / (locations.length - 1);
             }
          }
          return Math.sqrt(rtn);
+      }
+
+      public Location multiply(double value) {
+         Location rtn = new Location(this);
+         for (int i = 0; i < rtn.coords.length; i++) {
+            rtn.coords[i] *= value;
+         }
+         return rtn;
       }
 
       private void verifyMatchingDimensions(Location other) {
