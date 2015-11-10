@@ -29,7 +29,7 @@ public class Display extends Visualizer {
       this.addMouseMotionListener(ma);
       this.addMouseListener(ma);
       this.addMouseWheelListener(ma);
-      this.addKeyListener(ka);
+      this.addKeyListener(this);
       this.setFocusable(true);
       this.setBackground(Color.black);
       displayCamera = new Camera(new Vector(-1700, 0, 475), () -> {
@@ -150,65 +150,63 @@ public class Display extends Visualizer {
             displayCamera.zoom = 1000;
       }
    };
-   public KeyAdapter ka = new KeyAdapter() {
-      @Override
-      public void keyPressed(KeyEvent e) {
-         System.out.println(e.getKeyCode());
-         switch (e.getKeyCode()) {
-         case 37: // right
-            //go right
-            cameraSpeed.x = -scrollSpeed;
-            break;
-         case 38: // down
-            //go back
-            cameraSpeed.y = -scrollSpeed;
-            break;
-         case 39: // left
-            //go left
-            cameraSpeed.x = scrollSpeed;
-            break;
-         case 40: // up
-            //go forwards
-            cameraSpeed.y = scrollSpeed;
-            break;
-         case 16: // in (Shift)
-            //go up
-            cameraSpeed.z = -scrollSpeed;
-            break;
-         case 17: // out (Ctrl)
-            //go down
-            cameraSpeed.z = scrollSpeed;
-            break;
-         case 10: // enter
-            autoRotate = !autoRotate;
-            break;
-         }
+   
+   @Override
+   protected void keystroke(KeyEvent e) {
+      switch (e.getKeyCode()) {
+      case 37: // right
+         //go right
+         cameraSpeed.x = -scrollSpeed;
+         break;
+      case 38: // down
+         //go back
+         cameraSpeed.y = -scrollSpeed;
+         break;
+      case 39: // left
+         //go left
+         cameraSpeed.x = scrollSpeed;
+         break;
+      case 40: // up
+         //go forwards
+         cameraSpeed.y = scrollSpeed;
+         break;
+      case 16: // in (Shift)
+         //go up
+         cameraSpeed.z = -scrollSpeed;
+         break;
+      case 17: // out (Ctrl)
+         //go down
+         cameraSpeed.z = scrollSpeed;
+         break;
+      case 10: // enter
+         autoRotate = !autoRotate;
+         break;
       }
-
-      @Override
-      public void keyReleased(KeyEvent e) {
-         switch (e.getKeyCode()) {
-         case 37:
-            cameraSpeed.x = 0;
-            break;
-         case 38:
-            cameraSpeed.y = 0;
-            break;
-         case 39:
-            cameraSpeed.x = 0;
-            break;
-         case 40:
-            cameraSpeed.y = 0;
-            break;
-         case 16:
-            cameraSpeed.z = 0;
-            break;
-         case 17:
-            cameraSpeed.z = 0;
-            break;
-         }
+   }
+   
+   @Override
+   public void keyReleased(KeyEvent e) {
+      switch (e.getKeyCode()) {
+      case 37:
+         cameraSpeed.x = 0;
+         break;
+      case 38:
+         cameraSpeed.y = 0;
+         break;
+      case 39:
+         cameraSpeed.x = 0;
+         break;
+      case 40:
+         cameraSpeed.y = 0;
+         break;
+      case 16:
+         cameraSpeed.z = 0;
+         break;
+      case 17:
+         cameraSpeed.z = 0;
+         break;
       }
-   };
+   }
 
    private List<Planet> planets;
    private List<Fleet> fleets;
@@ -265,10 +263,5 @@ public class Display extends Visualizer {
       g.fillRect(0, 0, getWidth(), getHeight());
       g.drawLine(0, 0, 10, 10);
       displayCamera.draw(planets, fleets, g, getWidth() / 2, getHeight() / 2);
-   }
-
-   @Override
-   protected void keystroke(KeyEvent e) {
-
    }
 }
