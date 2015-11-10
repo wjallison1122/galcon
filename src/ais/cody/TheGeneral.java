@@ -35,7 +35,7 @@ public class TheGeneral extends Player {
       findBestActions(psuedoGalaxy);
       if (potentialMoves.size() > 0) {
     	  potentialMoves.get(0).commit();
-    	  System.out.println("Picked move: " + potentialMoves.get(0));
+    	  //System.out.println("Picked move: " + potentialMoves.get(0));
       }
       
    }
