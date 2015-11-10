@@ -26,13 +26,16 @@ public class PsuedoFleet {
 		turnsLeft = (int)(fleet.distanceLeft() / Fleet.SPEED);
 	}
 	
-	public boolean advance(int time) {
+	public PsuedoFleet(PsuedoFleet psuedoFleet) {
+		target = psuedoFleet.target;
+		strength = psuedoFleet.strength;
+		turnsLeft = psuedoFleet.turnsLeft;
+	}
+	
+	public void advance(int time) {
 		turnsLeft -= time;
-		if (time <= 0) {
+		if (turnsLeft <= 0) 
 			target.fleetArrives(strength);
-			return true;
-		}
-		return false;
 	}
 	
 	public boolean mine() {

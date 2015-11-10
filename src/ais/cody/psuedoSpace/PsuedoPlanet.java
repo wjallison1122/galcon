@@ -22,6 +22,15 @@ public class PsuedoPlanet {
 		   neutral = planet.ownedBy(null) ? 1 : 0;
 	   }
 	   
+	   public PsuedoPlanet(PsuedoPlanet psuedoPlanet) {
+		   position = psuedoPlanet.position;
+		   strength = psuedoPlanet.strength;
+		   productionFrequency = psuedoPlanet.productionFrequency;
+		   realPlanet = psuedoPlanet.realPlanet;
+		   partialProduction = 0;
+		   neutral = psuedoPlanet.neutral;
+	   }
+	   
 	   public void fleetArrives(int units) {
 		   boolean currentOwner = mine();
 		   strength += units;
@@ -62,6 +71,10 @@ public class PsuedoPlanet {
 	   
 	   public boolean mine() {
 		   return strength < 0;
+	   }
+	   
+	   public boolean enemy() {
+		   return (strength > 0 && neutral == 0);
 	   }
 	   
 	   public String toString() {

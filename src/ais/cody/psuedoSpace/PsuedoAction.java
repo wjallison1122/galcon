@@ -12,7 +12,7 @@ public class PsuedoAction {
 	   }
 	   
 	   public PsuedoFleet act() {
-		   from.strength -= numUnits;
+		   from.fleetDeparts(numUnits);
 		   return new PsuedoFleet(this);
 	   }
 	   
