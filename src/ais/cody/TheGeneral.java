@@ -27,6 +27,11 @@ public class TheGeneral extends Player {
 	  potentialMoves = new ArrayList<Move>();
    }
    
+   public TheGeneral(Color c) {
+	      super(c, "The General");
+		  potentialMoves = new ArrayList<Move>();
+	   }
+   
    @Override
    protected void turn() {
       

@@ -9,7 +9,12 @@ import java.util.Date;
 import ais.jono.*;
 import ais.tyler.TylerDefenderAI;
 import stats.DefaultStats;
+import visualizers.threedimensiondefault.Display;
 import visualizers.twodimensiondefault.DefaultVisualizer;
+import ais.cody.*;
+import ais.jono.*;
+import ais.tyler.*;
+import ais.jason.*;
 
 class GameSettings {
    static final boolean debugMode = false, logGame = false;
