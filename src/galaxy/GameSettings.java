@@ -9,15 +9,16 @@ import java.util.Date;
 
 import stats.DefaultStats;
 import visualizers.threedimensiondefault.Display;
+import visualizers.twodimensiondefault.DefaultVisualizer;
 import ais.cody.*;
-import ais.jono.DistanceValueDefenderAI;
+import ais.jono.*;
 
 class GameSettings {
    static final boolean debugMode = false, logGame = false;
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
-   static Player p1 = new DistanceValueDefenderAI(new Color(50, 100, 0));
-   static Player p2 = new TheGeneral();
+   static Player p1 = new TheGeneral(Color.BLUE);
+   static Player p2 = new ContestInfluenceAI();
    static Player [] players = {p1, p2};
    
    static final int[] DIMENSIONS = {1000, 1000, 1000};
