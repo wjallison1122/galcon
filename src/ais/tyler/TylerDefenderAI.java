@@ -80,7 +80,7 @@ public class TylerDefenderAI extends Player {
    
    private void sendInitialFleets() {
       for (Planet p : unownedPlanets) {
-         if (p.getNumUnits() <= 2 && p.distanceTo(myStartingPlanet) < p.distanceTo(enemyStartingPlanet)) {
+         if (p.getNumUnits() <= 4 && p.distanceTo(myStartingPlanet) < p.distanceTo(enemyStartingPlanet)) {
             addAction(myStartingPlanet, p, p.getNumUnits() + 1);
          }
       }
@@ -187,7 +187,7 @@ public class TylerDefenderAI extends Player {
                int unitsOnPlanet = unitsAtPlanetWhenArrive(p, myPlanet) + enemyUnitsIncoming;
                if (totalExpendableUnits > unitsOnPlanet &&
                      expendableUnits > 0 && 
-                     myUnitsIncoming < unitsOnPlanet && 
+                     myUnitsIncoming <= unitsOnPlanet && 
                      !PlayerUtils.getCurrentEventualOwner(p, fleets, this).equals(PlayerUtils.PlanetOwner.PLAYER)) {
                   int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
                   addAction(myPlanet, p, unitsToSend);
@@ -215,7 +215,7 @@ public class TylerDefenderAI extends Player {
                if (totalExpendableUnits > unitsOnPlanet && 
                      unitsOnPlanet < myUnitCount / 4 &&
                      expendableUnits > 0 && 
-                     myUnitsIncoming < unitsOnPlanet) {
+                     myUnitsIncoming <= unitsOnPlanet) {
                   int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
                   addAction(myPlanet, p, unitsToSend);
                   // Update unit counts
@@ -228,6 +228,30 @@ public class TylerDefenderAI extends Player {
       
       if (myUnitCount > enemyUnitCount + 50) {
          // Capture small neutral planets.
+         for (Planet p : otherPlanets) {
+            if (p.isNeutral()) {
+            //System.out.println("Planet: " + (p.isNeutral() ? "Neutral" : "Enemy"));
+               distSort(myPlanets, p);
+               for (Planet myPlanet : myPlanets) {
+                  int unitsSentThisTurn = myUnitsSent.get(myPlanet);
+                  int expendableUnits = getExpendableUnits(myPlanet) - unitsSentThisTurn;
+                  int myUnitsIncoming = myUnitsApproaching.get(p);
+                  int enemyUnitsIncoming = enemyUnitsApproaching.get(p);
+                  int unitsOnPlanet = unitsAtPlanetWhenArrive(p, myPlanet) + enemyUnitsIncoming;
+                  
+                  if (totalExpendableUnits > unitsOnPlanet && 
+                        unitsOnPlanet < myUnitCount / 4 &&
+                        expendableUnits > 0 && 
+                        myUnitsIncoming < unitsOnPlanet) {
+                     int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
+                     addAction(myPlanet, p, unitsToSend);
+                     // Update unit counts
+                     myUnitsApproaching.put(p, myUnitsIncoming + unitsToSend);
+                     myUnitsSent.put(myPlanet, unitsSentThisTurn + unitsToSend);
+                  }
+               }
+            }
+         }
       }
    }
    
