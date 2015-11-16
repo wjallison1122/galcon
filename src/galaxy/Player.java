@@ -34,7 +34,13 @@ public abstract class Player {
       newGame();
    }
 
-   protected abstract void newGame();
+   /*
+    * New game for an AI. 
+    * Non-final to allow it to be optional. 
+    */
+   protected void newGame() {
+      
+   }
 
    final LinkedList<Action> getActions() {
       return actions;
@@ -58,7 +64,23 @@ public abstract class Player {
 
    protected abstract void turn();
 
-   protected abstract String storeSelf();
+   /*
+    * Used to allow an AI to write its state to a file.
+    * AI is expected to be able to recreate itself from this string. 
+    * Note that order of operations is new AI -> loadFromStore and the 
+    * save string should be written as such. 
+    * Non-final to allow it to be optional. 
+    */
+   protected String storeSelf() {
+      return null;
+   }
+   
+   /*
+    * Used to allow an AI to restore its state from a file. 
+    * See above method. 
+    * Non-final to allow it to be optional. 
+    */
+   protected void loadFromStore(String oldself) {}
 
    /**
     * Checks if two players are equal. Works with null. 

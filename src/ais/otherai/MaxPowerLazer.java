@@ -1,0 +1,147 @@
+package ais.otherai;
+
+import galaxy.Fleet;
+import galaxy.Planet;
+import galaxy.Player;
+import galaxy.Unit;
+
+import java.awt.Color;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+
+/**
+ * A heuristic based greedy algorithm. 
+ * Searches through planets, creating a plan for the planet and
+ * then assigning a "profit value" for enacting that plan.
+ * All most valuable plans are then enacted. 
+ * @author user
+ *
+ */
+public class MaxPowerLazer extends Player {
+   HashMap<Planet, LinkedList<Fleet>> fleetsTargeting = new HashMap<Planet, LinkedList<Fleet>>();
+   PriorityQueue<PlanetValuer> plans = new PriorityQueue<PlanetValuer>();
+
+   int previd = 0;
+   
+   protected MaxPowerLazer(Color c, String name) {
+      super(Color.CYAN, "MaxPowerLazer");
+      for (Planet p : planets) {
+         LinkedList<Fleet> fleetList = new LinkedList<Fleet>();
+         fleetsTargeting.put(p, fleetList);
+         plans.add(new PlanetValuer(p, fleetList));
+      }
+      
+   }
+
+   @Override
+   protected void turn() {
+      cleanFleetsTargeting();
+      for (Fleet f : fleets) {
+         if (f.ID > previd) {
+            fleetsTargeting.get(f.getDestination()).add(f);
+         }
+      }
+      
+      previd = Unit.getLatestID();
+   }
+   
+   void cleanFleetsTargeting() {
+      for (LinkedList<Fleet> fleetList : fleetsTargeting.values()) {
+         Iterator<Fleet> fleeterator = fleetList.iterator();
+         while (fleeterator.hasNext()) {
+            if (fleeterator.next().hasHit()) {
+               fleeterator.remove();
+            }
+         }
+      }
+   }
+
+
+   class PlanetValuer implements Comparable<PlanetValuer> {
+      Planet home;
+      LinkedList<Fleet> fleetsTargeting;
+      LinkedList<MockAction> plan = new LinkedList<MockAction>();
+
+      int value;
+
+      PlanetValuer(Planet home, LinkedList<Fleet> fleetsTargeting) {
+         this.home = home;
+         this.fleetsTargeting = fleetsTargeting;
+         revalue();
+      }
+      
+      void revalue() {
+         value = determineValue();
+      }
+
+      int determineValue() {
+         if (home.isNeutral()) {
+            if (fleetsTargeting.size() > 0) {
+               return 0;
+            } else {
+               PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
+               int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / Fleet.SPEED) / home.PRODUCTION_TIME);
+               int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
+               // If I lose more units taking over the planet than can be made before the enemy hits the planet
+               if (prodDiff < 0) {
+                  // TODO check if close enemy planets can actually send enough units to help.
+                  
+                  return -1;
+               }
+
+               PriorityQueue<Planet> myp = planetsNearOwnedBy(home, MaxPowerLazer.this);
+               if (myp.peek().getNumUnits() > home.getNumUnits()){
+                  
+               }
+               return 0;
+            }
+         } else if (home.ownedByOpponentOf(MaxPowerLazer.this)) {
+            return 0;
+         } else if (home.ownedBy(MaxPowerLazer.this)) {
+            return 0;
+         }
+
+         return -1;
+      }
+
+      PriorityQueue<Planet> planetsNearOwnedBy(Planet target, Player owner) {
+         PriorityQueue<Planet> orderedPlanets = new PriorityQueue<Planet>(11, new Comparator<Planet>() {
+            @Override
+            public int compare(Planet p1, Planet p2) {
+               return (int) (target.distanceTo(p1) - target.distanceTo(p2));
+            }
+         });
+
+         for (Planet p : planets) {
+            if (p.ownedBy(owner)) {
+               orderedPlanets.add(p);
+            }
+         }
+
+         return orderedPlanets;
+      }
+
+      @Override
+      public int compareTo(PlanetValuer pv) {
+         return value - pv.value;
+      }
+   }
+
+   class MockAction {
+      Planet start, end;
+      int numUnits;
+
+      public MockAction(Planet start, Planet end, int numUnits) {
+         this.start = start;
+         this.end = end;
+         this.numUnits = numUnits;
+      }
+
+      void makeAction() {
+         addAction(start, end, numUnits);
+      }
+   }
+}

@@ -6,6 +6,10 @@ public abstract class Unit {
    Player owner;
    private double[] coords;
    int numUnits;
+   int ticsActive = 0;
+
+   private static int id = 0;
+   public final int ID = id++;
    public Color debugColor;
 
    Unit(Player owner, int numUnits, double ... coords) {
@@ -18,6 +22,22 @@ public abstract class Unit {
       if (Main.debugMode) {
          System.out.println(str);
       }
+   }
+   
+   public static final int getLatestID() {
+      return id;
+   }
+   
+   public final boolean equals(Unit u) {
+      if (u == null) {
+         return false;
+      }
+      
+      return u.ID == ID;
+   }
+   
+   public static final boolean areEqual(Unit u1, Unit u2) {
+      return (u1 == null || u2 == null) ? u1 == u2 : u1.ID == u2.ID;
    }
 
    public final Player getOwner() {
@@ -81,6 +101,12 @@ public abstract class Unit {
    public final double distanceTo(Unit u) {
       return distanceTo(u.getCoords());
    }
+   
+   /**
+    * Returns true if unit can be removed from game. 
+    * @return
+    */
+   abstract boolean update();
 }
 
 

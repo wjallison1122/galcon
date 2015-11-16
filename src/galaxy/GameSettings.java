@@ -15,6 +15,10 @@ import ais.cody.*;
 import ais.jono.*;
 import ais.tyler.*;
 import ais.jason.*;
+=======
+import ais.basicai.BasicRandomAI;
+import ais.jono.DistanceValueDefenderAI;
+>>>>>>> Added beginnings of unit ID changes, various fleet implementation cleanups.
 
 class GameSettings {
    static final boolean debugMode = false, logGame = false;

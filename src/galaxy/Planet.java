@@ -238,10 +238,11 @@ public final class Planet extends Unit {
       }
    }
 
-   private void update() {
+   boolean update() {
       if(!ownedBy(null) && updateCnt++ % PRODUCTION_TIME == 0) {
          numUnits++;
       }
+      return false;
    }
 
    static Planet[] getAllPlanets() {
