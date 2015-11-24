@@ -1,6 +1,5 @@
 package galaxy;
 
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,14 +10,16 @@ public final class Main extends GameSettings {
 
    static boolean pause = false;
    static boolean skipGame = false;
+   
+   private Director director = new Director();
 
+   
    private Main() {
-      if (visualizer != null) {
+      if (director.usingVisualizer()) {
          new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                if (!director.done()) {
-                  visualizer.update();
                   next();
                }
             }
@@ -68,20 +69,14 @@ public final class Main extends GameSettings {
       skipGame = true;
    }
 
-   static void writeToLog(String str) {
-      if (logGame) {
-         try {
-            gameLog.write(str);
-         } catch (IOException e) {
-            System.err.println("Couldn't write to log file.");
-         }
-      }
 
-   }
-
-   static void resetVisualizer(Player[] active) {
-      if (visualizer != null) {
-         visualizer.nextGame(active);
-      }
-   }
+//   static void writeToLog(String str) {
+//      if (logGame) {
+//         try {
+//            gameLog.write(str);
+//         } catch (IOException e) {
+//            System.err.println("Couldn't write to log file.");
+//         }
+//      }
+//   }
 }

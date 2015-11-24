@@ -3,35 +3,27 @@ package galaxy;
 import java.util.LinkedList;
 
 
-final class Director {
-   private Player[] players = Main.players;
+final class Director extends GameSettings {
    private int rounds = 0, tic = 0;
    private Matcher mm = null;
+   private Visualizer visualizer = createVisualizer();
 
    private LinkedList<Player> active;
 
-   private void debug(String str) { 
-      if (Main.debugMode) {
-         System.out.println(str);
-      }
-   }
-
    Director() {
       for (int i = 0; i < players.length; i++) {
-         Main.createStats(players[i]);
+         createStats(players[i]);
       }
 
-      for (int i = 0; i < Main.PLAYERS_PER_GAME; i++) {
+      for (int i = 0; i < PLAYERS_PER_GAME; i++) {
          mm = new Matcher(mm);
       }
 
       newGame();
-
-      debug("Finished director");
    }
 
    boolean done() {
-      return rounds > Main.NUM_ROUNDS;
+      return rounds > NUM_ROUNDS;
    }
 
    void reportStats() {
@@ -50,8 +42,9 @@ final class Director {
       }
 
       Galaxy.update();
+      visualizer.update();
 
-      Player winner = Galaxy.isGameOver();
+      Player winner = Galaxy.checkWinner();
       if (winner != null) {
          Stats.updateAllStats(active, winner);
          newGame();
@@ -59,13 +52,18 @@ final class Director {
 
       tic++;
    }
+   
+   boolean usingVisualizer() {
+      return visualizer != null;
+   }
 
    private void newGame() {
       active = mm.getPlayers();
+      mm.update();
 
       Galaxy.clear();
-      //Galaxy.generateRandomMap(active);
-      Galaxy.generateSymmetricMap();
+      Galaxy.generateRandomMap(active);
+//      Galaxy.generateSymmetricMap();
 
       Player[] activeArray = new Player[active.size()];
       int i = 0;
@@ -74,9 +72,10 @@ final class Director {
          activeArray[i++] = p;
       }
 
-      Main.resetVisualizer(activeArray);
+      if (usingVisualizer()) {
+         visualizer.nextGame(active);
+      }
 
-      mm.update();
       tic = 0;
    }
 

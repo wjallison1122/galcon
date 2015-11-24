@@ -15,9 +15,7 @@ import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 
-@SuppressWarnings("serial")
 public class DefaultVisualizer extends Visualizer {
-
    class MouseOver implements MouseOverInfo {
       private Font mouseOverFont = new Font("Monospaced", Font.PLAIN, 12);
       String text;
@@ -224,7 +222,7 @@ public class DefaultVisualizer extends Visualizer {
    }
 
    @Override
-   protected void drawPlayerInfo(Player[] players, Graphics g) {
+   protected void drawPlayerInfo(LinkedList<Player> players, Graphics g) {
       final int FONT_HEIGHT = 40;
       Font font = new Font("Monospaced", Font.PLAIN, FONT_HEIGHT);
       g.setFont (font);
@@ -248,7 +246,7 @@ public class DefaultVisualizer extends Visualizer {
 
 
    @Override
-   public void mousePress(MouseEvent e, Planet[] planets){
+   public void mouseOverPress(MouseEvent e, Planet[] planets){
       //Minuses are to offset it to the tip of the mouse pointer
       int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
 

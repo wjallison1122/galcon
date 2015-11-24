@@ -8,9 +8,7 @@ import galaxy.Visualizer;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.LinkedList;
@@ -20,18 +18,17 @@ import java.util.List;
  *
  * @author Jono
  */
-@SuppressWarnings("serial")
 public class Display extends Visualizer {
 
    public Display(int[] dimensions) {
       super(1600, 900, 3);
       mouseOverInfo = mouseOver;
-      this.addMouseMotionListener(ma);
-      this.addMouseListener(ma);
-      this.addMouseWheelListener(ma);
-      this.addKeyListener(this);
-      this.setFocusable(true);
-      this.setBackground(Color.black);
+      //      panel.addMouseMotionListener(ma);
+      //      panel.addMouseListener(ma);
+      //      panel.addMouseWheelListener(ma);
+      //      panel.addKeyListener(this);
+      //      panel.setFocusable(true);
+      //      panel.setBackground(Color.black);
       displayCamera = new Camera(new Vector(-1700, 0, 475), () -> {
          if (autoRotate) {
             autoRotatePosition += AUTO_ROTATE_SPEED;
@@ -57,9 +54,9 @@ public class Display extends Visualizer {
    private boolean autoRotate = true;
    private double autoRotatePosition = 0.0;
    private static final double AUTO_ROTATE_SPEED = 0.001;
-   
+
    MouseOver mouseOver = new MouseOver();
-   
+
    class MouseOver implements MouseOverInfo {
       private Font mouseOverFont = new Font("Monospaced", Font.PLAIN, 12);
       String text;
@@ -79,78 +76,76 @@ public class Display extends Visualizer {
          }
       }
    }
-   
-   private MouseAdapter ma = new MouseAdapter() {
-      @Override
-      public void mouseDragged(MouseEvent me) {
-         if (!autoRotate) {
-            if (mouseDown) {
-               displayCamera.hRot += (me.getX() - mousex) / (displayCamera.zoom / 3.0);
-               displayCamera.vRot += (me.getY() - mousey) / (displayCamera.zoom / 3.0);
-               if (displayCamera.vRot > Math.PI / 2) {
-                  displayCamera.vRot = Math.PI / 2;
-               }
-               if (displayCamera.vRot < -Math.PI / 2) {
-                  displayCamera.vRot = -Math.PI / 2;
-               }
-               mousex = me.getX();
-               mousey = me.getY();
-               repaint();
-            } else {
-               mousex = me.getX();
-               mousey = me.getY();
-               mouseDown = true;
-            }
-         }
-      }
 
-      @Override
-      public void mouseMoved(MouseEvent me) {
-         mousex = me.getX();
-         mousey = me.getY();
-         mouseDown = false;
-      }
-      
-      @Override
-      public void mousePressed(MouseEvent e) {
-         requestFocus(true);
-
-         //Minuses are to offset it to the tip of the mouse pointer
-         int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
-         for(GraphicHolder gh : displayCamera.drawList) {
-            double tempCoords[] = {mouseCoords[0], mouseCoords[1] - gh.screenRadius/2};
-            double scrLoc[] = {gh.screenLocation.x + 780, gh.screenLocation.y + 400};
-            
-            //Calculate distance
-            double distance = 0;
-            for (int i = 0; i < 2; i++) {
-               distance += Math.pow(scrLoc[i] - tempCoords[i], 2);
+   @Override
+   public void mouseDragged(MouseEvent me) {
+      if (!autoRotate) {
+         if (mouseDown) {
+            displayCamera.hRot += (me.getX() - mousex) / (displayCamera.zoom / 3.0);
+            displayCamera.vRot += (me.getY() - mousey) / (displayCamera.zoom / 3.0);
+            if (displayCamera.vRot > Math.PI / 2) {
+               displayCamera.vRot = Math.PI / 2;
             }
-            distance = Math.sqrt(distance);
-            
-            if(distance < gh.screenRadius) {
-               mouseOver.coords = mouseCoords;
-               mouseOver.text = "Production: " + gh.production;
-               mouseOver.timeToLive = 120;
-               return;
+            if (displayCamera.vRot < -Math.PI / 2) {
+               displayCamera.vRot = -Math.PI / 2;
             }
-         }
-         //If no planet was clicked on remove any text that still exists
-         mouseOver.timeToLive = 0;
-      }
-
-      @Override
-      public void mouseWheelMoved(MouseWheelEvent e) {
-         if (e.getWheelRotation() < 0) {
-            displayCamera.zoom *= 1.05;
+            mousex = me.getX();
+            mousey = me.getY();
+            repaint();
          } else {
-            displayCamera.zoom *= .95;
+            mousex = me.getX();
+            mousey = me.getY();
+            mouseDown = true;
          }
-         if (displayCamera.zoom < 1000)
-            displayCamera.zoom = 1000;
       }
-   };
-   
+   }
+
+   @Override
+   public void mouseMoved(MouseEvent me) {
+      mousex = me.getX();
+      mousey = me.getY();
+      mouseDown = false;
+   }
+
+   @Override
+   public void mousePress(MouseEvent e) {
+      requestFocus();
+
+      //Minuses are to offset it to the tip of the mouse pointer
+      int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
+      for(GraphicHolder gh : displayCamera.drawList) {
+         double tempCoords[] = {mouseCoords[0], mouseCoords[1] - gh.screenRadius/2};
+         double scrLoc[] = {gh.screenLocation.x + 780, gh.screenLocation.y + 400};
+
+         //Calculate distance
+         double distance = 0;
+         for (int i = 0; i < 2; i++) {
+            distance += Math.pow(scrLoc[i] - tempCoords[i], 2);
+         }
+         distance = Math.sqrt(distance);
+
+         if(distance < gh.screenRadius) {
+            mouseOver.coords = mouseCoords;
+            mouseOver.text = "Production: " + gh.production;
+            mouseOver.timeToLive = 120;
+            return;
+         }
+      }
+      //If no planet was clicked on remove any text that still exists
+      mouseOver.timeToLive = 0;
+   }
+
+   @Override
+   public void mouseWheelMoved(MouseWheelEvent e) {
+      if (e.getWheelRotation() < 0) {
+         displayCamera.zoom *= 1.05;
+      } else {
+         displayCamera.zoom *= .95;
+      }
+      if (displayCamera.zoom < 1000)
+         displayCamera.zoom = 1000;
+   }
+
    @Override
    protected void keystroke(KeyEvent e) {
       switch (e.getKeyCode()) {
@@ -183,7 +178,7 @@ public class Display extends Visualizer {
          break;
       }
    }
-   
+
    @Override
    public void keyReleased(KeyEvent e) {
       switch (e.getKeyCode()) {
@@ -240,11 +235,11 @@ public class Display extends Visualizer {
    }
 
    @Override
-   protected void drawPlayerInfo(Player[] players, Graphics g) {
+   protected void drawPlayerInfo(LinkedList<Player> players, Graphics g) {
       final int FONT_HEIGHT = 40;
       Font font = new Font("Monospaced", Font.PLAIN, FONT_HEIGHT);
       g.setFont (font);
-      
+
       int offset = 1;
       for (Player p : players) {
          g.setColor(Color.DARK_GRAY);

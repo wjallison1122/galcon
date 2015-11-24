@@ -1,16 +1,12 @@
 package galaxy;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 
 public final class Fleet extends Unit {
-   public static final double SPEED = Main.FLEET_SPEED;
+   public static final double SPEED = FLEET_SPEED;
 
    private final Planet DESTINATION;
    private boolean hasHit = false;
-
-   private static LinkedList<Fleet> fleets = new LinkedList<Fleet>();
-
+   
    Fleet(int units, Player owner, Planet destination, double ... coords) {
       super(owner, units, coords);
 
@@ -18,8 +14,8 @@ public final class Fleet extends Unit {
          throw new NullPointerException("Fleet destination was null.");
       }
       DESTINATION = destination;
-
-      fleets.add(this);
+      
+      Galaxy.addFleet(this);
    }
 
    public Planet getDestination() {
@@ -39,21 +35,7 @@ public final class Fleet extends Unit {
    }
 
    public static Fleet[] getAllFleets() {
-      Fleet[] armada = new Fleet[fleets.size()];
-      int i = 0;
-      for (Fleet f : fleets) {
-         armada[i++] = f;
-      }
-      return armada;
-   }
-
-   static void updateAll() {
-      Iterator<Fleet> fleeterator = fleets.iterator();
-      while (fleeterator.hasNext()) {
-         if (fleeterator.next().update()) {
-            fleeterator.remove();
-         }
-      }
+      return Galaxy.getAllFleets();
    }
 
    boolean update() {
@@ -61,7 +43,7 @@ public final class Fleet extends Unit {
       double[] fleetCoords = getCoords();
       double distance = distanceLeft();
 
-      for (int i = 0; i < Main.DIMENSIONS.length; i++) {
+      for (int i = 0; i < DIMENSIONS.length; i++) {
          fleetCoords[i] += (targetCoords[i] - fleetCoords[i]) / distance * SPEED;
       }
 
@@ -77,27 +59,8 @@ public final class Fleet extends Unit {
       return false;
    }
 
-   static void clear() {
-      fleets.clear();
-   }
-
-   static boolean checkWinner(Player winner) {
-      for (Fleet f : fleets) {
-         if (!f.ownedBy(winner)) {
-            return false;
-         }
-      }
-      return true;
-   }
-
    static int getNumUnitsInFleets(Player p) {
-      int count = 0;
-      for(Fleet f : fleets) {
-         if(f.ownedBy(p)) {
-            count += f.getNumUnits();
-         }
-      }
-      return count;
+      return Galaxy.getNumUnitsInFleets(p);
    }
 }
 

@@ -2,7 +2,7 @@ package galaxy;
 
 import java.awt.Color;
 
-public abstract class Unit {
+public abstract class Unit extends GameSettings {
    Player owner;
    private double[] coords;
    int numUnits;
@@ -16,12 +16,6 @@ public abstract class Unit {
       this.owner = owner;
       this.numUnits = numUnits;
       this.coords = coords;
-   }
-
-   protected final void debug(String str) {
-      if (Main.debugMode) {
-         System.out.println(str);
-      }
    }
    
    public static final int getLatestID() {
@@ -49,15 +43,14 @@ public abstract class Unit {
    }
 
    final void setCoords(double ... coords) {
-      if (coords.length != Main.DIMENSIONS.length) {
+      if (coords.length != DIMENSIONS.length) {
          throw new RuntimeException("Invalid dimensions of coordinates given.");
       }
       this.coords = coords.clone();
    }
 
-   @SuppressWarnings("unused")
    public final Color getColor() {
-      return Main.debugMode && debugColor != null ? debugColor : (owner == null ? Color.GRAY : owner.COLOR);
+      return debugMode && debugColor != null ? debugColor : (owner == null ? Color.GRAY : owner.COLOR);
    }
 
    public final int getNumUnits() {
@@ -92,7 +85,7 @@ public abstract class Unit {
 
    public final double distanceTo(double ... otherCoords) {
       double sum = 0;
-      for (int i = 0; i < Main.DIMENSIONS.length; i++) {
+      for (int i = 0; i < DIMENSIONS.length; i++) {
          sum += Math.pow(coords[i] - otherCoords[i], 2);
       }
       return Math.sqrt(sum);

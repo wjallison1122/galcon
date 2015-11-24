@@ -18,42 +18,81 @@ import ais.jason.*;
 import ais.basicai.BasicRandomAI;
 import ais.jono.DistanceValueDefenderAI;
 
+enum SymmetryType {
+   VERTICAL,
+   HORIZONTAL,
+   DIAGONAL,
+   RADIAL,
+}
+
+enum VisualizerType {
+   TWO_D,
+   THREE_D,
+   SERVER
+}
+
+enum StatsType {
+   DEFAULT
+}
+
 class GameSettings {
-   static final boolean debugMode = false, logGame = false;
+   public static final boolean debugMode = true, logGame = false;
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
    static Player p1 = new ContestInfluenceAI();
    static Player p2 = new TylerDefenderAI();
    static Player [] players = {p1, p2};
-   
-//   static final int[] DIMENSIONS = {1000, 1000, 1000};
-//   static final int NUM_PLANETS = 16;
-//   static Visualizer visualizer = new Display(DIMENSIONS);
+   public final int NUM_PLANETS = 16;
 
-   static final int[] DIMENSIONS = {800, 800};
-   static final int NUM_PLANETS = 16;
-   static Visualizer visualizer = new DefaultVisualizer(DIMENSIONS);
+   //   public final int[] DIMENSIONS = {1000, 1000, 1000};
+   private final VisualizerType vis = VisualizerType.TWO_D;
+   public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] {800, 800} : new int[] {1000, 1000, 1000};
 
+   public static final int FLEET_SPEED = 2;
 
+   public final int PLAYERS_PER_GAME = 2;
+   public final int NUM_ROUNDS = 5000;
 
-   static final int FLEET_SPEED = 2;
+   public final int FRAME_TIME = 10;
 
-   static final int PLAYERS_PER_GAME = 2;
-   static final int NUM_ROUNDS = 5000;
+   private final StatsType stats = StatsType.DEFAULT;
 
-   static final int FRAME_TIME = 10;
-   static final Director director = new Director();
-
-   static final Stats createStats(Player p) {
-      return new DefaultStats(p);
+   final Stats createStats(Player p) {
+      switch (stats) {
+      case DEFAULT:
+         return new DefaultStats(p);
+      default:
+         return null;
+      }
    }
 
+   final Visualizer createVisualizer() {
+      switch(vis) {
+      case TWO_D:
+         return new DefaultVisualizer(DIMENSIONS);
+      case THREE_D:
+         return new Display(DIMENSIONS);
+      case SERVER:
+         return null;
+      default:
+         return null;
+      }
+   }
 
-
-   static final void debug(String str) {
+   public final void debug(String str) {
       if (debugMode) {
          System.out.println(str);
       }
+   }
+
+   public final void debugError(String str) {
+      if (debugMode) {
+         error(str);
+      }
+   }
+
+   public final void error(String str) {
+      System.err.println(str);
    }
 
    static final BufferedWriter makeLogFile(String filename) {
@@ -66,13 +105,13 @@ class GameSettings {
       }
    }
 
-   static final String formatDate(Date date) {
+   public static final String formatDate(Date date) {
       String str = "";
       str += date.getTime();
       return str;
    }
 
-   static final int worldSize() {
+   public final int worldSize() {
       int prod = 1;
       for (int i : DIMENSIONS) {
          prod *= i;

@@ -3,13 +3,13 @@ package galaxy;
 import java.awt.Color;
 import java.util.LinkedList;
 
-public abstract class Player {
+public abstract class Player extends GameSettings {
    public final Color COLOR;
    public final String NAME;
    private static int currentId = 0;
    public final int ID = currentId++;
 
-   protected Planet[] planets = Planet.getAllPlanets();
+   protected Planet[] planets;
    protected Fleet[] fleets;
    private LinkedList<Action> actions = new LinkedList<Action>();
 
@@ -21,12 +21,6 @@ public abstract class Player {
    protected Player(Color c, String name) {
       COLOR = c;
       NAME = name;
-   }
-
-   protected final void debug(String str) {
-      if (Main.debugMode) {
-         System.out.println(str);
-      }
    }
 
    final void nextGame() {

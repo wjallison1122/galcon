@@ -1,54 +1,19 @@
 package galaxy;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.LinkedList;
 
-enum SymmetryType {
-   VERTICAL,
-   HORIZONTAL,
-   DIAGONAL,
-   RADIAL,
-}
+import mapmakers.RandomMapMaker;
 
-final class Galaxy {
-   private static void debug(String str) {
-      if (Main.debugMode) {
-         System.out.println(str);
-      }
-   }
 
-   static void generateRandomMap(LinkedList<Player> active) {
-      for (Player p : active) {
-         Planet.generateStartingPlanet(p);
-      }
-
-      for (int i = 0; i < Main.NUM_PLANETS; i++) {
-         Planet.generateRandomPlanet();
-      }
-
-      debug("Made planets");
-   }
-
-   static void generateMapFromFile(File f) {
-
-   }
-
-   static void generateSymmetricMap(SymmetryType symmetry) {
-
-   }
+final class Galaxy extends GameSettings {
    
-   static void generateSymmetricMap() {
-	  Planet.generateCenterPlanet();
-	  Planet.generateSymmetricStartingPlanets();
-      for (int i = 0; i < Main.NUM_PLANETS / Main.players.length; i++) {
-         Planet.generateSymmetricPlanets();
-      }
-
-      debug("Made planets");
-   }
-
-   static Player isGameOver() {
-      return Planet.isGameOver();
+   static Planet[] planets;
+   static LinkedList<Fleet> fleets = new LinkedList<Fleet>();
+   
+   static final void generateRandomMap(LinkedList<Player> active) {
+      planets = ((MapMaker)new RandomMapMaker()).getMap(active);
    }
 
    static File writeMap(String fileName) {
@@ -60,13 +25,70 @@ final class Galaxy {
    }
 
    static void update() {
-      debug("Updating galaxy");
-      Planet.updateAll();
-      Fleet.updateAll();
+      for (Planet p : planets) {
+         p.update();
+      }
+      
+      Iterator<Fleet> fleeterator = fleets.iterator();
+      while (fleeterator.hasNext()) {
+         if (fleeterator.next().update()) {
+            fleeterator.remove();
+         }
+      }
+   }
+   
+   public static Fleet[] getAllFleets() {
+      Fleet[] armada = new Fleet[fleets.size()];
+      int i = 0;
+      for (Fleet f : fleets) {
+         armada[i++] = f;
+      }
+      return armada;
+   }
+   
+   static Player checkPlanetIsGameOver() {
+      Player p = planets[0].getOwner();
+      int i = 0;
+      while (i < planets.length && !planets[i++].ownedByOpponentOf(p));
+      
+      return i == planets.length ? p : null;
+   }
+   
+   static Player checkWinner() {
+      Player winner = checkPlanetIsGameOver();
+      for (Fleet f : fleets) {
+         if (!f.ownedBy(winner)) {
+            return null;
+         }
+      }
+      return winner;
+   }
+   
+   static int getNumUnitsInPlanets(Player p) {
+      int count = 0;
+      for(Planet f : planets) {
+         if(f.ownedBy(p)) {
+            count += f.numUnits;
+         }
+      }
+      return count;
+   }
+   
+   static void addFleet(Fleet f) {
+      fleets.add(f);
+   }
+   
+   static int getNumUnitsInFleets(Player p) {
+      int count = 0;
+      for(Fleet f : fleets) {
+         if(f.ownedBy(p)) {
+            count += f.getNumUnits();
+         }
+      }
+      return count;
    }
 
    static void clear() {
-      Planet.clear();
-      Fleet.clear();
+      fleets.clear();
    }
 }
