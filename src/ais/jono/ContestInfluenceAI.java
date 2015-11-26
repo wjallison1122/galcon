@@ -139,7 +139,7 @@ public class ContestInfluenceAI extends Player {
       
       if (take != null) {
          int toSendToTake = 0;
-         while (!isEventualOwner(take, (int) Math.ceil(myPlanets.get(0).distanceTo(take) / Fleet.SPEED), toSendToTake)) {
+         while (!isEventualOwner(take, (int) Math.ceil(myPlanets.get(0).distanceTo(take) / FLEET_SPEED), toSendToTake)) {
             toSendToTake++;
          }
          if (toSendToTake > 0) {
@@ -148,17 +148,17 @@ public class ContestInfluenceAI extends Player {
       }
       
       for (Fleet fleet : PlayerUtils.getOpponentsFleets(fleets, this)) {
-         if (retake.contains(fleet.getDestination())) {
-            int distance = (int) Math.ceil(myPlanets.get(0).distanceTo(fleet.getDestination()) / Fleet.SPEED);
-            int fleetDistance = (int) Math.ceil(fleet.distanceLeft()/Fleet.SPEED);
+         if (retake.contains(fleet.DESTINATION)) {
+            int distance = (int) Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / FLEET_SPEED);
+            int fleetDistance = (int) Math.ceil(fleet.distanceLeft()/FLEET_SPEED);
             if (distance > fleetDistance) {
                int toSend = 0;
-               while (!isEventualOwner(fleet.getDestination(), distance, toSend)) toSend++;
+               while (!isEventualOwner(fleet.DESTINATION, distance, toSend)) toSend++;
                if (toSend > 0) {
-                  addAction(myPlanets.get(0), fleet.getDestination(), toSend);
+                  addAction(myPlanets.get(0), fleet.DESTINATION, toSend);
                }
-               retake.remove(fleet.getDestination());
-               mine.add(fleet.getDestination());
+               retake.remove(fleet.DESTINATION);
+               mine.add(fleet.DESTINATION);
             }
          }
       }
@@ -179,16 +179,16 @@ public class ContestInfluenceAI extends Player {
       } else {
          current = PlanetOwner.NOBODY;
       }
-      int updateCount = p.getUpdateCount() % p.PRODUCTION_TIME;
+      int updateCount = gameTic() % p.PRODUCTION_TIME;
       int previousUnits = 0;
       int unitCount = p.getNumUnits();
       int currentTime = 0;
       List<PlanetAction> actions = new ArrayList<>();
       for (Fleet f : Arrays.asList(fleets).stream()
-            .filter((fleet) -> fleet.getDestination() == p)
+            .filter((fleet) -> fleet.DESTINATION == p)
             .collect(Collectors.toList())) {
                PlanetAction action = new PlanetAction();
-               action.time = (int) Math.ceil(f.distanceLeft()/Fleet.SPEED);
+               action.time = (int) Math.ceil(f.distanceLeft()/FLEET_SPEED);
                action.amount = f.getNumUnits();
                if (f.ownedBy(this)) {
                   action.owner = PlanetOwner.PLAYER;
@@ -244,15 +244,15 @@ public class ContestInfluenceAI extends Player {
       Planet me = myPlanets.get(0);
       Planet them = theirPlanets.get(0);
       
-      int distance = (int) Math.ceil(me.distanceTo(them) / Fleet.SPEED);
+      int distance = (int) Math.ceil(me.distanceTo(them) / FLEET_SPEED);
       int distanceProduction = distance / me.PRODUCTION_TIME;
       
       Planet best = null;
       double bestValue = Double.MIN_VALUE;
       
       for (Planet p : unownedPlanets) {
-         int toMe = (int) Math.ceil(p.distanceTo(me) / Fleet.SPEED);
-         int toThem = (int) Math.ceil(p.distanceTo(them) / Fleet.SPEED);
+         int toMe = (int) Math.ceil(p.distanceTo(me) / FLEET_SPEED);
+         int toThem = (int) Math.ceil(p.distanceTo(them) / FLEET_SPEED);
          if (toMe <= toThem) {
             int takenContribution = 0;
             if (distance - toMe * 2 > 0) {
@@ -272,8 +272,8 @@ public class ContestInfluenceAI extends Player {
       retake = new ArrayList<>(unownedPlanets);
       
       for (Planet p : unownedPlanets) {
-         int toMe = (int) Math.ceil(p.distanceTo(me) / Fleet.SPEED);
-         int toThem = (int) Math.ceil(p.distanceTo(them) / Fleet.SPEED);
+         int toMe = (int) Math.ceil(p.distanceTo(me) / FLEET_SPEED);
+         int toThem = (int) Math.ceil(p.distanceTo(them) / FLEET_SPEED);
          if (toMe >= toThem) {
             int takenContribution = 0;
             if (distance - toThem * 2 > 0) {
@@ -336,7 +336,7 @@ public class ContestInfluenceAI extends Player {
       }
       
       for (Fleet f : myFleets) {
-         addMap(myInfluence, f.getDestination(), f.getNumUnits());
+         addMap(myInfluence, f.DESTINATION, f.getNumUnits());
       }
       
       Map<Planet, Double> theirInfluence = new HashMap<>();
@@ -352,7 +352,7 @@ public class ContestInfluenceAI extends Player {
       }
       
       for (Fleet f : theirFleets) {
-         addMap(theirInfluence, f.getDestination(), f.getNumUnits());
+         addMap(theirInfluence, f.DESTINATION, f.getNumUnits());
       }
       
       List<Planet> potentialTargets = new ArrayList<>();

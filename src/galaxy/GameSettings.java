@@ -6,17 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
-import ais.jono.*;
-import ais.tyler.TylerDefenderAI;
+import mapmakers.RandomMapMaker;
+import mapmakers.SymmetricMapMaker;
 import stats.DefaultStats;
 import visualizers.threedimensiondefault.Display;
 import visualizers.twodimensiondefault.DefaultVisualizer;
-import ais.cody.*;
-import ais.jono.*;
-import ais.tyler.*;
-import ais.jason.*;
-import ais.basicai.BasicRandomAI;
-import ais.jono.DistanceValueDefenderAI;
+import ais.jono.ContestInfluenceAI;
+import ais.tyler.TylerDefenderAI;
 
 enum SymmetryType {
    VERTICAL,
@@ -31,31 +27,35 @@ enum VisualizerType {
    SERVER
 }
 
+enum MapType {
+   RANDOM,
+   SYMMETRICAL
+}
+
 enum StatsType {
    DEFAULT
 }
 
-class GameSettings {
+public class GameSettings {
    public static final boolean debugMode = true, logGame = false;
 
    static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
    static Player p1 = new ContestInfluenceAI();
    static Player p2 = new TylerDefenderAI();
    static Player [] players = {p1, p2};
+   public final int PLAYERS_PER_GAME = 2;
+
    public final int NUM_PLANETS = 16;
 
-   //   public final int[] DIMENSIONS = {1000, 1000, 1000};
+   private final MapType map = MapType.RANDOM;
+   private final StatsType stats = StatsType.DEFAULT;
    private final VisualizerType vis = VisualizerType.TWO_D;
+   //   public final int[] DIMENSIONS = {1000, 1000, 1000};
    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] {800, 800} : new int[] {1000, 1000, 1000};
 
    public static final int FLEET_SPEED = 2;
-
-   public final int PLAYERS_PER_GAME = 2;
    public final int NUM_ROUNDS = 5000;
-
    public final int FRAME_TIME = 10;
-
-   private final StatsType stats = StatsType.DEFAULT;
 
    final Stats createStats(Player p) {
       switch (stats) {
@@ -66,8 +66,19 @@ class GameSettings {
       }
    }
 
+   final MapMaker createMapMaker() {
+      switch (map) {
+      case RANDOM:
+         return new RandomMapMaker();
+      case SYMMETRICAL:
+         return new SymmetricMapMaker();
+      default:
+         return null;
+      }
+   }
+
    final Visualizer createVisualizer() {
-      switch(vis) {
+      switch (vis) {
       case TWO_D:
          return new DefaultVisualizer(DIMENSIONS);
       case THREE_D:
@@ -95,6 +106,10 @@ class GameSettings {
       System.err.println(str);
    }
 
+   public static final int gameTic() {
+      return Director.getTic();
+   }
+
    static final BufferedWriter makeLogFile(String filename) {
       try {
          return new BufferedWriter(new FileWriter(new File(filename)));
@@ -109,13 +124,5 @@ class GameSettings {
       String str = "";
       str += date.getTime();
       return str;
-   }
-
-   public final int worldSize() {
-      int prod = 1;
-      for (int i : DIMENSIONS) {
-         prod *= i;
-      }
-      return prod;
    }
 }

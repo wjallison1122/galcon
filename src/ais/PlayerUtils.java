@@ -5,6 +5,7 @@ import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 import galaxy.Unit;
+import galaxy.GameSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PlayerUtils {
+public class PlayerUtils extends GameSettings {
 
    public static class Location {
       private double[] coords;
@@ -292,7 +293,7 @@ public class PlayerUtils {
    public static int getIncomingFleetCount(Planet p, Fleet[] fleets) {
       int rtn = 0;
       for (Fleet f : fleets) {
-         if (f.getDestination().equals(p)) {
+         if (f.DESTINATION.equals(p)) {
             rtn += f.getNumUnits();
          }
       }
@@ -302,7 +303,7 @@ public class PlayerUtils {
    public static int getPlayersIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
       int rtn = 0;
       for (Fleet f : fleets) {
-         if (f.getDestination().equals(planet) && f.ownedBy(player)) {
+         if (f.DESTINATION.equals(planet) && f.ownedBy(player)) {
             rtn += f.getNumUnits();
          }
       }
@@ -312,7 +313,7 @@ public class PlayerUtils {
    public static int getOpponentsIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
       int rtn = 0;
       for (Fleet f : fleets) {
-         if (f.getDestination().equals(planet) && !f.ownedBy(player)) {
+         if (f.DESTINATION.equals(planet) && !f.ownedBy(player)) {
             rtn += f.getNumUnits();
          }
       }
@@ -370,15 +371,15 @@ public class PlayerUtils {
       } else {
          current = PlanetOwner.NOBODY;
       }
-      int updateCount = p.getUpdateCount() % p.PRODUCTION_TIME;
+      int updateCount = gameTic() % p.PRODUCTION_TIME;
       int previousUnits = 0;
       int unitCount = p.getNumUnits();
       int currentTime = 0;
       for (Fleet f : Arrays.asList(fleets).stream()
-            .filter((fleet) -> fleet.getDestination() == p)
+            .filter((fleet) -> fleet.DESTINATION == p)
             .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft()))
             .collect(Collectors.toList())) {
-         int passingTime = (int) Math.ceil(f.distanceLeft()/Fleet.SPEED) - currentTime;
+         int passingTime = (int) Math.ceil(f.distanceLeft()/FLEET_SPEED) - currentTime;
          if (current != PlanetOwner.NOBODY) {
             updateCount += passingTime;
             int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;

@@ -3,7 +3,7 @@ package galaxy;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public final class Main extends GameSettings {
+final class Main extends GameSettings {
    public static void main(String[] args) {
       new Main();
    }
@@ -12,7 +12,6 @@ public final class Main extends GameSettings {
    static boolean skipGame = false;
    
    private Director director = new Director();
-
    
    private Main() {
       if (director.usingVisualizer()) {
@@ -29,7 +28,6 @@ public final class Main extends GameSettings {
             next();
          }
       }
-
    }
 
    /**
@@ -68,15 +66,4 @@ public final class Main extends GameSettings {
    static void skipGame() {
       skipGame = true;
    }
-
-
-//   static void writeToLog(String str) {
-//      if (logGame) {
-//         try {
-//            gameLog.write(str);
-//         } catch (IOException e) {
-//            System.err.println("Couldn't write to log file.");
-//         }
-//      }
-//   }
 }

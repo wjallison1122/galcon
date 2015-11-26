@@ -8,9 +8,7 @@ public final class Planet extends Unit {
    public static final int MIN_PRODUCE_TIME = 34;
    public static final int MAX_PRODUCE_TIME = 100;
 
-
    public final int RADIUS, PRODUCTION_TIME;
-   private int updateCnt = 0;
    private boolean recentlyConquered = false;
    
    Planet(Player owner, int numUnits, int radius, int prodTime, double ... coords) {
@@ -18,22 +16,11 @@ public final class Planet extends Unit {
       RADIUS = radius;
       PRODUCTION_TIME = prodTime;
    }
-   
-   
-   
- 
 
-   //********** END PLANET GENERATION CODE **********//
-
-   boolean update() {
-      if(!ownedBy(null) && updateCnt++ % PRODUCTION_TIME == 0) {
+   void update() {
+      if(!ownedBy(null) && gameTic() % PRODUCTION_TIME == 0) {
          numUnits++;
       }
-      return false;
-   }
-
-   static Planet[] getAllPlanets() {
-      return Galaxy.planets.clone();
    }
 
    void hitBy(Fleet f) {
@@ -69,13 +56,5 @@ public final class Planet extends Unit {
       } else {
          return null;
       }
-   }
-
-   static int getNumUnitsInPlanets(Player p)  {
-      return Galaxy.getNumUnitsInPlanets(p);
-   }
-   
-   public int getUpdateCount() {
-      return updateCnt;
    }
 }

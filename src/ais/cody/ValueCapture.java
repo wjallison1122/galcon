@@ -129,7 +129,7 @@ public class ValueCapture extends Player {
 	   double cost = Double.MAX_VALUE;
 	   double timeCost;
 	   
-	   timeCost = (target.getProductionFrequency() * (target.distanceTo(Vector.getCoords(heart)) / Fleet.SPEED)) + 1;
+	   timeCost = (target.getProductionFrequency() * (target.distanceTo(Vector.getCoords(heart)) / FLEET_SPEED)) + 1;
 	   
 	   if (target.ownedBy(this)) {
 			   cost = ((double)planetStrength(target));
@@ -148,7 +148,7 @@ public class ValueCapture extends Player {
    private int planetStrength(Planet planet) {
 	   int myStrength;
 	   int enemyStrength;
-	   Fleet[] allFleets = Fleet.getAllFleets();
+	   Fleet[] allFleets = fleets;
 	   
 	   if (planet.ownedBy(this)) {
 		   myStrength = planet.getNumUnits();
@@ -160,7 +160,7 @@ public class ValueCapture extends Player {
 	   }
 	   
 	   for (Fleet fleet : allFleets) 
-		   if (fleet.getDestination().equals(planet)) {
+		   if (fleet.DESTINATION.equals(planet)) {
 			   if (fleet.ownedBy(this)) {
 				   myStrength += fleet.getNumUnits();
 			   }

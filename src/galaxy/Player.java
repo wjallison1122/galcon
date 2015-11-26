@@ -23,8 +23,8 @@ public abstract class Player extends GameSettings {
       NAME = name;
    }
 
-   final void nextGame() {
-      planets = Planet.getAllPlanets();
+   final void nextGame(Planet[] newMap) {
+      planets = newMap;
       newGame();
    }
 
@@ -32,17 +32,19 @@ public abstract class Player extends GameSettings {
     * New game for an AI. 
     * Non-final to allow it to be optional. 
     */
-   protected void newGame() {
-      
+   protected void newGame() {}
+
+   protected final boolean ownedByMe(Unit u) {
+      return u != null && u.ownedBy(this);
    }
 
    final LinkedList<Action> getActions() {
       return actions;
    }
 
-   final void doTurn() {
+   final void doTurn(Fleet[] currentFleets) {
       actions = new LinkedList<Action>();
-      fleets = Fleet.getAllFleets();
+      fleets = currentFleets;
       turn();
    }
 
@@ -87,15 +89,15 @@ public abstract class Player extends GameSettings {
    }
 
    protected static final int numUnitsOwnedBy(Player p) {
-      return Galaxy.numUnitsOwnedBy(p);
+      return Director.numUnitsOwnedBy(p);
    }
 
    protected static final int numUnitsInPlanets(Player p) {
-      return Planet.getNumUnitsInPlanets(p);
+      return Director.numUnitsInPlanets(p);
    }
 
    protected static final int numUnitsInFleets(Player p) {
-      return Fleet.getNumUnitsInFleets(p);
+      return Director.numUnitsInFleets(p);
    }
 }
 

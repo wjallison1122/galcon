@@ -119,7 +119,7 @@ public class InfluenceAI extends Player {
       int currentTime = 0;
       List<PlanetAction> actions = new ArrayList<>();
       for (Fleet f : Arrays.asList(fleets).stream()
-            .filter((fleet) -> fleet.getDestination() == p)
+            .filter((fleet) -> fleet.DESTINATION == p)
             .collect(Collectors.toList())) {
                PlanetAction action = new PlanetAction();
                action.time = (int) Math.ceil(f.distanceLeft()/Fleet.SPEED);
@@ -220,7 +220,7 @@ public class InfluenceAI extends Player {
       }
       
       for (Fleet f : myFleets) {
-         addMap(myInfluence, f.getDestination(), f.getNumUnits());
+         addMap(myInfluence, f.DESTINATION, f.getNumUnits());
       }
       
       Map<Planet, Double> theirInfluence = new HashMap<>();
@@ -236,7 +236,7 @@ public class InfluenceAI extends Player {
       }
       
       for (Fleet f : theirFleets) {
-         addMap(theirInfluence, f.getDestination(), f.getNumUnits());
+         addMap(theirInfluence, f.DESTINATION, f.getNumUnits());
       }
       
       List<Planet> potentialTargets = new ArrayList<>();

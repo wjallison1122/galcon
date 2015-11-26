@@ -1,18 +1,24 @@
 package galaxy;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 
 final class Director extends GameSettings {
-   private int rounds = 0, tic = 0;
+   private int rounds = 0;
    private Matcher mm = null;
    private Visualizer visualizer = createVisualizer();
-
+   private MapMaker maps = createMapMaker();
+   private Galaxy galaxy = new Galaxy();
    private LinkedList<Player> active;
+   
+   private static HashMap<Player, Integer> numUnitsInFleets, numUnitsInPlanets;
+   private static HashMap<Player, Stats> playerStats = new HashMap<Player, Stats>();
+   private static int tic = 0;
 
    Director() {
-      for (int i = 0; i < players.length; i++) {
-         createStats(players[i]);
+      for (Player p : players) {
+         playerStats.put(p, createStats(p));
       }
 
       for (int i = 0; i < PLAYERS_PER_GAME; i++) {
@@ -31,20 +37,28 @@ final class Director extends GameSettings {
    }
 
    void next() {
+      numUnitsInFleets = new HashMap<Player, Integer>();
+      numUnitsInPlanets = new HashMap<Player, Integer>();
+
       for (Player p : active) {
-         p.doTurn();
+         numUnitsInFleets.put(p, galaxy.numUnitsInFleets(p));
+         numUnitsInPlanets.put(p, galaxy.numUnitsInPlanets(p));
+      }
+
+      for (Player p : active) {
+         p.doTurn(galaxy.getAllFleets());
       }
 
       for (Player p : active) {
          for (Action a : p.getActions()) {
-            a.doAction(tic);
+            galaxy.addFleet(a.doAction());
          }
       }
 
-      Galaxy.update();
-      visualizer.update();
+      galaxy.update();
+      visualizer.update(galaxy.getAllFleets());
 
-      Player winner = Galaxy.checkWinner();
+      Player winner = galaxy.checkWinner();
       if (winner != null) {
          Stats.updateAllStats(active, winner);
          newGame();
@@ -52,31 +66,31 @@ final class Director extends GameSettings {
 
       tic++;
    }
-   
+
    boolean usingVisualizer() {
       return visualizer != null;
    }
 
+   static int getTic() {
+      return tic;
+   }
+
    private void newGame() {
+      tic = 0;
+
       active = mm.getPlayers();
       mm.update();
 
-      Galaxy.clear();
-      Galaxy.generateRandomMap(active);
-//      Galaxy.generateSymmetricMap();
+      // TODO add re-mirror, re-play
+      galaxy.nextGame(active, maps.getMap(active));
 
-      Player[] activeArray = new Player[active.size()];
-      int i = 0;
       for (Player p : active) {
-         p.nextGame();
-         activeArray[i++] = p;
+         p.nextGame(galaxy.getAllPlanets());
       }
 
       if (usingVisualizer()) {
-         visualizer.nextGame(active);
+         visualizer.nextGame(active, galaxy.getAllPlanets());
       }
-
-      tic = 0;
    }
 
    /**
@@ -86,6 +100,22 @@ final class Director extends GameSettings {
       Stats.updateAllStats(active, null);
       newGame();
    }
+
+   static final int numUnitsOwnedBy(Player p) {
+      return numUnitsInPlanets(p) + numUnitsInFleets(p);
+   }
+
+   static final int numUnitsInPlanets(Player p) {
+      Integer numUnits = numUnitsInPlanets.get(p);
+      return numUnits == null ? 0 : numUnits;
+   }
+
+   static final int numUnitsInFleets(Player p) {
+      Integer numUnits = numUnitsInFleets.get(p);
+      return numUnits == null ? 0 : numUnits;
+   }
+
+   /******************* MATCHER *****************/
 
    private class Matcher {
       private Matcher next, prev;

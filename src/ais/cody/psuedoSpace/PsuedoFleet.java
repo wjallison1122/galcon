@@ -1,12 +1,14 @@
 package ais.cody.psuedoSpace;
 
+import galaxy.Fleet;
+import galaxy.GameSettings;
+import galaxy.Player;
+
 import java.util.ArrayList;
 
 import ais.cody.Vector;
-import galaxy.Fleet;
-import galaxy.Player;
 
-public class PsuedoFleet {
+public class PsuedoFleet extends GameSettings {
 	public PsuedoPlanet target;
 	public int strength;
 	public int turnsLeft;
@@ -14,16 +16,16 @@ public class PsuedoFleet {
 	public PsuedoFleet(PsuedoAction psuedoAction) {
 		target = psuedoAction.to;
 		strength = psuedoAction.numUnits;
-		turnsLeft = (int)(target.distanceTo(Vector.getCoords(psuedoAction.from.position)) / Fleet.SPEED);
+		turnsLeft = (int)(target.distanceTo(Vector.getCoords(psuedoAction.from.position)) / FLEET_SPEED);
 	}
 	
 	public PsuedoFleet(Fleet fleet, Player me, ArrayList<PsuedoPlanet> psuedoPlanets) {		
 		for (PsuedoPlanet psuedoPlanet : psuedoPlanets) 
-			if (psuedoPlanet.realPlanet.equals(fleet.getDestination()))
+			if (psuedoPlanet.realPlanet.equals(fleet.DESTINATION))
 				target = psuedoPlanet;
 		
 		strength = fleet.ownedBy(me) ? -fleet.getNumUnits() : fleet.getNumUnits();
-		turnsLeft = (int)(fleet.distanceLeft() / Fleet.SPEED);
+		turnsLeft = (int)(fleet.distanceLeft() / FLEET_SPEED);
 	}
 	
 	public PsuedoFleet(PsuedoFleet psuedoFleet) {

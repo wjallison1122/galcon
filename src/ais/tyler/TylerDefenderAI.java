@@ -282,8 +282,8 @@ public class TylerDefenderAI extends Player {
       if (dest.isNeutral()) {
          return dest.getNumUnits();
       } else {
-         double turns = (src.distanceTo(dest) / Fleet.SPEED);
-         int updateCount = dest.getUpdateCount() % dest.PRODUCTION_TIME;
+         double turns = (src.distanceTo(dest) / FLEET_SPEED);
+         int updateCount = gameTic() % dest.PRODUCTION_TIME;
          int unitsProduced = (int)((turns + updateCount) / dest.PRODUCTION_TIME);
          if (updateCount == 0) unitsProduced++;
          return dest.getNumUnits() + unitsProduced;

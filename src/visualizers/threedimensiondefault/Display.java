@@ -109,7 +109,6 @@ public class Display extends Visualizer {
 
    @Override
    public void mousePress(MouseEvent e) {
-      requestFocus();
 
       //Minuses are to offset it to the tip of the mouse pointer
       int mouseCoords[] = {e.getX() - 10, e.getY() - 12};

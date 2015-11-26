@@ -356,7 +356,7 @@ public class TylerClusterAI extends Player {
    private double distOfFarthestFleet(List<Fleet> fleets, Planet p) {
       double maxDist = 0;
       for (Fleet f : fleets) {
-         if (f.getDestination().equals(p)) {
+         if (f.targeting(p)) {
             double dist = f.distanceLeft();
             if (dist > maxDist) {
                maxDist = dist;

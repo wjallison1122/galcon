@@ -41,7 +41,7 @@ public class MaxPowerLazer extends Player {
       cleanFleetsTargeting();
       for (Fleet f : fleets) {
          if (f.ID > previd) {
-            fleetsTargeting.get(f.getDestination()).add(f);
+            fleetsTargeting.get(f.DESTINATION).add(f);
          }
       }
       
@@ -79,32 +79,58 @@ public class MaxPowerLazer extends Player {
 
       int determineValue() {
          if (home.isNeutral()) {
-            if (fleetsTargeting.size() > 0) {
-               return 0;
-            } else {
-               PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
-               int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / Fleet.SPEED) / home.PRODUCTION_TIME);
-               int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
-               // If I lose more units taking over the planet than can be made before the enemy hits the planet
-               if (prodDiff < 0) {
-                  // TODO check if close enemy planets can actually send enough units to help.
-                  
-                  return -1;
-               }
-
-               PriorityQueue<Planet> myp = planetsNearOwnedBy(home, MaxPowerLazer.this);
-               if (myp.peek().getNumUnits() > home.getNumUnits()){
-                  
-               }
-               return 0;
-            }
+            valueNeutralPlanet();
          } else if (home.ownedByOpponentOf(MaxPowerLazer.this)) {
-            return 0;
+            return valueEnemyPlanet();
          } else if (home.ownedBy(MaxPowerLazer.this)) {
-            return 0;
+            return valueMyPlanet();
          }
 
          return -1;
+      }
+      
+      int valueMyPlanet() {
+         if (fleetsTargeting.size() > 0) {
+            int myInbound = 0, enemyInbound = 0;
+            
+            for (Fleet f : fleetsTargeting) {
+               if (ownedByMe(f)) {
+                  myInbound += f.getNumUnits();
+               } else {
+                  enemyInbound += f.getNumUnits();
+               }
+            }
+            
+            return 0;
+         } else {
+            return -1;
+         }
+      }
+      
+      int valueEnemyPlanet() {
+         return 0;
+      }
+      
+      int valueNeutralPlanet() {
+         if (fleetsTargeting.size() > 0) {
+            return 0;
+         } else {
+            PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
+            int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / FLEET_SPEED) / home.PRODUCTION_TIME);
+            int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
+            // If I lose more units taking over the planet than can be made before the enemy hits the planet
+            if (prodDiff < 0) {
+               // TODO check if close enemy planets can actually send enough units to help.
+               
+               return -1;
+            }
+
+            PriorityQueue<Planet> myp = planetsNearOwnedBy(home, MaxPowerLazer.this);
+            if (myp.peek().getNumUnits() > home.getNumUnits()){
+               
+            }
+            return 0;
+         }
       }
 
       PriorityQueue<Planet> planetsNearOwnedBy(Planet target, Player owner) {

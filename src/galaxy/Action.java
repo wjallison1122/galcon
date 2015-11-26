@@ -23,10 +23,8 @@ public class Action extends GameSettings {
       NUM_UNITS = numUnits;
    }
 
-   final void doAction(int tic) {
-      if (START != null && TARGET != null) {
-         START.sendFleet(TARGET, NUM_UNITS);
-      }
+   final Fleet doAction() {
+      return START.sendFleet(TARGET, NUM_UNITS);
    }
 
    @Override

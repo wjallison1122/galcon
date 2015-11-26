@@ -66,22 +66,22 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
       return panel.getHeight();
    }
 
-   final void nextGame(LinkedList<Player> active) {
-      planets = Planet.getAllPlanets();
+   final void nextGame(LinkedList<Player> active, Planet[] newMap) {
+      planets = newMap;
       players = active;
       newGame();
    }
 
    protected abstract void newGame();
 
-   final void update() {
+   final void update(Fleet[] fleets) {
       BufferedImage image = new BufferedImage(WIN_WIDTH, WIN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
       Graphics g = image.getGraphics();
 
       // Switch to being drawAllUnits(planets, fleets)
       drawBackground(g);
       drawPlanets(planets, g);
-      drawFleets(Fleet.getAllFleets(), g);
+      drawFleets(fleets, g);
       drawOther(g);
       drawPlayerInfo(players, g);
       if (mouseOverInfo != null) {
@@ -105,7 +105,15 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
    }
 
    protected final int numUnitsOwnedBy(Player p) {
-      return Galaxy.numUnitsOwnedBy(p);
+      return Director.numUnitsOwnedBy(p);
+   }
+
+   protected static final int numUnitsInPlanets(Player p) {
+      return Director.numUnitsInPlanets(p);
+   }
+
+   protected static final int numUnitsInFleets(Player p) {
+      return Director.numUnitsInFleets(p);
    }
 
    protected abstract void drawBackground(Graphics g);

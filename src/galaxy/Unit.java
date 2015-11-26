@@ -94,12 +94,6 @@ public abstract class Unit extends GameSettings {
    public final double distanceTo(Unit u) {
       return distanceTo(u.getCoords());
    }
-   
-   /**
-    * Returns true if unit can be removed from game. 
-    * @return
-    */
-   abstract boolean update();
 }
 
 

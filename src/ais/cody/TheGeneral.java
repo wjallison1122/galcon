@@ -282,7 +282,7 @@ public class TheGeneral extends Player {
 	   double cost = Double.MAX_VALUE;
 	   double timeCost;
 	   
-	   timeCost = (target.productionFrequency * (target.distanceTo(Vector.getCoords(psuedoGalaxy.heart)) / Fleet.SPEED)) + 1;
+	   timeCost = (target.productionFrequency * (target.distanceTo(Vector.getCoords(psuedoGalaxy.heart)) / FLEET_SPEED)) + 1;
 	   
 	   if (target.neutral == 1) {
 		   cost = psuedoGalaxy.psuedoPlanetStrength(target) + 1;
@@ -301,7 +301,7 @@ public class TheGeneral extends Player {
 	   double cost = Double.MIN_VALUE;
 	   double timeCost;
 	   
-	   timeCost = -(target.productionFrequency * (target.distanceTo(Vector.getCoords(psuedoGalaxy.enemyHeart)) / Fleet.SPEED)) - 1;
+	   timeCost = -(target.productionFrequency * (target.distanceTo(Vector.getCoords(psuedoGalaxy.enemyHeart)) / FLEET_SPEED)) - 1;
 	   
 	   if (target.neutral == 1) {
 		   cost = psuedoGalaxy.psuedoPlanetStrength(target) - 1;

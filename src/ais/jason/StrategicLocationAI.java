@@ -158,10 +158,10 @@ public class StrategicLocationAI extends Player {
             //go under the assumption that whoever owns it now gets the full benefit of unit production
             if(!temp.planet.isNeutral()) {
                if(temp.planet.getOwner() == this) { //minus production from cost if ours
-                  temp.minBaseConquerCost -= ((planets[i].getProductionFrequency() / Fleet.SPEED) *
+                  temp.minBaseConquerCost -= ((planets[i].getProductionFrequency() / FLEET_SPEED) *
                         PlayerUtils.getNearestOwnedPlanet(planets, planets[i], this).distanceTo(planets[i]));
                } else { //add production to cost if enemy's
-                  temp.minBaseConquerCost += (planets[i].getProductionFrequency() / Fleet.SPEED) *
+                  temp.minBaseConquerCost += (planets[i].getProductionFrequency() / FLEET_SPEED) *
                         PlayerUtils.getNearestOwnedPlanet(planets, planets[i], this).distanceTo(planets[i]) + 10;
                }
             }
