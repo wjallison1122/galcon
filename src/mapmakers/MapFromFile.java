@@ -1,7 +1,6 @@
 package mapmakers;
 
 import galaxy.MapMaker;
-import galaxy.Planet;
 import galaxy.Player;
 
 import java.io.BufferedReader;
@@ -19,10 +18,9 @@ public class MapFromFile extends MapMaker {
 
    @Override
    protected void makeMap(LinkedList<Player> active) {
-      Planet[] planets = new Planet[NUM_PLANETS];
       for (int i = 0; i < NUM_PLANETS; i++) {
          try {
-            planets[i] = makePlanetFromString(file.readLine(), active);
+            makePlanetFromString(file.readLine(), active);
          } catch (IOException e) {
             System.out.println("Couldn't read file.");
             System.exit(0);
@@ -30,7 +28,7 @@ public class MapFromFile extends MapMaker {
       }
    }
    
-   private Planet makePlanetFromString(String str, LinkedList<Player> active) {
+   private void makePlanetFromString(String str, LinkedList<Player> active) {
       Scanner s = new Scanner(str);
 
       double[] coords = new double[DIMENSIONS.length];
@@ -38,10 +36,9 @@ public class MapFromFile extends MapMaker {
          coords[i] = s.nextDouble();
       }
  
-      Planet p = makePlanet(active.get(s.nextInt()), 
+      makePlanet(active.get(s.nextInt()), 
             s.nextInt(), s.nextInt(), s.nextInt(), coords);
       s.close();
-      return p;
    }
 
 }

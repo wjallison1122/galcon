@@ -2,12 +2,6 @@ package galaxy;
 
 
 public final class Planet extends Unit {
-   public static final int MAX_RADIUS = 50;
-   public static final int MIN_RADIUS = 12;
-   public static final int MAX_NEUTRAL_UNITS = 50;
-   public static final int MIN_PRODUCE_TIME = 34;
-   public static final int MAX_PRODUCE_TIME = 100;
-
    public final int RADIUS, PRODUCTION_TIME;
    private boolean recentlyConquered = false;
    
@@ -56,5 +50,10 @@ public final class Planet extends Unit {
       } else {
          return null;
       }
+   }
+   
+   @Override
+   protected Planet clone() {
+      return new Planet(owner, numUnits, RADIUS, PRODUCTION_TIME, getCoords());
    }
 }

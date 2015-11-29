@@ -99,8 +99,8 @@ public class DefaultVisualizer extends Visualizer {
 
    @Override
    protected void drawBackground(Graphics g) {
-      g.clearRect(0, 0, WIN_WIDTH, WIN_HEIGHT);
-      g.drawImage(STAR_BACKGROUND, 0, 0, WIN_WIDTH, WIN_HEIGHT, null);
+      g.clearRect(0, 0, getWidth(), getHeight());
+      g.drawImage(STAR_BACKGROUND, 0, 0, getWidth(), getHeight(), null);
    }
 
 

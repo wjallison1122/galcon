@@ -29,7 +29,7 @@ public class Action extends GameSettings {
 
    @Override
    public final String toString() {
-      return START.ID + " " + NUM_UNITS + " " + TARGET.ID;
+      return gameTic() + " " + START.ID + " " + NUM_UNITS + " " + TARGET.ID;
    }
 
    @SuppressWarnings("serial")

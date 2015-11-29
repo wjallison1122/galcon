@@ -39,23 +39,31 @@ enum StatsType {
 public class GameSettings {
    public static final boolean debugMode = true, logGame = false;
 
-   static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
-   static Player p1 = new ContestInfluenceAI();
-   static Player p2 = new TylerDefenderAI();
-   static Player [] players = {p1, p2};
-   public final int PLAYERS_PER_GAME = 2;
+   private static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
+   private static Player p1 = new ContestInfluenceAI();
+   private static Player p2 = new TylerDefenderAI();
+   public Player [] players = {p1, p2};
+   public static final int PLAYERS_PER_GAME = 2;
 
-   public final int NUM_PLANETS = 16;
+   public static final int NUM_PLANETS = 16;
 
    private final MapType map = MapType.RANDOM;
    private final StatsType stats = StatsType.DEFAULT;
    private final VisualizerType vis = VisualizerType.TWO_D;
+   public final static int FRAME_TIME = 10;
    //   public final int[] DIMENSIONS = {1000, 1000, 1000};
    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] {800, 800} : new int[] {1000, 1000, 1000};
 
    public static final int FLEET_SPEED = 2;
    public final int NUM_ROUNDS = 5000;
-   public final int FRAME_TIME = 10;
+   public final int TIC_LIMIT = 50000;
+   final boolean reverseEachMap = true;
+   
+   public static final int MAX_RADIUS = 50;
+   public static final int MIN_RADIUS = 12;
+   public static final int MAX_NEUTRAL_UNITS = 50;
+   public static final int MIN_PRODUCE_TIME = 34;
+   public static final int MAX_PRODUCE_TIME = 100;
 
    final Stats createStats(Player p) {
       switch (stats) {
@@ -90,19 +98,19 @@ public class GameSettings {
       }
    }
 
-   public final void debug(String str) {
+   public static final void debug(String str) {
       if (debugMode) {
          System.out.println(str);
       }
    }
 
-   public final void debugError(String str) {
+   public static final void debugError(String str) {
       if (debugMode) {
          error(str);
       }
    }
 
-   public final void error(String str) {
+   public static final void error(String str) {
       System.err.println(str);
    }
 
@@ -117,6 +125,14 @@ public class GameSettings {
          System.err.println("Couldn't make log file.");
          System.exit(0);
          return null;
+      }
+   }
+   
+   static final void writeToLog(String str) {
+      try {
+         gameLog.write(str);
+      } catch (IOException e) {
+         error("Couldn't write to log file");
       }
    }
 

@@ -4,43 +4,27 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 final class Main extends GameSettings {
-   public static void main(String[] args) {
-      new Main();
-   }
+   private static Director director = new Director();
+   private static Timer game = new Timer();
+   private static boolean pause = false;
 
-   static boolean pause = false;
-   static boolean skipGame = false;
-   
-   private Director director = new Director();
-   
-   private Main() {
+   public static void main(String[] args) {
       if (director.usingVisualizer()) {
-         new Timer().schedule(new TimerTask() {
+         game.schedule(new TimerTask() {
             @Override
             public void run() {
-               if (!director.done()) {
-                  next();
+               if (!pause && !director.done()) {
+                  director.next();
                }
             }
          }, 0, FRAME_TIME);
       } else {
          while (!director.done()) {
-            next();
+            if (!pause) {
+               director.next();
+
+            }
          }
-      }
-   }
-
-   /**
-    * The next game tic
-    */
-   void next() {
-      if (skipGame) {
-         skipGame = false;
-         director.skipGame();
-      }
-
-      if (!pause && !director.done()) {
-         director.next();
       }
    }
 
@@ -64,6 +48,14 @@ final class Main extends GameSettings {
     * For visualizer to be able to skip games
     */
    static void skipGame() {
-      skipGame = true;
+      director.skipGame();
+   }
+
+   static void restartGame() {
+      director.restartGame();
+   }
+   
+   static void reverseMap() {
+      director.startReversedGame();
    }
 }

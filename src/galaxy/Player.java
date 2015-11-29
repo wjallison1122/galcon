@@ -66,6 +66,7 @@ public abstract class Player extends GameSettings {
     * Note that order of operations is new AI -> loadFromStore and the 
     * save string should be written as such. 
     * Non-final to allow it to be optional. 
+    * '#' character is disallowed and will be cleaned if used.
     */
    protected String storeSelf() {
       return null;

@@ -19,7 +19,6 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
    private BufferedImage bufferImage;
    private Planet[] planets;
    private LinkedList<Player> players;
-   protected final int WIN_WIDTH, WIN_HEIGHT;
    private JFrame frame;
    private JPanel panel = new JPanel() {
       @Override
@@ -39,14 +38,11 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
       if (dimensions != DIMENSIONS.length) {
          throw new DimensionMismatchException("Visualizer does not match galaxy dimension space.");
       }
-
-      WIN_WIDTH = winWidth;
-      WIN_HEIGHT = winHeight;
-
+      
       Visualizer listener = this;
       frame = new JFrame() {{
          setName("Galcon AI Challenge");
-         setSize(WIN_WIDTH, WIN_HEIGHT);
+         setSize(winWidth, winHeight);
          setContentPane(panel);
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
          setResizable(true);
@@ -75,7 +71,7 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
    protected abstract void newGame();
 
    final void update(Fleet[] fleets) {
-      BufferedImage image = new BufferedImage(WIN_WIDTH, WIN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+      BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
       Graphics g = image.getGraphics();
 
       // Switch to being drawAllUnits(planets, fleets)
@@ -137,6 +133,10 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
          Main.skipGame();
       } else if (command == ' ') {
          Main.togglePause();
+      } else if (command == 'R') {
+         Main.restartGame();
+      } else if (command == 'T') {
+         Main.reverseMap();
       }
 
       keystroke(e);

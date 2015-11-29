@@ -1,31 +1,89 @@
 package galaxy;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public abstract class MapMaker extends GameSettings {
-   public static final int MAX_RADIUS = Planet.MAX_RADIUS;
-   public static final int MIN_RADIUS = Planet.MIN_RADIUS;
-   public static final int MAX_NEUTRAL_UNITS = Planet.MAX_NEUTRAL_UNITS;
-   public static final int MIN_PRODUCE_TIME = Planet.MIN_PRODUCE_TIME;
-   public static final int MAX_PRODUCE_TIME = Planet.MAX_PRODUCE_TIME;
-
-   private Planet[] planets = new Planet[NUM_PLANETS];
+   private PlanetMaker[] planets = new PlanetMaker[NUM_PLANETS];
+   private HashMap<Player, LinkedList<PlanetMaker>> startingPlanets = new HashMap<Player, LinkedList<PlanetMaker>>();
    private int pi;
+   private boolean hasReversed = false;
 
 
    protected abstract void makeMap(LinkedList<Player> active);
 
-   protected final Planet makePlanet(Player owner, int numUnits, int radius, int prodTime, double ... coords) {
-      return planets[pi++] = new Planet(owner, numUnits, radius, prodTime, coords);
+   protected final PlanetMaker makePlanet(Player owner, int numUnits, int radius, int prodTime, double ... coords) {
+      PlanetMaker p = new PlanetMaker(owner, numUnits, radius, prodTime, coords);
+      planets[pi++] = p;
+      if (owner != null) {
+         if (startingPlanets.containsKey(owner)) {
+            startingPlanets.get(owner).add(p);
+         } else {
+            LinkedList<PlanetMaker> starting = new LinkedList<PlanetMaker>();
+            starting.add(p);
+            startingPlanets.put(owner, starting);
+         }
+      }
+      return p;
+   }
+   
+   boolean hasRevsered() {
+      return hasReversed;
    }
 
-   public final Planet[] getMap(LinkedList<Player> active) {
+   public final Planet[] getExistingMap() {
+      return generateMap();
+   }
+
+   public final Planet[] getReversedMap() {
+      swapStartingPlanets();
+      return generateMap();
+   }
+
+   
+   // Made slightly more complex due to the tenet that the engine should support games with more than 2 players, 
+   // even if those games are not the intended use case of the AIs
+   private void swapStartingPlanets() {
+      hasReversed = true;
+      HashMap<Player, LinkedList<PlanetMaker>> newStartingSet = new HashMap<Player, LinkedList<PlanetMaker>>();
+      Iterator<Player> players = startingPlanets.keySet().iterator();
+      Player first = players.next();
+      Player p1 = first;
+      Player p2;
+      while (players.hasNext()) {
+         p2 = players.next();
+         newStartingSet.put(p2, startingPlanets.get(p1));
+         for (PlanetMaker plan : startingPlanets.get(p1)) {
+            plan.owner = p2;
+         }
+         p1 = p2;
+      }
+      newStartingSet.put(first, startingPlanets.get(p1));
+      for (PlanetMaker plan : startingPlanets.get(p1)) {
+         plan.owner = first;
+      }
+
+      startingPlanets = newStartingSet;
+   }
+
+   public final Planet[] getNewMap(LinkedList<Player> active) {
+      hasReversed = false;
       pi = 0;
+      startingPlanets = new HashMap<Player, LinkedList<PlanetMaker>>();
       makeMap(active);
       if (pi != NUM_PLANETS) {
          throw new RuntimeException("Not enough planets generated.");
       }
-      return planets.clone();
+      return generateMap();
+   }
+
+   private Planet[] generateMap() {
+      Planet[] map = new Planet[NUM_PLANETS];
+      for (int i = 0; i < map.length; i++) {
+         map[i] = planets[i].makePlanet();
+      }
+      return map;
    }
 
    protected boolean checkOverlappingOtherPlanets(int radius, double ... coords) {
@@ -35,5 +93,21 @@ public abstract class MapMaker extends GameSettings {
          }
       }
       return false;
+   }
+
+   class PlanetMaker extends Unit {
+      final int RADIUS;
+      int prodTime;
+
+      PlanetMaker(Player owner, int numUnits, int radius, int prodTime, double[] coords) {
+         super(owner, numUnits, coords);
+         RADIUS = radius;
+         this.prodTime = prodTime;
+      }
+
+      Planet makePlanet() {
+         return new Planet(owner, numUnits, RADIUS, prodTime, getCoords());
+      }
+
    }
 }

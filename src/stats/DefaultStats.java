@@ -12,6 +12,7 @@ public final class DefaultStats extends Stats {
       super(p);
    }
 
+   @Override
    protected void updateStats(LinkedList<Player> active, Player winner) {
       // List of active is so more stats can be added later.
       // For now, just win/loss record
@@ -22,8 +23,7 @@ public final class DefaultStats extends Stats {
       }
    }
 
-
-
+   @Override
    protected void reportStats() {
       System.out.println("Had " + wins + " wins and " + losses + " losses.");
    }

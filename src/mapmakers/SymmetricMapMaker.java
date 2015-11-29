@@ -1,10 +1,9 @@
 package mapmakers;
 
-import java.util.LinkedList;
-
 import galaxy.MapMaker;
-import galaxy.Planet;
 import galaxy.Player;
+
+import java.util.LinkedList;
 
 public class SymmetricMapMaker extends MapMaker {
 
@@ -15,12 +14,12 @@ public class SymmetricMapMaker extends MapMaker {
       generateSymmetricPlanets(active);
    }
 
-   Planet generateCenterPlanet() {
+   void generateCenterPlanet() {
       double[] coords = new double[DIMENSIONS.length];
       for (int i = 0; i < DIMENSIONS.length; i++) {
          coords[i] = DIMENSIONS[i] / 2;
       }
-      return makePlanet(null, MAX_NEUTRAL_UNITS, MAX_RADIUS, MIN_PRODUCE_TIME, coords);
+      makePlanet(null, MAX_NEUTRAL_UNITS, MAX_RADIUS, MIN_PRODUCE_TIME, coords);
    }
 
    void generateSymmetricStartingPlanets(LinkedList<Player> players) {

@@ -11,7 +11,7 @@ final class Director extends GameSettings {
    private MapMaker maps = createMapMaker();
    private Galaxy galaxy = new Galaxy();
    private LinkedList<Player> active;
-   
+
    private static HashMap<Player, Integer> numUnitsInFleets, numUnitsInPlanets;
    private static HashMap<Player, Stats> playerStats = new HashMap<Player, Stats>();
    private static int tic = 0;
@@ -25,7 +25,7 @@ final class Director extends GameSettings {
          mm = new Matcher(mm);
       }
 
-      newGame();
+      newGame(maps.getNewMap(mm.nextMatchup()));
    }
 
    boolean done() {
@@ -33,7 +33,9 @@ final class Director extends GameSettings {
    }
 
    void reportStats() {
-      Stats.reportAllStats();
+      for (Stats s : playerStats.values()) {
+         s.reportStats();
+      }
    }
 
    void next() {
@@ -58,13 +60,27 @@ final class Director extends GameSettings {
       galaxy.update();
       visualizer.update(galaxy.getAllFleets());
 
+      tic++;
+
       Player winner = galaxy.checkWinner();
       if (winner != null) {
-         Stats.updateAllStats(active, winner);
-         newGame();
+         finishGame(winner);
       }
 
-      tic++;
+      if (tic > TIC_LIMIT) {
+         finishGame(null);
+      }
+   }
+
+   void finishGame(Player winner) {
+      updateStats(winner);
+      newGame(maps.hasRevsered() || !reverseEachMap ? maps.getNewMap(mm.nextMatchup()) : maps.getReversedMap());
+   }
+   
+   void updateStats(Player winner) {
+      for (Player p : active) {
+         playerStats.get(p).updateStats(active, winner);
+      }
    }
 
    boolean usingVisualizer() {
@@ -75,14 +91,10 @@ final class Director extends GameSettings {
       return tic;
    }
 
-   private void newGame() {
+   private void newGame(Planet[] map) {
       tic = 0;
 
-      active = mm.getPlayers();
-      mm.update();
-
-      // TODO add re-mirror, re-play
-      galaxy.nextGame(active, maps.getMap(active));
+      galaxy.nextGame(active, map);
 
       for (Player p : active) {
          p.nextGame(galaxy.getAllPlanets());
@@ -97,8 +109,17 @@ final class Director extends GameSettings {
     * When manually skipped game
     */
    void skipGame() {
-      Stats.updateAllStats(active, null);
-      newGame();
+      finishGame(null);
+   }
+
+   void restartGame() {
+      updateStats(null);
+      newGame(maps.getExistingMap());
+   }
+
+   void startReversedGame() {
+      updateStats(null);
+      newGame(maps.getReversedMap());
    }
 
    static final int numUnitsOwnedBy(Player p) {
@@ -129,6 +150,12 @@ final class Director extends GameSettings {
          } else {
             player = 0;
          }
+      }
+
+      LinkedList<Player> nextMatchup() {
+         active = getPlayers();
+         update();
+         return active;
       }
 
       void update() {
