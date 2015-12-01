@@ -58,12 +58,17 @@ final class Director extends GameSettings {
       }
 
       galaxy.update();
-      visualizer.update(galaxy.getAllFleets());
+      if (visualizer != null) {
+         visualizer.update(galaxy.getAllFleets());
+      }
 
       tic++;
 
       Player winner = galaxy.checkWinner();
       if (winner != null) {
+         for (Player p : active) {
+            p.endGame(p == winner);
+         }
          finishGame(winner);
       }
 

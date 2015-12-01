@@ -78,6 +78,9 @@ public abstract class Player extends GameSettings {
     * Non-final to allow it to be optional. 
     */
    protected void loadFromStore(String oldself) {}
+   
+   //notify player about end of game
+   protected void endGame(boolean vicorious) {}
 
    /**
     * Checks if two players are equal. Works with null. 

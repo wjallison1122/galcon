@@ -12,7 +12,9 @@ import stats.DefaultStats;
 import visualizers.threedimensiondefault.Display;
 import visualizers.twodimensiondefault.DefaultVisualizer;
 import ais.jono.ContestInfluenceAI;
+import ais.jono.GoodAI;
 import ais.tyler.TylerDefenderAI;
+import ais.tyler.TylerRandomAI;
 
 enum SymmetryType {
    VERTICAL,
@@ -40,8 +42,8 @@ public class GameSettings {
    public static final boolean debugMode = true, logGame = false;
 
    private static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
-   private static Player p1 = new ContestInfluenceAI();
-   private static Player p2 = new TylerDefenderAI();
+   private static Player p1 = new GoodAI(false);
+   private static Player p2 = new TylerRandomAI();
    public Player [] players = {p1, p2};
    public static final int PLAYERS_PER_GAME = 2;
 
@@ -49,7 +51,7 @@ public class GameSettings {
 
    private final MapType map = MapType.RANDOM;
    private final StatsType stats = StatsType.DEFAULT;
-   private final VisualizerType vis = VisualizerType.TWO_D;
+   private final VisualizerType vis = VisualizerType.THREE_D;
    public final static int FRAME_TIME = 10;
    //   public final int[] DIMENSIONS = {1000, 1000, 1000};
    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] {800, 800} : new int[] {1000, 1000, 1000};
@@ -86,6 +88,7 @@ public class GameSettings {
    }
 
    final Visualizer createVisualizer() {
+      if (vis == null) return null;
       switch (vis) {
       case TWO_D:
          return new DefaultVisualizer(DIMENSIONS);
@@ -141,4 +144,6 @@ public class GameSettings {
       str += date.getTime();
       return str;
    }
+   
+   
 }
