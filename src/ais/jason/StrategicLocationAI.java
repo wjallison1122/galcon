@@ -194,7 +194,6 @@ public class StrategicLocationAI extends Player {
       //System.out.println("unitRatio: " + currentUnitRatio + " prdnRatio: " + currentProductionRatio);
       //System.out.println(mode);
       
-      mode = PlayMode.NORMAL;
       //aggregate information about planets
       for(int i = 0; i < allPlanetInfo.size(); i++) {
          PlanetUtility temp = allPlanetInfo.get(i);
