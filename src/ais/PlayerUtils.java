@@ -407,6 +407,52 @@ public class PlayerUtils extends GameSettings {
       return current;
    }
 
+   public static int getUnitsToCapture(Planet p, Fleet[] fleets, Player player) {
+      PlanetOwner current;
+      if (p.ownedBy(player)) {
+         current = PlanetOwner.PLAYER;
+      } else if (p.ownedByOpponentOf(player)) {
+         current = PlanetOwner.OPPONENT;
+      } else {
+         current = PlanetOwner.NOBODY;
+      }
+      int updateCount = gameTic() % p.PRODUCTION_TIME;
+      int previousUnits = 0;
+      int unitCount = p.getNumUnits();
+      int currentTime = 0;
+      for (Fleet f : Arrays.asList(fleets).stream()
+            .filter((fleet) -> fleet.DESTINATION == p)
+            .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft()))
+            .collect(Collectors.toList())) {
+         int passingTime = (int) Math.ceil(f.distanceLeft()/FLEET_SPEED) - currentTime;
+         if (current != PlanetOwner.NOBODY) {
+            updateCount += passingTime;
+            int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;
+            previousUnits += unitsToAdd;
+            unitCount += unitsToAdd;
+         }
+         if ((f.ownedBy(player) && current == PlanetOwner.PLAYER) || (f.ownedByOpponentOf(player) && current == PlanetOwner.OPPONENT)) {
+            unitCount += f.getNumUnits();
+         } else {
+            unitCount -= f.getNumUnits();
+            if (unitCount == 0) {
+               current = PlanetOwner.NOBODY;
+            }
+            if (unitCount < 0) {
+               unitCount = -unitCount;
+               if (f.ownedBy(player)) {
+                  current = PlanetOwner.PLAYER;
+               } else {
+                  current = PlanetOwner.OPPONENT;
+               }
+            }
+         }
+         currentTime += passingTime;
+      }
+      
+      return current == PlanetOwner.PLAYER ? -unitCount : unitCount;
+   }
+   
    public static Planet getNearestOwnedPlanet(Planet[] planets, Planet planet, Player player) {
       double bestDistance = Double.MAX_VALUE;
       Planet rtn = null;

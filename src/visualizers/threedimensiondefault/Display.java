@@ -114,7 +114,7 @@ public class Display extends Visualizer {
       int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
       for(GraphicHolder gh : displayCamera.drawList) {
          double tempCoords[] = {mouseCoords[0], mouseCoords[1] - gh.screenRadius/2};
-         double scrLoc[] = {gh.screenLocation.x + 780, gh.screenLocation.y + 400};
+         double scrLoc[] = {gh.screenLocation.x + 785, gh.screenLocation.y + 435};
 
          //Calculate distance
          double distance = 0;
@@ -123,7 +123,7 @@ public class Display extends Visualizer {
          }
          distance = Math.sqrt(distance);
 
-         if(distance < gh.screenRadius) {
+         if(distance < gh.screenRadius + 5) {
             mouseOver.coords = mouseCoords;
             mouseOver.text = "Production: " + gh.production;
             mouseOver.timeToLive = 120;
