@@ -47,7 +47,6 @@ public class GoodAI extends Player {
       
       public AIConstants() {
          //Default Constants
-         /*
          USE_MOVE_FORWARDS = false;
          USE_OLD_VALUE_CALCULATION = true;
          MIN_AGGRESSIVE_DEFENSE = 10;
@@ -58,7 +57,6 @@ public class GoodAI extends Player {
          UNIT_COUNT_POSITION_WEIGHT = 0.8;
          UNIT_GEN_POSITION_WEIGHT = 0.2;
          CAPTURE_SAFTEY_MARGIN = 1.02;
-         */
          
          //TylerDefender on 2d
          /*
@@ -75,6 +73,7 @@ public class GoodAI extends Player {
          */
          
          //TylerRandom on 2d
+         /*
          USE_MOVE_FORWARDS = true;
          USE_OLD_VALUE_CALCULATION = false;
          MIN_AGGRESSIVE_DEFENSE = 39;
@@ -85,6 +84,7 @@ public class GoodAI extends Player {
          UNIT_COUNT_POSITION_WEIGHT = 0.609490464638585;
          UNIT_GEN_POSITION_WEIGHT = 0.37792441961384515;
          CAPTURE_SAFTEY_MARGIN = 0.11104507853259545;
+         */
       }
       
       public void printSettings() {
