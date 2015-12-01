@@ -226,8 +226,10 @@ public class TylerDefenderAI extends Player {
          }
       }
       
-      if (myUnitCount > enemyUnitCount + 50) {
+      int unitsInAir = PlayerUtils.getMyUnitsInFleets(fleets, this);
+      if (myUnitCount - unitsInAir > enemyUnitCount + 50) {
          // Capture small neutral planets.
+         int totalUnitsSentThisTurn = 0;
          for (Planet p : otherPlanets) {
             if (p.isNeutral()) {
             //System.out.println("Planet: " + (p.isNeutral() ? "Neutral" : "Enemy"));
@@ -244,10 +246,13 @@ public class TylerDefenderAI extends Player {
                         expendableUnits > 0 && 
                         myUnitsIncoming < unitsOnPlanet) {
                      int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
-                     addAction(myPlanet, p, unitsToSend);
-                     // Update unit counts
-                     myUnitsApproaching.put(p, myUnitsIncoming + unitsToSend);
-                     myUnitsSent.put(myPlanet, unitsSentThisTurn + unitsToSend);
+                     if (unitsToSend < 50 - totalUnitsSentThisTurn) {
+                        addAction(myPlanet, p, unitsToSend);
+                        // Update unit counts
+                        myUnitsApproaching.put(p, myUnitsIncoming + unitsToSend);
+                        myUnitsSent.put(myPlanet, unitsSentThisTurn + unitsToSend);
+                        totalUnitsSentThisTurn += unitsToSend;
+                     }
                   }
                }
             }
