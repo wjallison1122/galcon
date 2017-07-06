@@ -23,6 +23,7 @@ enum SymmetryType {
    RADIAL,
 }
 
+// TODO Switch to holder pattern
 enum VisualizerType {
    TWO_D,
    THREE_D,
@@ -51,7 +52,7 @@ public class GameSettings {
 
    private final MapType map = MapType.RANDOM;
    private final StatsType stats = StatsType.DEFAULT;
-   private final VisualizerType vis = VisualizerType.THREE_D;
+   private final VisualizerType vis = VisualizerType.TWO_D;
    public final static int FRAME_TIME = 10;
    //   public final int[] DIMENSIONS = {1000, 1000, 1000};
    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] {800, 800} : new int[] {1000, 1000, 1000};

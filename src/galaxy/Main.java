@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 final class Main extends GameSettings {
+   // TODO Figure out if this is really the best setup
    private static Director director = new Director();
    private static Timer game = new Timer();
    private static boolean pause = false;
@@ -22,13 +23,13 @@ final class Main extends GameSettings {
          while (!director.done()) {
             if (!pause) {
                director.next();
-
             }
          }
       }
    }
 
    /**
+    * TODO
     * For make map from text
     * @param ID
     * @return

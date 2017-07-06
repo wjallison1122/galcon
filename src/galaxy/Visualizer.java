@@ -54,11 +54,11 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
       }};
    }
    
-   protected int getWidth() {
+   protected final int getWidth() {
       return panel.getWidth();
    }
    
-   protected int getHeight() {
+   protected final int getHeight() {
       return panel.getHeight();
    }
 
@@ -88,6 +88,7 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
       repaint();
    }
    
+   // Why put this separate but not final?
    protected void repaint() {
       frame.repaint();
    }
@@ -122,7 +123,7 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
 
    protected abstract void drawOther(Graphics g);
 
-   protected void keystroke(KeyEvent e){}
+   protected void keystroke(KeyEvent e) {}
 
    @Override
    public final void keyPressed(KeyEvent e) {
@@ -153,21 +154,21 @@ public abstract class Visualizer extends GameSettings implements KeyListener, Mo
    }
 
    @Override
-   public void keyReleased(KeyEvent arg0) {}
+   public void keyReleased(KeyEvent e) {}
    @Override
-   public void keyTyped(KeyEvent arg0) {}
+   public void keyTyped(KeyEvent e) {}
    @Override
-   public void mouseClicked(MouseEvent e){}
+   public void mouseClicked(MouseEvent e) {}
    @Override
-   public void mouseEntered(MouseEvent e){}
+   public void mouseEntered(MouseEvent e) {}
    @Override
-   public void mouseExited(MouseEvent e){}
+   public void mouseExited(MouseEvent e) {}
    @Override
-   public void mouseReleased(MouseEvent e){}
+   public void mouseReleased(MouseEvent e) {}
    @Override
-   public void mouseDragged(MouseEvent arg0) {}
+   public void mouseDragged(MouseEvent e) {}
    @Override
-   public void mouseMoved(MouseEvent arg0) {}
+   public void mouseMoved(MouseEvent e) {}
    @Override
-   public void mouseWheelMoved(MouseWheelEvent arg0) {}
+   public void mouseWheelMoved(MouseWheelEvent e) {}
 }

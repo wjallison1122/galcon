@@ -10,7 +10,6 @@ public abstract class MapMaker extends GameSettings {
    private int pi;
    private boolean hasReversed = false;
 
-
    protected abstract void makeMap(LinkedList<Player> active);
 
    protected final PlanetMaker makePlanet(Player owner, int numUnits, int radius, int prodTime, double ... coords) {
@@ -27,7 +26,7 @@ public abstract class MapMaker extends GameSettings {
       }
       return p;
    }
-   
+
    boolean hasRevsered() {
       return hasReversed;
    }
@@ -41,7 +40,7 @@ public abstract class MapMaker extends GameSettings {
       return generateMap();
    }
 
-   
+
    // Made slightly more complex due to the tenet that the engine should support games with more than 2 players, 
    // even if those games are not the intended use case of the AIs
    private void swapStartingPlanets() {
@@ -86,13 +85,18 @@ public abstract class MapMaker extends GameSettings {
       return map;
    }
 
-   protected boolean checkOverlappingOtherPlanets(int radius, double ... coords) {
+   protected boolean checkOverlappingPlanets(int radius, double ... coords) {
       for (int i = 0; i < pi; i++) {
          if (planets[i].distanceTo(coords) < radius + planets[i].RADIUS + 10) {
             return true;
          }
       }
       return false;
+   }
+
+   @Override
+   public String toString() {
+      return "";
    }
 
    class PlanetMaker extends Unit {
@@ -109,5 +113,9 @@ public abstract class MapMaker extends GameSettings {
          return new Planet(owner, numUnits, RADIUS, prodTime, getCoords());
       }
 
+      @Override
+      public String toString() {
+         return "";
+      }
    }
 }

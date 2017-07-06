@@ -200,7 +200,7 @@ public class PlayerUtils extends GameSettings {
 
       private void verifyMatchingDimensions(Location other) {
          if (this.coords.length != other.coords.length) {
-            throw new DimensionMismatchException();
+            throw new DimensionMismatchException("PlayerUtils");
          }
       }
    }

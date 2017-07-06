@@ -70,16 +70,18 @@ final class Director extends GameSettings {
             p.endGame(p == winner);
          }
          finishGame(winner);
-      }
-
-      if (tic > TIC_LIMIT) {
+      } else if (tic > TIC_LIMIT) {
          finishGame(null);
       }
    }
+   
+   void finishGame(Player winner, Planet[] newMap) {
+      updateStats(winner);
+      newGame(newMap);
+   }
 
    void finishGame(Player winner) {
-      updateStats(winner);
-      newGame(maps.hasRevsered() || !reverseEachMap ? maps.getNewMap(mm.nextMatchup()) : maps.getReversedMap());
+      finishGame(winner, maps.hasRevsered() || !reverseEachMap ? maps.getNewMap(mm.nextMatchup()) : maps.getReversedMap());
    }
    
    void updateStats(Player winner) {
@@ -99,7 +101,7 @@ final class Director extends GameSettings {
    private void newGame(Planet[] map) {
       tic = 0;
 
-      galaxy.nextGame(active, map);
+      galaxy.nextGame(map);
 
       for (Player p : active) {
          p.nextGame(galaxy.getAllPlanets());
@@ -118,13 +120,11 @@ final class Director extends GameSettings {
    }
 
    void restartGame() {
-      updateStats(null);
-      newGame(maps.getExistingMap());
+      finishGame(null, maps.getExistingMap());
    }
 
    void startReversedGame() {
-      updateStats(null);
-      newGame(maps.getReversedMap());
+      finishGame(null, maps.getReversedMap());
    }
 
    static final int numUnitsOwnedBy(Player p) {

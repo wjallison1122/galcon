@@ -64,7 +64,7 @@ public class SymmetricMapMaker extends MapMaker {
 
       do {
          coords1[0] = Math.random() * (DIMENSIONS[0] / 2 - planetRadius * 2) + planetRadius;
-      } while (checkOverlappingOtherPlanets(planetRadius, coords1));
+      } while (checkOverlappingPlanets(planetRadius, coords1));
       coords2[0] = DIMENSIONS[0] - coords1[0];
 
       double[][] locs = { coords1, coords2 };
@@ -83,7 +83,7 @@ public class SymmetricMapMaker extends MapMaker {
          randomAngle = Math.random() * maxAngle;
          coords[0] = randomRadius * Math.cos(randomAngle) + DIMENSIONS[0] / 2;
          coords[1] = randomRadius * Math.sin(randomAngle) + DIMENSIONS[1] / 2;
-      } while (checkOverlappingOtherPlanets(planetRadius, coords));
+      } while (checkOverlappingPlanets(planetRadius, coords));
       // TODO: there might be an edge case where there are a lot of players and a planet is
       // generated very close to the center. It may not overlap with existing planets, but it
       // might overlap with the other planets that will be generated symmetrically to it for
@@ -132,7 +132,7 @@ public class SymmetricMapMaker extends MapMaker {
          lastAngle = Math.random() * maxAngle * 2;
          coords[DIMENSIONS.length - 2] = randomRadius * calculatedSin * Math.cos(lastAngle) + DIMENSIONS[DIMENSIONS.length - 2] / 2;
          coords[DIMENSIONS.length - 1] = randomRadius * calculatedSin * Math.sin(lastAngle) + DIMENSIONS[DIMENSIONS.length - 1] / 2;
-      } while (checkOverlappingOtherPlanets(planetRadius, coords));
+      } while (checkOverlappingPlanets(planetRadius, coords));
       // TODO: there might be an edge case where there are a lot of players and a planet is
       // generated very close to the center. It may not overlap with existing planets, but it
       // might overlap with the other planets that will be generated symmetrically to it for

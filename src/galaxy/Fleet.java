@@ -27,6 +27,11 @@ public final class Fleet extends Unit {
    }
 
    boolean update() {
+      if (hasHit) {
+         error("Fleet being updated after reaching destination");
+         return true;
+      }
+
       double[] targetCoords = DESTINATION.getCoords();
       double[] fleetCoords = getCoords();
       double distance = distanceLeft();
@@ -45,6 +50,10 @@ public final class Fleet extends Unit {
       }
 
       return false;
+   }
+   
+   String storeSelf() {
+      return "";
    }
 }
 

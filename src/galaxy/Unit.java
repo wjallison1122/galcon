@@ -8,9 +8,10 @@ public abstract class Unit extends GameSettings {
    int numUnits;
    int ticsActive = 0;
 
+   // TODO add game ID 
    private static int id = 0;
    public final int ID = id++;
-   public Color debugColor;
+   public Color debugColor; // Where is this used?
 
    Unit(Player owner, int numUnits, double ... coords) {
       this.owner = owner;
@@ -23,15 +24,11 @@ public abstract class Unit extends GameSettings {
    }
    
    public final boolean equals(Unit u) {
-      if (u == null) {
-         return false;
-      }
-      
-      return u.ID == ID;
+      return u == null ? false : u.ID == ID;
    }
    
    public static final boolean areEqual(Unit u1, Unit u2) {
-      return (u1 == null || u2 == null) ? u1 == u2 : u1.ID == u2.ID;
+      return u1 == null || u2 == null ? u1 == u2 : u1.ID == u2.ID;
    }
 
    public final Player getOwner() {
@@ -44,7 +41,7 @@ public abstract class Unit extends GameSettings {
 
    final void setCoords(double ... coords) {
       if (coords.length != DIMENSIONS.length) {
-         throw new RuntimeException("Invalid dimensions of coordinates given.");
+         throw new DimensionMismatchException("Invalid dimensions of coordinates given.");
       }
       this.coords = coords.clone();
    }

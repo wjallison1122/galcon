@@ -15,6 +15,3 @@ public abstract class Stats {
 
    protected abstract void reportStats();
 }
-
-
-

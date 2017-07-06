@@ -28,12 +28,13 @@ public abstract class Player extends GameSettings {
       newGame();
    }
 
-   /*
-    * New game for an AI. 
-    * Non-final to allow it to be optional. 
-    */
+   // Notify player about start of a new game (new planet set)
    protected void newGame() {}
+   
+   // Notify player about end of game
+   protected void endGame(boolean victorious) {}
 
+   // Move to PlayerUtils?
    protected final boolean ownedByMe(Unit u) {
       return u != null && u.ownedBy(this);
    }
@@ -69,18 +70,14 @@ public abstract class Player extends GameSettings {
     * '#' character is disallowed and will be cleaned if used.
     */
    protected String storeSelf() {
-      return null;
+      return "";
    }
    
    /*
     * Used to allow an AI to restore its state from a file. 
     * See above method. 
-    * Non-final to allow it to be optional. 
     */
    protected void loadFromStore(String oldself) {}
-   
-   //notify player about end of game
-   protected void endGame(boolean vicorious) {}
 
    /**
     * Checks if two players are equal. Works with null. 

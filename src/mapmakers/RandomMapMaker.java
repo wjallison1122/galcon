@@ -40,7 +40,7 @@ public class RandomMapMaker extends MapMaker {
          for (int i = 0; i < DIMENSIONS.length; i++) {
             coords[i] = Math.random() * (DIMENSIONS[i] - radius * 2) + radius;
          }
-      } while (checkOverlappingOtherPlanets(radius, coords));
+      } while (checkOverlappingPlanets(radius, coords));
       return coords;
    }
 }

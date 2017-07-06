@@ -2,6 +2,7 @@ package galaxy;
 
 
 public final class Planet extends Unit {
+	
    public final int RADIUS, PRODUCTION_TIME;
    private boolean recentlyConquered = false;
    
@@ -36,6 +37,10 @@ public final class Planet extends Unit {
 	  return 1. / (double)this.PRODUCTION_TIME;
    }
 
+   /**
+    * For visualizer to check if a planet was recently conquered. 
+    * @return Whether this planet had changed hands since last checked
+    */
    boolean checkRecentlyConquered() {
       boolean recent = recentlyConquered;
       recentlyConquered = false;
@@ -52,8 +57,12 @@ public final class Planet extends Unit {
       }
    }
    
-   @Override
-   protected Planet clone() {
-      return new Planet(owner, numUnits, RADIUS, PRODUCTION_TIME, getCoords());
+   String storeSelf() {
+      return "";
+   }
+   
+   void terminate() {
+      numUnits = -1;
+      owner = null;
    }
 }
