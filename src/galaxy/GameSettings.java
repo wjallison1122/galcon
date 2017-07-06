@@ -6,24 +6,30 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
+import ais.jono.GoodAI;
+import ais.tyler.TylerRandomAI;
 import mapmakers.RandomMapMaker;
 import mapmakers.SymmetricMapMaker;
 import stats.DefaultStats;
 import visualizers.threedimensiondefault.Display;
 import visualizers.twodimensiondefault.DefaultVisualizer;
-import ais.jono.ContestInfluenceAI;
-import ais.jono.GoodAI;
-import ais.tyler.TylerDefenderAI;
-import ais.tyler.TylerRandomAI;
 
-enum SymmetryType{VERTICAL,HORIZONTAL,DIAGONAL,RADIAL,}
+enum SymmetryType {
+    VERTICAL, HORIZONTAL, DIAGONAL, RADIAL,
+}
 
 // TODO Switch to holder pattern
-enum VisualizerType{TWO_D,THREE_D,SERVER}
+enum VisualizerType {
+    TWO_D, THREE_D, SERVER
+}
 
-enum MapType{RANDOM,SYMMETRICAL}
+enum MapType {
+    RANDOM, SYMMETRICAL
+}
 
-enum StatsType{DEFAULT}
+enum StatsType {
+    DEFAULT
+}
 
 public class GameSettings {
     public static final boolean debugMode = true, logGame = false;
@@ -31,7 +37,7 @@ public class GameSettings {
     private static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
     private static Player p1 = new GoodAI(false);
     private static Player p2 = new TylerRandomAI();
-    public Player [] players = {p1, p2};
+    public Player[] players = { p1, p2 };
     public static final int PLAYERS_PER_GAME = 2;
 
     public static final int NUM_PLANETS = 16;
@@ -40,8 +46,9 @@ public class GameSettings {
     private final StatsType stats = StatsType.DEFAULT;
     private final VisualizerType vis = VisualizerType.TWO_D;
     public final static int FRAME_TIME = 10;
-    //   public final int[] DIMENSIONS = {1000, 1000, 1000};
-    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] {800, 800} : new int[] {1000, 1000, 1000};
+    // public final int[] DIMENSIONS = {1000, 1000, 1000};
+    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] { 800, 800 }
+            : new int[] { 1000, 1000, 1000 };
 
     public static final int FLEET_SPEED = 2;
     public final int NUM_ROUNDS = 5000;
@@ -75,7 +82,9 @@ public class GameSettings {
     }
 
     final Visualizer createVisualizer() {
-        if (vis == null) return null;
+        if (vis == null) {
+            return null;
+        }
         switch (vis) {
             case TWO_D:
                 return new DefaultVisualizer(DIMENSIONS);
@@ -131,6 +140,5 @@ public class GameSettings {
         str += date.getTime();
         return str;
     }
-
 
 }

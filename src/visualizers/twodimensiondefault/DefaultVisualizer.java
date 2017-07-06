@@ -1,10 +1,5 @@
 package visualizers.twodimensiondefault;
 
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-import galaxy.Visualizer;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -14,6 +9,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
+
+import galaxy.Fleet;
+import galaxy.Planet;
+import galaxy.Player;
+import galaxy.Visualizer;
 
 public class DefaultVisualizer extends Visualizer {
     class MouseOver implements MouseOverInfo {
@@ -40,8 +40,8 @@ public class DefaultVisualizer extends Visualizer {
         mouseOverInfo = mouseOver;
     }
 
-    private static final Image STAR_BACKGROUND = new ImageIcon("SpacePic.jpg").getImage();
-    private static final Image PLANET_IMAGE = new ImageIcon("planetGray.png").getImage();
+    private static final Image STAR_BACKGROUND = new ImageIcon("assets/SpacePic.jpg").getImage();
+    private static final Image PLANET_IMAGE = new ImageIcon("assets/planetGray.png").getImage();
     private static final Font FONT = new Font("Monospaced", Font.BOLD, 18);
 
     @Override
@@ -117,7 +117,7 @@ public class DefaultVisualizer extends Visualizer {
         private LinkedList<Particle> particles = new LinkedList<Particle>();
         private static LinkedList<Explosion> explosions = new LinkedList<Explosion>();
 
-        public static final Image PARTICLE = new ImageIcon("particle.png").getImage();
+        public static final Image PARTICLE = new ImageIcon("assets/particle.png").getImage();
         public static final int RADIUS_MIN = 5;
         public static final int RADIUS_MAX = 10;
         public static final double DELTA_RADIUS_MIN = 0.05;
@@ -132,7 +132,7 @@ public class DefaultVisualizer extends Visualizer {
          * explosion. However, no real difference in processing speed with this current
          * method and it allows for potential tweaks to be made more easily in the
          * future.
-         * 
+         *
          * @param x
          *            X coord of planet
          * @param y
