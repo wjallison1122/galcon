@@ -13,161 +13,162 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 /**
- * A heuristic based greedy algorithm. 
- * Searches through planets, creating a plan for the planet and
- * then assigning a "profit value" for enacting that plan.
- * All most valuable plans are then enacted. 
+ * A heuristic based greedy algorithm. Searches through planets, creating a plan
+ * for the planet and then assigning a "profit value" for enacting that plan.
+ * All most valuable plans are then enacted.
+ * 
  * @author user
  *
  */
 public class MaxPowerLazer extends Player {
-   HashMap<Planet, LinkedList<Fleet>> fleetsTargeting = new HashMap<Planet, LinkedList<Fleet>>();
-   PriorityQueue<PlanetValuer> plans = new PriorityQueue<PlanetValuer>();
+    HashMap<Planet, LinkedList<Fleet>> fleetsTargeting = new HashMap<Planet, LinkedList<Fleet>>();
+    PriorityQueue<PlanetValuer> plans = new PriorityQueue<PlanetValuer>();
 
-   int previd = 0;
-   
-   protected MaxPowerLazer(Color c, String name) {
-      super(Color.CYAN, "MaxPowerLazer");
-      for (Planet p : planets) {
-         LinkedList<Fleet> fleetList = new LinkedList<Fleet>();
-         fleetsTargeting.put(p, fleetList);
-         plans.add(new PlanetValuer(p, fleetList));
-      }
-      
-   }
+    int previd = 0;
 
-   @Override
-   protected void turn() {
-      cleanFleetsTargeting();
-      for (Fleet f : fleets) {
-         if (f.ID > previd) {
-            fleetsTargeting.get(f.DESTINATION).add(f);
-         }
-      }
-      
-      previd = Unit.getLatestID();
-   }
-   
-   void cleanFleetsTargeting() {
-      for (LinkedList<Fleet> fleetList : fleetsTargeting.values()) {
-         Iterator<Fleet> fleeterator = fleetList.iterator();
-         while (fleeterator.hasNext()) {
-            if (fleeterator.next().hasHit()) {
-               fleeterator.remove();
+    protected MaxPowerLazer(Color c, String name) {
+        super(Color.CYAN, "MaxPowerLazer");
+        for (Planet p : planets) {
+            LinkedList<Fleet> fleetList = new LinkedList<Fleet>();
+            fleetsTargeting.put(p, fleetList);
+            plans.add(new PlanetValuer(p, fleetList));
+        }
+
+    }
+
+    @Override
+    protected void turn() {
+        cleanFleetsTargeting();
+        for (Fleet f : fleets) {
+            if (f.ID > previd) {
+                fleetsTargeting.get(f.DESTINATION).add(f);
             }
-         }
-      }
-   }
+        }
 
+        previd = Unit.getLatestID();
+    }
 
-   class PlanetValuer implements Comparable<PlanetValuer> {
-      Planet home;
-      LinkedList<Fleet> fleetsTargeting;
-      LinkedList<MockAction> plan = new LinkedList<MockAction>();
-
-      int value;
-
-      PlanetValuer(Planet home, LinkedList<Fleet> fleetsTargeting) {
-         this.home = home;
-         this.fleetsTargeting = fleetsTargeting;
-         revalue();
-      }
-      
-      void revalue() {
-         value = determineValue();
-      }
-
-      int determineValue() {
-         if (home.isNeutral()) {
-            valueNeutralPlanet();
-         } else if (home.ownedByOpponentOf(MaxPowerLazer.this)) {
-            return valueEnemyPlanet();
-         } else if (home.ownedBy(MaxPowerLazer.this)) {
-            return valueMyPlanet();
-         }
-
-         return -1;
-      }
-      
-      int valueMyPlanet() {
-         if (fleetsTargeting.size() > 0) {
-            int myInbound = 0, enemyInbound = 0;
-            
-            for (Fleet f : fleetsTargeting) {
-               if (ownedByMe(f)) {
-                  myInbound += f.getNumUnits();
-               } else {
-                  enemyInbound += f.getNumUnits();
-               }
+    void cleanFleetsTargeting() {
+        for (LinkedList<Fleet> fleetList : fleetsTargeting.values()) {
+            Iterator<Fleet> fleeterator = fleetList.iterator();
+            while (fleeterator.hasNext()) {
+                if (fleeterator.next().hasHit()) {
+                    fleeterator.remove();
+                }
             }
-            
-            return 0;
-         } else {
+        }
+    }
+
+    class PlanetValuer implements Comparable<PlanetValuer> {
+        Planet home;
+        LinkedList<Fleet> fleetsTargeting;
+        LinkedList<MockAction> plan = new LinkedList<MockAction>();
+
+        int value;
+
+        PlanetValuer(Planet home, LinkedList<Fleet> fleetsTargeting) {
+            this.home = home;
+            this.fleetsTargeting = fleetsTargeting;
+            revalue();
+        }
+
+        void revalue() {
+            value = determineValue();
+        }
+
+        int determineValue() {
+            if (home.isNeutral()) {
+                valueNeutralPlanet();
+            } else if (home.ownedByOpponentOf(MaxPowerLazer.this)) {
+                return valueEnemyPlanet();
+            } else if (home.ownedBy(MaxPowerLazer.this)) {
+                return valueMyPlanet();
+            }
+
             return -1;
-         }
-      }
-      
-      int valueEnemyPlanet() {
-         return 0;
-      }
-      
-      int valueNeutralPlanet() {
-         if (fleetsTargeting.size() > 0) {
+        }
+
+        int valueMyPlanet() {
+            if (fleetsTargeting.size() > 0) {
+                int myInbound = 0, enemyInbound = 0;
+
+                for (Fleet f : fleetsTargeting) {
+                    if (ownedByMe(f)) {
+                        myInbound += f.getNumUnits();
+                    } else {
+                        enemyInbound += f.getNumUnits();
+                    }
+                }
+
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+
+        int valueEnemyPlanet() {
             return 0;
-         } else {
-            PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
-            int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / FLEET_SPEED) / home.PRODUCTION_TIME);
-            int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
-            // If I lose more units taking over the planet than can be made before the enemy hits the planet
-            if (prodDiff < 0) {
-               // TODO check if close enemy planets can actually send enough units to help.
-               
-               return -1;
+        }
+
+        int valueNeutralPlanet() {
+            if (fleetsTargeting.size() > 0) {
+                return 0;
+            } else {
+                PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
+                int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / FLEET_SPEED)
+                        / home.PRODUCTION_TIME);
+                int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
+                // If I lose more units taking over the planet than can be made before the enemy
+                // hits the planet
+                if (prodDiff < 0) {
+                    // TODO check if close enemy planets can actually send enough units to help.
+
+                    return -1;
+                }
+
+                PriorityQueue<Planet> myp = planetsNearOwnedBy(home, MaxPowerLazer.this);
+                if (myp.peek().getNumUnits() > home.getNumUnits()) {
+
+                }
+                return 0;
+            }
+        }
+
+        PriorityQueue<Planet> planetsNearOwnedBy(Planet target, Player owner) {
+            PriorityQueue<Planet> orderedPlanets = new PriorityQueue<Planet>(11, new Comparator<Planet>() {
+                @Override
+                public int compare(Planet p1, Planet p2) {
+                    return (int) (target.distanceTo(p1) - target.distanceTo(p2));
+                }
+            });
+
+            for (Planet p : planets) {
+                if (p.ownedBy(owner)) {
+                    orderedPlanets.add(p);
+                }
             }
 
-            PriorityQueue<Planet> myp = planetsNearOwnedBy(home, MaxPowerLazer.this);
-            if (myp.peek().getNumUnits() > home.getNumUnits()){
-               
-            }
-            return 0;
-         }
-      }
+            return orderedPlanets;
+        }
 
-      PriorityQueue<Planet> planetsNearOwnedBy(Planet target, Player owner) {
-         PriorityQueue<Planet> orderedPlanets = new PriorityQueue<Planet>(11, new Comparator<Planet>() {
-            @Override
-            public int compare(Planet p1, Planet p2) {
-               return (int) (target.distanceTo(p1) - target.distanceTo(p2));
-            }
-         });
+        @Override
+        public int compareTo(PlanetValuer pv) {
+            return value - pv.value;
+        }
+    }
 
-         for (Planet p : planets) {
-            if (p.ownedBy(owner)) {
-               orderedPlanets.add(p);
-            }
-         }
+    class MockAction {
+        Planet start, end;
+        int numUnits;
 
-         return orderedPlanets;
-      }
+        public MockAction(Planet start, Planet end, int numUnits) {
+            this.start = start;
+            this.end = end;
+            this.numUnits = numUnits;
+        }
 
-      @Override
-      public int compareTo(PlanetValuer pv) {
-         return value - pv.value;
-      }
-   }
-
-   class MockAction {
-      Planet start, end;
-      int numUnits;
-
-      public MockAction(Planet start, Planet end, int numUnits) {
-         this.start = start;
-         this.end = end;
-         this.numUnits = numUnits;
-      }
-
-      void makeAction() {
-         addAction(start, end, numUnits);
-      }
-   }
+        void makeAction() {
+            addAction(start, end, numUnits);
+        }
+    }
 }

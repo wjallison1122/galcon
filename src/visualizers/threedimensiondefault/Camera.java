@@ -49,40 +49,35 @@ public class Camera {
             drawList[i] = h;
         }
         for (int i = planetList.size(); i < planetList.size() + fleetList.size(); i++) {
-           GraphicHolder h = new GraphicHolder(fleetList.get(i - planetList.size()));
-           h.location = Vector.add(h.location, location);
-           h.screenLocation = new Vector();
-           h.screenLocation.z = distance(h.location);
-           drawList[i] = h;
-       }
+            GraphicHolder h = new GraphicHolder(fleetList.get(i - planetList.size()));
+            h.location = Vector.add(h.location, location);
+            h.screenLocation = new Vector();
+            h.screenLocation.z = distance(h.location);
+            drawList[i] = h;
+        }
         quickSort(drawList, 0, drawList.length - 1);
         for (GraphicHolder gh : drawList) {
-            if (gh.screenLocation.z > 0.001) { //.001 to avoid glitches with following objects and rounding errors
+            if (gh.screenLocation.z > 0.001) { // .001 to avoid glitches with following objects and rounding errors
                 calcBasicCoords(gh);
                 if (!isOrtho) {
                     scaleForDistance(gh);
                 }
-                //fill object
+                // fill object
                 g.setColor(gh.drawColor);
-                g.fillOval(
-                        (int) (gh.screenLocation.x - gh.screenRadius) + x,
-                        (int) (gh.screenLocation.y - gh.screenRadius) + y,
-                        (int) (gh.screenRadius * 2),
+                g.fillOval((int) (gh.screenLocation.x - gh.screenRadius) + x,
+                        (int) (gh.screenLocation.y - gh.screenRadius) + y, (int) (gh.screenRadius * 2),
                         (int) (gh.screenRadius * 2));
-                //draw circle around object
+                // draw circle around object
                 g.setColor(Color.WHITE);
-                g.drawOval(
-                        (int) (gh.screenLocation.x - gh.screenRadius) + x,
-                        (int) (gh.screenLocation.y - gh.screenRadius) + y,
-                        (int) (gh.screenRadius * 2),
+                g.drawOval((int) (gh.screenLocation.x - gh.screenRadius) + x,
+                        (int) (gh.screenLocation.y - gh.screenRadius) + y, (int) (gh.screenRadius * 2),
                         (int) (gh.screenRadius * 2));
-                //draw unit value
+                // draw unit value
                 String unitStr = Integer.toString(gh.units);
                 g.setColor(Color.CYAN);
                 g.setFont(new Font("Arial", Font.PLAIN, fontSize));
-                g.drawString(unitStr,
-                      (int) (gh.screenLocation.x - fontXOffset * unitStr.length()) + x,
-                      (int) (gh.screenLocation.y + (fontSize - 1)/ 2) + y);
+                g.drawString(unitStr, (int) (gh.screenLocation.x - fontXOffset * unitStr.length()) + x,
+                        (int) (gh.screenLocation.y + (fontSize - 1) / 2) + y);
             }
         }
     }
@@ -90,7 +85,8 @@ public class Camera {
     private void calcBasicCoords(GraphicHolder gh) {
         gh.screenRadius = gh.radius * zoom * objectScale;
         gh.screenLocation.x = -Vector.dot(gh.location, lateral) / Vector.dot(lateral, lateral) * zoom + screenX;
-        gh.screenLocation.y = -Vector.dot(gh.location, horizontal) / Vector.dot(horizontal, horizontal) * zoom + screenY;
+        gh.screenLocation.y = -Vector.dot(gh.location, horizontal) / Vector.dot(horizontal, horizontal) * zoom
+                + screenY;
     }
 
     private void scaleForDistance(GraphicHolder gh) {
@@ -110,7 +106,7 @@ public class Camera {
     }
 
     private static void quickSort(GraphicHolder arr[], int left, int right) {
-        //modified from code found online at stackOverflow.com
+        // modified from code found online at stackOverflow.com
         int i = left, j = right;
         GraphicHolder tmp;
         double pivot = arr[(left + right) / 2].screenLocation.z;
@@ -145,6 +141,5 @@ public class Camera {
         location = Vector.add(Vector.scale(normal, amt.y), location);
         location = Vector.add(Vector.scale(horizontal, amt.z), location);
     }
-    
-}
 
+}

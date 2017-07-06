@@ -10,41 +10,42 @@ import ais.PlayerUtils;
 
 public class TotalWarAI extends Player {
 
-   public TotalWarAI() {
-      super(Color.WHITE, "Total War AI");
-   }
+    public TotalWarAI() {
+        super(Color.WHITE, "Total War AI");
+    }
 
-   @Override
-   protected void newGame() {
-      sentFleet = false;
-   }
-   
-   private boolean sentFleet = false;
+    @Override
+    protected void newGame() {
+        sentFleet = false;
+    }
 
-   @Override
-   protected void turn() {
-      List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-      List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
-      List<Planet> opponentsPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
-      
-      Planet smallestUnoccupied = otherPlanets.stream().min((a,b) -> Integer.compare(a.getNumUnits(), b.getNumUnits())).get();
-      
-      if (!sentFleet) {
-         sentFleet = true;
-         addAction(myPlanets.get(0), smallestUnoccupied, smallestUnoccupied.getNumUnits() + 1);
-      }
-      
-      if (opponentsPlanets.size() > 0) {
-         Planet target = opponentsPlanets.get(0);
-         for (Planet p : myPlanets) {
-            addAction(p,target,1000);
-         }
-      }
-   }
+    private boolean sentFleet = false;
 
-   @Override
-   protected String storeSelf() {
-      return null;
-   }
-   
+    @Override
+    protected void turn() {
+        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+        List<Planet> opponentsPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+
+        Planet smallestUnoccupied = otherPlanets.stream()
+                .min((a, b) -> Integer.compare(a.getNumUnits(), b.getNumUnits())).get();
+
+        if (!sentFleet) {
+            sentFleet = true;
+            addAction(myPlanets.get(0), smallestUnoccupied, smallestUnoccupied.getNumUnits() + 1);
+        }
+
+        if (opponentsPlanets.size() > 0) {
+            Planet target = opponentsPlanets.get(0);
+            for (Planet p : myPlanets) {
+                addAction(p, target, 1000);
+            }
+        }
+    }
+
+    @Override
+    protected String storeSelf() {
+        return null;
+    }
+
 }

@@ -4,111 +4,102 @@ import java.awt.Color;
 import java.util.LinkedList;
 
 public abstract class Player extends GameSettings {
-   public final Color COLOR;
-   public final String NAME;
-   private static int currentId = 0;
-   public final int ID = currentId++;
+    public final Color COLOR;
+    public final String NAME;
+    private static int currentId = 0;
+    public final int ID = currentId++;
 
-   protected Planet[] planets;
-   protected Fleet[] fleets;
-   private LinkedList<Action> actions = new LinkedList<Action>();
+    protected Planet[] planets;
+    protected Fleet[] fleets;
+    private LinkedList<Action> actions = new LinkedList<Action>();
 
+    /*
+     * Arbitrary creation of new players does not matter since ID is forced unique
+     * and only main-created players can actually get asked for turns.
+     */
+    protected Player(Color c, String name) {
+        COLOR = c;
+        NAME = name;
+    }
 
-   /*
-    *  Arbitrary creation of new players does not matter since ID is forced unique and only main-created
-    *  players can actually get asked for turns. 
-    */
-   protected Player(Color c, String name) {
-      COLOR = c;
-      NAME = name;
-   }
+    final void nextGame(Planet[] newMap) {
+        planets = newMap;
+        newGame();
+    }
 
-   final void nextGame(Planet[] newMap) {
-      planets = newMap;
-      newGame();
-   }
+    // Notify player about start of a new game (new planet set)
+    protected void newGame() {
+    }
 
-   // Notify player about start of a new game (new planet set)
-   protected void newGame() {}
-   
-   // Notify player about end of game
-   protected void endGame(boolean victorious) {}
+    // Notify player about end of game
+    protected void endGame(boolean victorious) {
+    }
 
-   // Move to PlayerUtils?
-   protected final boolean ownedByMe(Unit u) {
-      return u != null && u.ownedBy(this);
-   }
+    // Move to PlayerUtils?
+    protected final boolean ownedByMe(Unit u) {
+        return u != null && u.ownedBy(this);
+    }
 
-   final LinkedList<Action> getActions() {
-      return actions;
-   }
+    final LinkedList<Action> getActions() {
+        return actions;
+    }
 
-   final void doTurn(Fleet[] currentFleets) {
-      actions = new LinkedList<Action>();
-      fleets = currentFleets;
-      turn();
-   }
+    final void doTurn(Fleet[] currentFleets) {
+        actions = new LinkedList<Action>();
+        fleets = currentFleets;
+        turn();
+    }
 
-   protected final Action addAction(Planet start, Planet target, int numUnits) {
-      Action a = new Action(start, target, numUnits, this);
-      actions.add(a);
-      return a;
-   }
-   
-   protected final void clearActions() {
-      actions.clear();
-   }
+    protected final Action addAction(Planet start, Planet target, int numUnits) {
+        Action a = new Action(start, target, numUnits, this);
+        actions.add(a);
+        return a;
+    }
 
-   protected abstract void turn();
+    protected final void clearActions() {
+        actions.clear();
+    }
 
-   /*
-    * Used to allow an AI to write its state to a file.
-    * AI is expected to be able to recreate itself from this string. 
-    * Note that order of operations is new AI -> loadFromStore and the 
-    * save string should be written as such. 
-    * Non-final to allow it to be optional. 
-    * '#' character is disallowed and will be cleaned if used.
-    */
-   protected String storeSelf() {
-      return "";
-   }
-   
-   /*
-    * Used to allow an AI to restore its state from a file. 
-    * See above method. 
-    */
-   protected void loadFromStore(String oldself) {}
+    protected abstract void turn();
 
-   /**
-    * Checks if two players are equal. Works with null. 
-    * @param p1
-    * @param p2
-    * @return Whether two players are equal. Both null returns true, only one null returns false. 
-    */
-   protected static final boolean areEqual(Player p1, Player p2) {
-      return (p1 == null || p2 == null) ? p1 == p2 : p1.ID == p2.ID;
-   }
+    /*
+     * Used to allow an AI to write its state to a file. AI is expected to be able
+     * to recreate itself from this string. Note that order of operations is new AI
+     * -> loadFromStore and the save string should be written as such. Non-final to
+     * allow it to be optional. '#' character is disallowed and will be cleaned if
+     * used.
+     */
+    protected String storeSelf() {
+        return "";
+    }
 
-   protected static final int numUnitsOwnedBy(Player p) {
-      return Director.numUnitsOwnedBy(p);
-   }
+    /*
+     * Used to allow an AI to restore its state from a file. See above method.
+     */
+    protected void loadFromStore(String oldself) {
+    }
 
-   protected static final int numUnitsInPlanets(Player p) {
-      return Director.numUnitsInPlanets(p);
-   }
+    /**
+     * Checks if two players are equal. Works with null.
+     * 
+     * @param p1
+     * @param p2
+     * @return Whether two players are equal. Both null returns true, only one null
+     *         returns false.
+     */
+    protected static final boolean areEqual(Player p1, Player p2) {
+        return (p1 == null || p2 == null) ? p1 == p2 : p1.ID == p2.ID;
+    }
 
-   protected static final int numUnitsInFleets(Player p) {
-      return Director.numUnitsInFleets(p);
-   }
+    protected static final int numUnitsOwnedBy(Player p) {
+        return Director.numUnitsOwnedBy(p);
+    }
+
+    protected static final int numUnitsInPlanets(Player p) {
+        return Director.numUnitsInPlanets(p);
+    }
+
+    protected static final int numUnitsInFleets(Player p) {
+        return Director.numUnitsInFleets(p);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-

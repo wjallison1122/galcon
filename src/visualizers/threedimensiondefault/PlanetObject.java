@@ -14,29 +14,32 @@ public class PlanetObject {
     public double mass;
     public double radius;
     public String name;
-    
-    public PlanetObject(Vector _location,double _mass) {
+
+    public PlanetObject(Vector _location, double _mass) {
         location = _location;
         mass = _mass;
         velocity = new Vector();
         acceleration = new Vector();
-        radius = Math.pow(mass,1.0/3) / 1000;
+        radius = Math.pow(mass, 1.0 / 3) / 1000;
     }
-    public PlanetObject(Vector _location, Vector _velocity,double _mass) {
+
+    public PlanetObject(Vector _location, Vector _velocity, double _mass) {
         location = _location;
         mass = _mass;
         velocity = _velocity;
         acceleration = new Vector();
-        radius = Math.pow(mass,1.0/3) / 1000;
+        radius = Math.pow(mass, 1.0 / 3) / 1000;
     }
-    public PlanetObject(Vector _location, Vector _velocity,double _mass,double _radius) {
+
+    public PlanetObject(Vector _location, Vector _velocity, double _mass, double _radius) {
         location = _location;
         mass = _mass;
         velocity = _velocity;
         acceleration = new Vector();
         radius = _radius;
     }
-    public PlanetObject(Vector _location, Vector _velocity,double _mass,double _radius,String _name) {
+
+    public PlanetObject(Vector _location, Vector _velocity, double _mass, double _radius, String _name) {
         location = _location;
         mass = _mass;
         velocity = _velocity;
@@ -44,8 +47,9 @@ public class PlanetObject {
         radius = _radius;
         name = _name;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return "Location: " + location + "\nvelocity: " + velocity + "\nMass: " + mass + "\nRadius: " + radius;
     }
 }
