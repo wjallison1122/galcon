@@ -2,9 +2,8 @@ package galaxy;
 
 import java.awt.Color;
 
-public abstract class Unit extends GameSettings {
+public abstract class Unit extends Coords {
     Player owner;
-    private double[] coords;
     int numUnits;
 
     // TODO add game ID
@@ -13,16 +12,17 @@ public abstract class Unit extends GameSettings {
     public Color debugColor; // Where is this used?
 
     Unit(Player owner, int numUnits, double... coords) {
+        super(coords);
         this.owner = owner;
         this.numUnits = numUnits;
-        this.coords = coords;
     }
 
     public static final int getLatestID() {
         return id;
     }
-    
-    void update() {}
+
+    void update() {
+    }
 
     public final boolean equals(Unit u) {
         return u == null ? false : u.ID == ID;
@@ -34,17 +34,6 @@ public abstract class Unit extends GameSettings {
 
     public final Player getOwner() {
         return owner;
-    }
-
-    public final double[] getCoords() {
-        return coords.clone();
-    }
-
-    final void setCoords(double... coords) {
-        if (coords.length != DIMENSIONS.length) {
-            throw new DimensionMismatchException("Invalid dimensions of coordinates given.");
-        }
-        this.coords = coords.clone();
     }
 
     public final Color getColor() {
@@ -69,7 +58,7 @@ public abstract class Unit extends GameSettings {
 
     /**
      * E-Z null protection
-     * 
+     *
      * @param u
      * @param player
      * @return
@@ -80,14 +69,6 @@ public abstract class Unit extends GameSettings {
 
     public final static boolean unitOwnedByOpponentOf(Unit u, Player p) {
         return u == null ? false : u.ownedByOpponentOf(p);
-    }
-
-    public final double distanceTo(double... otherCoords) {
-        double sum = 0;
-        for (int i = 0; i < DIMENSIONS.length; i++) {
-            sum += Math.pow(coords[i] - otherCoords[i], 2);
-        }
-        return Math.sqrt(sum);
     }
 
     public final double distanceTo(Unit u) {
