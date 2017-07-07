@@ -1,9 +1,5 @@
 package ais.jono;
 
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +13,9 @@ import java.util.stream.Collectors;
 import ais.PlayerUtils;
 import ais.PlayerUtils.Location;
 import ais.PlayerUtils.PlanetOwner;
+import galaxy.Fleet;
+import galaxy.Planet;
+import galaxy.Player;
 
 public class ContestInfluenceAI extends Player {
     private static final boolean USE_MOVE_FORWARDS = false;
@@ -157,8 +156,9 @@ public class ContestInfluenceAI extends Player {
                 int fleetDistance = (int) Math.ceil(fleet.distanceLeft() / FLEET_SPEED);
                 if (distance > fleetDistance) {
                     int toSend = 0;
-                    while (!isEventualOwner(fleet.DESTINATION, distance, toSend))
+                    while (!isEventualOwner(fleet.DESTINATION, distance, toSend)) {
                         toSend++;
+                    }
                     if (toSend > 0) {
                         addAction(myPlanets.get(0), fleet.DESTINATION, toSend);
                     }
@@ -184,7 +184,7 @@ public class ContestInfluenceAI extends Player {
         } else {
             current = PlanetOwner.NOBODY;
         }
-        int updateCount = gameTic() % p.PRODUCTION_TIME;
+        int updateCount = p.getLifespan() % p.PRODUCTION_TIME;
         int previousUnits = 0;
         int unitCount = p.getNumUnits();
         int currentTime = 0;
@@ -303,7 +303,7 @@ public class ContestInfluenceAI extends Player {
          * PlayerUtils.getMyUnitCount(fleets, planets, this); int theirUnits =
          * PlayerUtils.getOpponentUnitCount(fleets, planets, this); boolean
          * unitAdvantage = myUnits > theirUnits * ADVANTAGE_THRESHOLD;
-         * 
+         *
          * double myProduction = myPlanets.stream().collect(Collectors.summingDouble(p
          * -> p.getProductionFrequency())); double theirProduction =
          * theirPlanets.stream().collect(Collectors.summingDouble(p ->

@@ -6,7 +6,6 @@ public abstract class Unit extends GameSettings {
     Player owner;
     private double[] coords;
     int numUnits;
-    int ticsActive = 0;
 
     // TODO add game ID
     private static int id = 0;
@@ -22,6 +21,8 @@ public abstract class Unit extends GameSettings {
     public static final int getLatestID() {
         return id;
     }
+    
+    void update() {}
 
     public final boolean equals(Unit u) {
         return u == null ? false : u.ID == ID;

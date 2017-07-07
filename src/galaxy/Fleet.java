@@ -25,10 +25,11 @@ public final class Fleet extends Unit {
         return hasHit;
     }
 
-    boolean update() {
+    @Override
+    void update() {
         if (hasHit) {
             error("Fleet being updated after reaching destination");
-            return true;
+            return;
         }
 
         double[] targetCoords = DESTINATION.getCoords();
@@ -42,13 +43,10 @@ public final class Fleet extends Unit {
         setCoords(fleetCoords);
 
         if (distance - FLEET_SPEED < 0) {
-            setCoords(targetCoords);
+            setCoords(targetCoords); // TODO is this needed?
             hasHit = true;
             DESTINATION.hitBy(this);
-            return true;
         }
-
-        return false;
     }
 
     String storeSelf() {

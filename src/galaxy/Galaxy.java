@@ -14,7 +14,9 @@ final class Galaxy {
 
         Iterator<Fleet> fleeterator = fleets.iterator();
         while (fleeterator.hasNext()) {
-            if (fleeterator.next().update()) {
+            Fleet f = fleeterator.next();
+            f.update();
+            if (f.hasHit()) {
                 fleeterator.remove();
             }
         }
@@ -49,11 +51,13 @@ final class Galaxy {
         int i = -1;
         Player p = null;
         // Finds first planet owned by a player
-        while (++i < planets.length && (p = planets[i].getOwner()) == null)
+        while (++i < planets.length && (p = planets[i].getOwner()) == null) {
             ;
+        }
         // Sees if any planets are owned by another player
-        while (++i < planets.length && !planets[i].ownedByOpponentOf(p))
+        while (++i < planets.length && !planets[i].ownedByOpponentOf(p)) {
             ;
+        }
         return i == planets.length ? p : null;
     }
 

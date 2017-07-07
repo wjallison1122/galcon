@@ -94,10 +94,6 @@ final class Director extends GameSettings {
         return visualizer != null;
     }
 
-    static int getTic() {
-        return tic;
-    }
-
     private void newGame(Planet[] map) {
         tic = 0;
 

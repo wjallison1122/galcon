@@ -113,10 +113,6 @@ public class GameSettings {
         System.err.println(str);
     }
 
-    public static final int gameTic() {
-        return Director.getTic();
-    }
-
     static final BufferedWriter makeLogFile(String filename) {
         try {
             return new BufferedWriter(new FileWriter(new File(filename)));

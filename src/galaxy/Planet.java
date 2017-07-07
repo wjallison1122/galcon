@@ -3,6 +3,7 @@ package galaxy;
 public final class Planet extends Unit {
 
     public final int RADIUS, PRODUCTION_TIME;
+    private int lifespan = 0;
     private boolean recentlyConquered = false;
 
     Planet(Player owner, int numUnits, int radius, int prodTime, double... coords) {
@@ -11,10 +12,15 @@ public final class Planet extends Unit {
         PRODUCTION_TIME = prodTime;
     }
 
+    @Override
     void update() {
-        if (!ownedBy(null) && gameTic() % PRODUCTION_TIME == 0) {
+        if (!ownedBy(null) && lifespan++ % PRODUCTION_TIME == 0) {
             numUnits++;
         }
+    }
+
+    public int getLifespan() {
+        return lifespan;
     }
 
     void hitBy(Fleet f) {
@@ -23,9 +29,10 @@ public final class Planet extends Unit {
         } else {
             numUnits -= f.getNumUnits();
             if (numUnits < 0) {
-                recentlyConquered = true; // Variable for visualizer, visualizer resets.
+                recentlyConquered = true; // Variable for visualizer, visualizer resets planet.
                 owner = f.getOwner();
                 numUnits *= -1;
+                lifespan = 0;
             } else if (numUnits == 0) {
                 owner = null;
             }
@@ -33,12 +40,12 @@ public final class Planet extends Unit {
     }
 
     public double getProductionFrequency() {
-        return 1. / (double) this.PRODUCTION_TIME;
+        return 1. / this.PRODUCTION_TIME;
     }
 
     /**
      * For visualizer to check if a planet was recently conquered.
-     * 
+     *
      * @return Whether this planet had changed hands since last checked
      */
     boolean checkRecentlyConquered() {

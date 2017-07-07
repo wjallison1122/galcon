@@ -12,7 +12,6 @@ import java.util.TreeSet;
 
 import ais.PlayerUtils;
 import ais.PlayerUtils.Location;
-import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
@@ -172,8 +171,9 @@ public class TylerDefenderAI extends Player {
     ///////////////////////
 
     private void defenderAI() {
-        if (myPlanets.size() == 0)
+        if (myPlanets.size() == 0) {
             return;
+        }
         defendPlanets.addAll(myPlanets);
 
         int totalExpendableUnits = getTotalExpendableUnits();
@@ -286,10 +286,11 @@ public class TylerDefenderAI extends Player {
             return dest.getNumUnits();
         } else {
             double turns = (src.distanceTo(dest) / FLEET_SPEED);
-            int updateCount = gameTic() % dest.PRODUCTION_TIME;
+            int updateCount = dest.getLifespan() % dest.PRODUCTION_TIME;
             int unitsProduced = (int) ((turns + updateCount) / dest.PRODUCTION_TIME);
-            if (updateCount == 0)
+            if (updateCount == 0) {
                 unitsProduced++;
+            }
             return dest.getNumUnits() + unitsProduced;
         }
     }

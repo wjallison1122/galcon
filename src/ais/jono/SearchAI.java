@@ -1,9 +1,5 @@
 package ais.jono;
 
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,11 +13,16 @@ import ais.PlayerUtils.PlanetOwner;
 import ais.alphabeta.AlphaBeta;
 import ais.alphabeta.Move;
 import ais.alphabeta.Position;
+import galaxy.Fleet;
+import galaxy.Planet;
+import galaxy.Player;
 
 public class SearchAI extends Player {
 
-   private static enum Limit
-    {TIME, DEPTH};
+    private static enum Limit {
+        TIME, DEPTH
+    };
+
     private static final Limit LIMIT = Limit.TIME;
     private static final int SEARCH_DEPTH = 6;
     private static final int SEARCH_TIME_MILLIS = 1000;
@@ -186,7 +187,7 @@ public class SearchAI extends Player {
             location = new Location(planet);
             owner = PlanetOwner.getOwner(planet, player);
             productionDelay = planet.PRODUCTION_TIME;
-            updateCount = gameTic();
+            updateCount = planet.getLifespan();
             units = planet.getNumUnits();
         }
 

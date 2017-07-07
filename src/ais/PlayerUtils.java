@@ -1,17 +1,17 @@
 package ais;
 
-import galaxy.DimensionMismatchException;
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-import galaxy.Unit;
-import galaxy.GameSettings;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import galaxy.DimensionMismatchException;
+import galaxy.Fleet;
+import galaxy.GameSettings;
+import galaxy.Planet;
+import galaxy.Player;
+import galaxy.Unit;
 
 public class PlayerUtils extends GameSettings {
 
@@ -79,6 +79,7 @@ public class PlayerUtils extends GameSettings {
             return rtn;
         }
 
+        @Override
         public String toString() {
             StringBuilder rtn = new StringBuilder();
             rtn.append("<Location: ");
@@ -103,8 +104,9 @@ public class PlayerUtils extends GameSettings {
         }
 
         public static Location center(Location... locations) {
-            if (locations.length == 0)
+            if (locations.length == 0) {
                 return null; // whoever would do this, screw you
+            }
             Location rtn = new Location(locations[0].coords.length);
             for (int i = 0; i < locations.length; i++) {
                 rtn.verifyMatchingDimensions(locations[i]);
@@ -119,8 +121,9 @@ public class PlayerUtils extends GameSettings {
         }
 
         public static Location getProductionWeightedCenter(List<Planet> list) {
-            if (list.size() == 0)
+            if (list.size() == 0) {
                 return null; // whoever would do this, screw you
+            }
             Location rtn = new Location(list.get(0).getCoords().length);
             double weights = 0;
             for (int i = 0; i < list.size(); i++) {
@@ -139,8 +142,9 @@ public class PlayerUtils extends GameSettings {
         }
 
         public static Location getUnitCountWeightedCenter(List<Planet> list) {
-            if (list.size() == 0)
+            if (list.size() == 0) {
                 return null; // whoever would do this, screw you
+            }
             Location rtn = new Location(list.get(0).getCoords().length);
             double weights = 0;
             for (int i = 0; i < list.size(); i++) {
@@ -174,8 +178,9 @@ public class PlayerUtils extends GameSettings {
 
         public static double variance(Location... locations) {
             Location average = center(locations);
-            if (average == null)
+            if (average == null) {
                 return 0;
+            }
             double[] values = new double[average.coords.length];
             for (int i = 0; i < values.length; i++) {
                 values[i] = 0;
@@ -355,23 +360,20 @@ public class PlayerUtils extends GameSettings {
                         .collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
     }
 
-   public static enum PlanetOwner
-    {
-      NOBODY,
-      PLAYER,
-      OPPONENT;
+    public static enum PlanetOwner {
+        NOBODY, PLAYER, OPPONENT;
 
-    public static PlanetOwner getOwner(Unit u, Player p) {
-        if (u.ownedBy(p)) {
-            return PLAYER;
-        } else if (u.ownedByOpponentOf(p)) {
-            return OPPONENT;
-        } else {
-            return NOBODY;
+        public static PlanetOwner getOwner(Unit u, Player p) {
+            if (u.ownedBy(p)) {
+                return PLAYER;
+            } else if (u.ownedByOpponentOf(p)) {
+                return OPPONENT;
+            } else {
+                return NOBODY;
+            }
         }
-    }
 
-   }
+    }
 
     public static PlanetOwner getCurrentEventualOwner(Planet p, Fleet[] fleets, Player player) {
         PlanetOwner current;
@@ -382,7 +384,7 @@ public class PlayerUtils extends GameSettings {
         } else {
             current = PlanetOwner.NOBODY;
         }
-        int updateCount = gameTic() % p.PRODUCTION_TIME;
+        int updateCount = p.getLifespan() % p.PRODUCTION_TIME;
         int previousUnits = 0;
         int unitCount = p.getNumUnits();
         int currentTime = 0;
@@ -426,7 +428,7 @@ public class PlayerUtils extends GameSettings {
         } else {
             current = PlanetOwner.NOBODY;
         }
-        int updateCount = gameTic() % p.PRODUCTION_TIME;
+        int updateCount = p.getLifespan() % p.PRODUCTION_TIME;
         int previousUnits = 0;
         int unitCount = p.getNumUnits();
         int currentTime = 0;

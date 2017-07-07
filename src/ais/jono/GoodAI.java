@@ -318,8 +318,9 @@ public class GoodAI extends Player {
                 int fleetDistance = (int) Math.ceil(fleet.distanceLeft() / Fleet.FLEET_SPEED);
                 if (distance > fleetDistance) {
                     int toSend = 0;
-                    while (!isEventualOwner(fleet.DESTINATION, distance, toSend))
+                    while (!isEventualOwner(fleet.DESTINATION, distance, toSend)) {
                         toSend++;
+                    }
                     if (toSend > 0) {
                         addAction(myPlanets.get(0), fleet.DESTINATION, toSend);
                     }
@@ -345,7 +346,7 @@ public class GoodAI extends Player {
         } else {
             current = PlanetOwner.NOBODY;
         }
-        int updateCount = gameTic() % p.PRODUCTION_TIME;
+        int updateCount = p.getLifespan() % p.PRODUCTION_TIME;
         int previousUnits = 0;
         int unitCount = p.getNumUnits();
         int currentTime = 0;
@@ -480,7 +481,7 @@ public class GoodAI extends Player {
          * PlayerUtils.getMyUnitCount(fleets, planets, this); int theirUnits =
          * PlayerUtils.getOpponentUnitCount(fleets, planets, this); boolean
          * unitAdvantage = myUnits > theirUnits * ADVANTAGE_THRESHOLD;
-         * 
+         *
          * double myProduction = myPlanets.stream().collect(Collectors.summingDouble(p
          * -> p.getProductionFrequency())); double theirProduction =
          * theirPlanets.stream().collect(Collectors.summingDouble(p ->
