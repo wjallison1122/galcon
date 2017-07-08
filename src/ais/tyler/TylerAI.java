@@ -5,12 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import ais.PlayerUtils;
+import ais.PlayerWithUtils;
 import galaxy.Fleet;
 import galaxy.Planet;
-import galaxy.Player;
 
-public class TylerAI extends Player {
+public class TylerAI extends PlayerWithUtils {
 
     private static final int MAX_UNIT_SPREAD_TO_DETECT_STALEMATE = 10;
 
@@ -31,11 +30,11 @@ public class TylerAI extends Player {
 
     @Override
     protected void turn() {
-        if (PlayerUtils.getOpponentsFleets(fleets, this).size() > 0) {
+        if (getOpponentsFleets(fleets, this).size() > 0) {
             opponentMadeMove = true;
         }
 
-        int myUnits = PlayerUtils.getMyUnitCount(fleets, planets, this);
+        int myUnits = getMyUnitCount(fleets, planets, this);
         if (myUnits > maxUnits) {
             maxUnits = myUnits;
             if (maxUnits - minUnits > MAX_UNIT_SPREAD_TO_DETECT_STALEMATE) {
@@ -94,7 +93,9 @@ public class TylerAI extends Player {
     private int planetValue(Planet p) {
         // return -p.getNumUnits();
 
-        int value1 = (int) (p.PRODUCTION_TIME + p.getNumUnits() * 5);// + p.distanceTo(p1) / 5);
+        int value1 = p.PRODUCTION_TIME + p.getNumUnits() * 5;// +
+                                                             // p.distanceTo(p1)
+                                                             // / 5);
         value1 += p.getColor().equals(Color.GRAY) ? 0 : 2;
         return -value1;
     }
@@ -104,9 +105,9 @@ public class TylerAI extends Player {
     ///////////////////////
 
     private void firstAI() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> otherPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
-        List<Planet> oppPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> otherPlanets = getUnoccupiedPlanets(planets);
+        List<Planet> oppPlanets = getOpponentsPlanets(planets, this);
 
         greedySort(oppPlanets);
         greedySort(otherPlanets);
@@ -115,8 +116,8 @@ public class TylerAI extends Player {
 
         for (Planet p : oppPlanets) {
             distSort(myPlanets, p);
-            if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) != PlayerUtils.PlanetOwner.PLAYER) {
-                int myUnitsEnRoute = PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this);
+            if (getCurrentEventualOwner(p, fleets, this) != PlanetOwner.PLAYER) {
+                int myUnitsEnRoute = getPlayersIncomingFleetCount(p, fleets, this);
                 int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p);
                 if (expendableUnits > unitsNeededToCapturePlanet - myUnitsEnRoute) {
                     for (Planet myP : myPlanets) {
@@ -131,12 +132,13 @@ public class TylerAI extends Player {
             }
         }
 
-        // If we still have some extra units that haven't been sent to the opponent,
+        // If we still have some extra units that haven't been sent to the
+        // opponent,
         // try to capture neutral planets (only ones with small unit count).
         if (expendableUnits > 0) {
             for (Planet p : otherPlanets) {
                 if (p.getNumUnits() < expendableUnits / 4) {
-                    int myUnitsEnRoute = PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this);
+                    int myUnitsEnRoute = getPlayersIncomingFleetCount(p, fleets, this);
                     int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p);
                     if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
                         for (Planet myP : myPlanets) {
@@ -171,11 +173,10 @@ public class TylerAI extends Player {
 
     // TODO: optimize this method
     private int unitsNeededToCapturePlanet(Planet p) {
-        int myUnits = PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this);
-        int oppUnits = PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this);
+        int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
+        int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
-        int unitsGeneratedByPlanet = (int) (distOfFarthestFleet(PlayerUtils.getMyFleets(fleets, this), p))
-                % p.PRODUCTION_TIME + 2;
+        int unitsGeneratedByPlanet = (int) (distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
 
         if (p.isNeutral()) {
             return (oppUnits + p.getNumUnits()) - myUnits + 1;

@@ -1,50 +1,55 @@
 package ais;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import galaxy.Coords;
 import galaxy.DimensionMismatchException;
 import galaxy.Fleet;
-import galaxy.GameSettings;
 import galaxy.Planet;
 import galaxy.Player;
 import galaxy.Unit;
 
-public class PlayerUtils extends GameSettings {
+public abstract class PlayerWithUtils extends Player {
 
-    public static class Location {
+    protected PlayerWithUtils(Color c, String name) {
+        super(c, name);
+    }
+
+    private class Location {
         private double[] coords;
 
-        public Location(Planet p) {
-            this(p.getCoords());
+        Location(Coords c) {
+            this(c.getCoords());
         }
 
-        public Location(Location other) {
+        Location(Location other) {
             this(other.coords);
         }
 
-        public Location(double[] coords) {
+        Location(double[] coords) {
             this.coords = new double[coords.length];
             for (int i = 0; i < coords.length; i++) {
                 this.coords[i] = coords[i];
             }
         }
 
-        public Location(int dimension) {
+        Location(int dimension) {
             coords = new double[dimension];
             for (int i = 0; i < coords.length; i++) {
                 coords[i] = 0;
             }
         }
 
-        public double distance(Planet other) {
+        double distance(Coords other) {
             return distance(new Location(other));
         }
 
-        public double distance(Location other) {
+        double distance(Location other) {
             verifyMatchingDimensions(other);
             double sum = 0;
             for (int i = 0; i < this.coords.length; i++) {
@@ -53,24 +58,11 @@ public class PlayerUtils extends GameSettings {
             return Math.sqrt(sum);
         }
 
-        public Location sum(Planet other) {
-            return sum(new Location(other));
-        }
-
-        public Location sum(Location other) {
-            verifyMatchingDimensions(other);
-            Location rtn = new Location(this.coords.length);
-            for (int i = 0; i < this.coords.length; i++) {
-                rtn.coords[i] = this.coords[i] + other.coords[i];
-            }
-            return rtn;
-        }
-
-        public Location difference(Planet other) {
+        Location difference(Planet other) {
             return difference(new Location(other));
         }
 
-        public Location difference(Location other) {
+        Location difference(Location other) {
             verifyMatchingDimensions(other);
             Location rtn = new Location(this.coords.length);
             for (int i = 0; i < this.coords.length; i++) {
@@ -89,125 +81,6 @@ public class PlayerUtils extends GameSettings {
             return rtn.substring(0, rtn.length() - 3) + ">";
         }
 
-        public static Location center(@SuppressWarnings("rawtypes") List list) {
-            Location[] locations = new Location[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i) instanceof Location) {
-                    locations[i] = (Location) list.get(i);
-                } else if (list.get(i) instanceof Planet) {
-                    locations[i] = new Location((Planet) list.get(i));
-                } else {
-                    throw new RuntimeException("I dont take those");
-                }
-            }
-            return center(locations);
-        }
-
-        public static Location center(Location... locations) {
-            if (locations.length == 0) {
-                return null; // whoever would do this, screw you
-            }
-            Location rtn = new Location(locations[0].coords.length);
-            for (int i = 0; i < locations.length; i++) {
-                rtn.verifyMatchingDimensions(locations[i]);
-                for (int j = 0; j < rtn.coords.length; j++) {
-                    rtn.coords[j] += locations[i].coords[j];
-                }
-            }
-            for (int j = 0; j < rtn.coords.length; j++) {
-                rtn.coords[j] = rtn.coords[j] / locations.length;
-            }
-            return rtn;
-        }
-
-        public static Location getProductionWeightedCenter(List<Planet> list) {
-            if (list.size() == 0) {
-                return null; // whoever would do this, screw you
-            }
-            Location rtn = new Location(list.get(0).getCoords().length);
-            double weights = 0;
-            for (int i = 0; i < list.size(); i++) {
-                for (int j = 0; j < rtn.coords.length; j++) {
-                    rtn.coords[j] += list.get(i).getCoords()[j] * list.get(i).getProductionFrequency();
-                    weights += list.get(i).getProductionFrequency();
-                }
-            }
-            if (weights == 0) {
-                weights = 1;
-            }
-            for (int j = 0; j < rtn.coords.length; j++) {
-                rtn.coords[j] = rtn.coords[j] / list.size() / weights;
-            }
-            return rtn;
-        }
-
-        public static Location getUnitCountWeightedCenter(List<Planet> list) {
-            if (list.size() == 0) {
-                return null; // whoever would do this, screw you
-            }
-            Location rtn = new Location(list.get(0).getCoords().length);
-            double weights = 0;
-            for (int i = 0; i < list.size(); i++) {
-                for (int j = 0; j < rtn.coords.length; j++) {
-                    rtn.coords[j] += list.get(i).getCoords()[j] * list.get(i).getNumUnits();
-                    weights += list.get(i).getNumUnits();
-                }
-            }
-            if (weights == 0) {
-                weights = 1;
-            }
-            for (int j = 0; j < rtn.coords.length; j++) {
-                rtn.coords[j] = rtn.coords[j] / list.size() / weights;
-            }
-            return rtn;
-        }
-
-        public static double variance(@SuppressWarnings("rawtypes") List list) {
-            Location[] locations = new Location[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i) instanceof Location) {
-                    locations[i] = (Location) list.get(i);
-                } else if (list.get(i) instanceof Planet) {
-                    locations[i] = new Location((Planet) list.get(i));
-                } else {
-                    throw new RuntimeException("I dont take those");
-                }
-            }
-            return variance(locations);
-        }
-
-        public static double variance(Location... locations) {
-            Location average = center(locations);
-            if (average == null) {
-                return 0;
-            }
-            double[] values = new double[average.coords.length];
-            for (int i = 0; i < values.length; i++) {
-                values[i] = 0;
-            }
-            for (int i = 0; i < locations.length; i++) {
-                for (int j = 0; j < values.length; j++) {
-                    values[j] = values[j] + (locations[i].coords[j] - average.coords[j])
-                            * (locations[i].coords[j] - average.coords[j]);
-                }
-            }
-            double rtn = 0.0;
-            if (locations.length >= 2) {
-                for (int i = 0; i < values.length; i++) {
-                    rtn += values[i] / (locations.length - 1);
-                }
-            }
-            return Math.sqrt(rtn);
-        }
-
-        public Location multiply(double value) {
-            Location rtn = new Location(this);
-            for (int i = 0; i < rtn.coords.length; i++) {
-                rtn.coords[i] *= value;
-            }
-            return rtn;
-        }
-
         private void verifyMatchingDimensions(Location other) {
             if (this.coords.length != other.coords.length) {
                 throw new DimensionMismatchException("PlayerUtils");
@@ -215,7 +88,118 @@ public class PlayerUtils extends GameSettings {
         }
     }
 
-    public static List<Planet> getPlanetsOwnedByPlayer(Planet[] planets, Player player) {
+    public boolean ownedByMe(Unit u) {
+        return u != null && u.ownedBy(this);
+    }
+
+    protected Coords center(@SuppressWarnings("rawtypes") List list) {
+        Location[] locations = new Location[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) instanceof Location) {
+                locations[i] = (Location) list.get(i);
+            } else if (list.get(i) instanceof Planet) {
+                locations[i] = new Location((Planet) list.get(i));
+            } else {
+                throw new RuntimeException("I dont take those");
+            }
+        }
+        return center(locations);
+    }
+
+    public Coords getProductionWeightedCenter(List<Planet> list) {
+        if (list.size() == 0) {
+            return null; // whoever would do this, screw you
+        }
+        double[] rtn = new double[list.get(0).getCoords().length];
+        double weights = 0;
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < rtn.length; j++) {
+                rtn[j] += list.get(i).getCoords()[j] * list.get(i).getProductionFrequency();
+                weights += list.get(i).getProductionFrequency();
+            }
+        }
+        if (weights == 0) {
+            weights = 1;
+        }
+        for (int j = 0; j < rtn.length; j++) {
+            rtn[j] = rtn[j] / list.size() / weights;
+        }
+        return new Coords(rtn);
+    }
+
+    public Coords getUnitCountWeightedCenter(List<Planet> list) {
+        if (list.size() == 0) {
+            return null; // whoever would do this, screw you
+        }
+        double[] rtn = new double[list.get(0).getCoords().length];
+        double weights = 0;
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < rtn.length; j++) {
+                rtn[j] += list.get(i).getCoords()[j] * list.get(i).getNumUnits();
+                weights += list.get(i).getNumUnits();
+            }
+        }
+        if (weights == 0) {
+            weights = 1;
+        }
+        for (int j = 0; j < rtn.length; j++) {
+            rtn[j] = rtn[j] / list.size() / weights;
+        }
+        return new Coords(rtn);
+    }
+
+    Coords center(Location... locations) {
+        if (locations.length == 0) {
+            return null; // whoever would do this, screw you
+        }
+        double[] rtn = new double[locations[0].coords.length];
+        for (int i = 0; i < locations.length; i++) {
+            for (int j = 0; j < rtn.length; j++) {
+                rtn[j] += locations[i].coords[j];
+            }
+        }
+        for (int j = 0; j < rtn.length; j++) {
+            rtn[j] = rtn[j] / locations.length;
+        }
+        return new Coords(rtn);
+    }
+
+    public double variance(@SuppressWarnings("rawtypes") List list) {
+        Location[] locations = new Location[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) instanceof Location) {
+                locations[i] = (Location) list.get(i);
+            } else if (list.get(i) instanceof Planet) {
+                locations[i] = new Location((Planet) list.get(i));
+            } else {
+                throw new RuntimeException("I dont take those");
+            }
+        }
+        return variance(locations);
+    }
+
+    public double variance(Location... locations) {
+        Location average = new Location(center(locations));
+        double[] values = new double[average.coords.length];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = 0;
+        }
+        for (int i = 0; i < locations.length; i++) {
+            for (int j = 0; j < values.length; j++) {
+                values[j] = values[j]
+                        + (locations[i].coords[j] - average.coords[j]) * (locations[i].coords[j] - average.coords[j]);
+            }
+        }
+        double rtn = 0.0;
+        if (locations.length >= 2) {
+            for (int i = 0; i < values.length; i++) {
+                rtn += values[i] / (locations.length - 1);
+            }
+        }
+        return Math.sqrt(rtn);
+    }
+
+    public List<Planet> getPlanetsOwnedByPlayer(Planet[] planets, Player player) {
         ArrayList<Planet> rtn = new ArrayList<>();
         for (Planet p : planets) {
             if (p.ownedBy(player)) {
@@ -225,7 +209,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static List<Planet> getPlanetsNotOwnedByPlayer(Planet[] planets, Player player) {
+    public List<Planet> getPlanetsNotOwnedByPlayer(Planet[] planets, Player player) {
         ArrayList<Planet> rtn = new ArrayList<>();
         for (Planet p : planets) {
             if (!p.ownedBy(player)) {
@@ -235,7 +219,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static List<Planet> getUnoccupiedPlanets(Planet[] planets) {
+    public List<Planet> getUnoccupiedPlanets(Planet[] planets) {
         ArrayList<Planet> rtn = new ArrayList<>();
         for (Planet p : planets) {
             if (p.isNeutral()) {
@@ -245,7 +229,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static List<Planet> getOwnedPlanets(Planet[] planets) {
+    public List<Planet> getOwnedPlanets(Planet[] planets) {
         ArrayList<Planet> rtn = new ArrayList<>();
         for (Planet p : planets) {
             if (!p.isNeutral()) {
@@ -255,11 +239,11 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static List<Planet> getOpponentsPlanets(Planet[] planets, Player player) {
+    public List<Planet> getOpponentsPlanets(Planet[] planets, Player player) {
         return Arrays.asList(planets).stream().filter((p) -> p.ownedByOpponentOf(player)).collect(Collectors.toList());
     }
 
-    public static Planet getNearestPlanet(Planet[] planets, Planet planet) {
+    public Planet getNearestPlanet(Planet[] planets, Planet planet) {
         double bestDistance = Double.MAX_VALUE;
         Planet rtn = null;
         for (Planet p : planets) {
@@ -272,7 +256,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static Planet getNearestNotOwnedPlanet(Planet[] planets, Planet planet, Player player) {
+    public Planet getNearestNotOwnedPlanet(Planet[] planets, Planet planet, Player player) {
         double bestDistance = Double.MAX_VALUE;
         Planet rtn = null;
         for (Planet p : planets) {
@@ -287,7 +271,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static Planet getNearestEnemyPlanet(Planet[] planets, Planet planet, Player player) {
+    public Planet getNearestEnemyPlanet(Planet[] planets, Planet planet, Player player) {
         double bestDistance = Double.MAX_VALUE;
         Planet rtn = null;
         for (Planet p : getOpponentsPlanets(planets, player)) {
@@ -300,7 +284,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static int getIncomingFleetCount(Planet p, Fleet[] fleets) {
+    public int getIncomingFleetCount(Planet p, Fleet[] fleets) {
         int rtn = 0;
         for (Fleet f : fleets) {
             if (f.DESTINATION.equals(p)) {
@@ -310,7 +294,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static int getPlayersIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
+    public int getPlayersIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
         int rtn = 0;
         for (Fleet f : fleets) {
             if (f.DESTINATION.equals(planet) && f.ownedBy(player)) {
@@ -320,7 +304,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static int getOpponentsIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
+    public int getOpponentsIncomingFleetCount(Planet planet, Fleet[] fleets, Player player) {
         int rtn = 0;
         for (Fleet f : fleets) {
             if (f.DESTINATION.equals(planet) && !f.ownedBy(player)) {
@@ -330,7 +314,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static List<Planet> sortByDistance(List<Planet> planets, Planet planet) {
+    public List<Planet> sortByDistance(List<Planet> planets, Planet planet) {
         List<Planet> rtn = new ArrayList<Planet>(planets);
         Collections.sort(rtn, (a, b) -> {
             return Double.compare(a.distanceTo(planet), b.distanceTo(planet));
@@ -338,44 +322,43 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static List<Fleet> getMyFleets(Fleet[] fleets, Player player) {
+    public List<Fleet> getMyFleets(Fleet[] fleets, Player player) {
         return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player)).collect(Collectors.toList());
     }
 
-    public static List<Fleet> getOpponentsFleets(Fleet[] fleets, Player player) {
+    public List<Fleet> getOpponentsFleets(Fleet[] fleets, Player player) {
         return Arrays.asList(fleets).stream().filter((fleet) -> !fleet.ownedBy(player)).collect(Collectors.toList());
     }
 
-    public static int getMyUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
+    public int getMyUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
         return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player))
                 .collect(Collectors.summingInt((fleet) -> fleet.getNumUnits()))
                 + Arrays.asList(planets).stream().filter((planet) -> planet.ownedBy(player))
                         .collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
     }
 
-    public static int getOpponentUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
+    public int getOpponentUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
         return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedByOpponentOf(player))
                 .collect(Collectors.summingInt((fleet) -> fleet.getNumUnits()))
                 + Arrays.asList(planets).stream().filter((planet) -> planet.ownedByOpponentOf(player))
                         .collect(Collectors.summingInt((planet) -> planet.getNumUnits()));
     }
 
-    public static enum PlanetOwner {
+    public enum PlanetOwner {
         NOBODY, PLAYER, OPPONENT;
-
-        public static PlanetOwner getOwner(Unit u, Player p) {
-            if (u.ownedBy(p)) {
-                return PLAYER;
-            } else if (u.ownedByOpponentOf(p)) {
-                return OPPONENT;
-            } else {
-                return NOBODY;
-            }
-        }
-
     }
 
-    public static PlanetOwner getCurrentEventualOwner(Planet p, Fleet[] fleets, Player player) {
+    public PlanetOwner getOwner(Unit u, Player p) {
+        if (u.ownedBy(p)) {
+            return PlanetOwner.PLAYER;
+        } else if (u.ownedByOpponentOf(p)) {
+            return PlanetOwner.OPPONENT;
+        } else {
+            return PlanetOwner.NOBODY;
+        }
+    }
+
+    public PlanetOwner getCurrentEventualOwner(Planet p, Fleet[] fleets, Player player) {
         PlanetOwner current;
         if (p.ownedBy(player)) {
             current = PlanetOwner.PLAYER;
@@ -419,7 +402,7 @@ public class PlayerUtils extends GameSettings {
         return current;
     }
 
-    public static int getUnitsToCapture(Planet p, Fleet[] fleets, Player player) {
+    public int getUnitsToCapture(Planet p, Fleet[] fleets, Player player) {
         PlanetOwner current;
         if (p.ownedBy(player)) {
             current = PlanetOwner.PLAYER;
@@ -464,7 +447,7 @@ public class PlayerUtils extends GameSettings {
         return current == PlanetOwner.PLAYER ? -unitCount : unitCount;
     }
 
-    public static Planet getNearestOwnedPlanet(Planet[] planets, Planet planet, Player player) {
+    public Planet getNearestOwnedPlanet(Planet[] planets, Planet planet, Player player) {
         double bestDistance = Double.MAX_VALUE;
         Planet rtn = null;
         for (Planet p : planets) {
@@ -480,7 +463,7 @@ public class PlayerUtils extends GameSettings {
         return rtn;
     }
 
-    public static int getEnemyUnitsOnPlanets(Planet[] planets, Player player) {
+    public int getEnemyUnitsOnPlanets(Planet[] planets, Player player) {
         int unitCount = 0;
         for (Planet p : planets) {
             if (!p.ownedBy(player) && !p.isNeutral()) {
@@ -490,7 +473,7 @@ public class PlayerUtils extends GameSettings {
         return unitCount;
     }
 
-    public static int getMyUnitsOnPlanets(Planet[] planets, Player player) {
+    public int getMyUnitsOnPlanets(Planet[] planets, Player player) {
         int unitCount = 0;
         for (Planet p : planets) {
             if (p.ownedBy(player)) {
@@ -500,7 +483,7 @@ public class PlayerUtils extends GameSettings {
         return unitCount;
     }
 
-    public static int getEnemyUnitsInFleets(Fleet[] fleets, Player player) {
+    public int getEnemyUnitsInFleets(Fleet[] fleets, Player player) {
         int unitCount = 0;
         for (Fleet f : fleets) {
             if (!f.ownedBy(player) && !f.isNeutral()) {
@@ -510,7 +493,7 @@ public class PlayerUtils extends GameSettings {
         return unitCount;
     }
 
-    public static int getMyUnitsInFleets(Fleet[] fleets, Player player) {
+    public int getMyUnitsInFleets(Fleet[] fleets, Player player) {
         int unitCount = 0;
         for (Fleet f : fleets) {
             if (f.ownedBy(player)) {
@@ -520,7 +503,7 @@ public class PlayerUtils extends GameSettings {
         return unitCount;
     }
 
-    public static double getMyTotalProductionFrequency(Planet[] planets, Player player) {
+    public double getMyTotalProductionFrequency(Planet[] planets, Player player) {
         double productionFrequency = 0;
         for (Planet p : planets) {
             if (p.ownedBy(player)) {
@@ -530,7 +513,7 @@ public class PlayerUtils extends GameSettings {
         return productionFrequency;
     }
 
-    public static double getEnemyTotalProductionFrequency(Planet[] planets, Player player) {
+    public double getEnemyTotalProductionFrequency(Planet[] planets, Player player) {
         double productionFrequency = 0;
         for (Planet p : planets) {
             if (!p.ownedBy(player) && !p.isNeutral()) {

@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerUtils;
-import ais.PlayerUtils.Location;
-import ais.PlayerUtils.PlanetOwner;
+import ais.PlayerWithUtils;
+import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
-import galaxy.Player;
 
-public class ContestPlanetsAI extends Player {
+public class ContestPlanetsAI extends PlayerWithUtils {
     private static final int MIN_AGGRESSIVE_DEFENSE = 10;
     private static final int MIN_DEFENSIVE_DEFENSE = 2;
     private static final double BASE_DISTANCE_FACTOR = 20;
@@ -34,33 +32,33 @@ public class ContestPlanetsAI extends Player {
         super(c, "Contest Planets AI");
     }
 
-    public double getValue(Planet p, Location averageLocation, double variance) {
+    public double getValue(Planet p, Coords averageLocation, double variance) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
-                / (averageLocation.distance(p) + BASE_DISTANCE_FACTOR);
+                / (averageLocation.distanceTo(p) + BASE_DISTANCE_FACTOR);
         return (p.getColor().equals(Color.GRAY) ? 1.0 : AGGRESSION) * Math.pow(distanceFactor, DISTANCE_WEIGHTING)
                 / p.PRODUCTION_TIME / (10 + p.getNumUnits());
     }
 
     @Override
     protected void turn() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         for (Planet p : myPlanets) {
-            if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) == PlayerUtils.PlanetOwner.PLAYER) {
+            if (getCurrentEventualOwner(p, fleets, this) == PlanetOwner.PLAYER) {
                 mine.add(p);
             }
         }
         if (myPlanets.size() == 0) {
             return;
         }
-        List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+        List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
         boolean defending = false;
         Planet target = null;
         int needed = 0;
         for (Planet p : mine) {
-            if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) != PlayerUtils.PlanetOwner.PLAYER) {
-                needed = PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this) - p.getNumUnits()
-                        - PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) + MIN_DEFENSIVE_DEFENSE;
+            if (getCurrentEventualOwner(p, fleets, this) != PlanetOwner.PLAYER) {
+                needed = getOpponentsIncomingFleetCount(p, fleets, this) - p.getNumUnits()
+                        - getPlayersIncomingFleetCount(p, fleets, this) + MIN_DEFENSIVE_DEFENSE;
                 needed = Math.max(needed, 2);
                 target = p;
                 defending = true;
@@ -75,15 +73,15 @@ public class ContestPlanetsAI extends Player {
             }
         }
 
-        Location average = Location.center(myPlanets);
-        double variance = Location.variance(myPlanets);
+        Coords average = center(myPlanets);
+        double variance = variance(myPlanets);
 
         if (target == null) {
             double best = Double.MIN_VALUE;
             for (Planet p : otherPlanets) {
                 double value = getValue(p, average, variance);
                 if (value > best) {
-                    if (PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) == 0) {
+                    if (getPlayersIncomingFleetCount(p, fleets, this) == 0) {
                         target = p;
                         best = value;
                     }
@@ -98,7 +96,7 @@ public class ContestPlanetsAI extends Player {
         int available = 0;
         for (Planet p : myPlanets) {
             if (p != target) {
-                int contribution = p.getNumUnits() - PlayerUtils.getIncomingFleetCount(p, fleets)
+                int contribution = p.getNumUnits() - getIncomingFleetCount(p, fleets)
                         - (defending ? MIN_DEFENSIVE_DEFENSE : MIN_AGGRESSIVE_DEFENSE);
 
                 if (available + contribution > needed) {
@@ -117,8 +115,8 @@ public class ContestPlanetsAI extends Player {
     }
 
     private void contest() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
 
         if (myPlanets.size() > 1 || theirPlanets.size() > 1) {
             contest = false;
@@ -136,7 +134,7 @@ public class ContestPlanetsAI extends Player {
             }
         }
 
-        for (Fleet fleet : PlayerUtils.getOpponentsFleets(fleets, this)) {
+        for (Fleet fleet : getOpponentsFleets(fleets, this)) {
             if (retake.contains(fleet.DESTINATION)) {
                 int distance = (int) Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / FLEET_SPEED);
                 int fleetDistance = (int) Math.ceil(fleet.distanceLeft() / FLEET_SPEED);
@@ -226,9 +224,9 @@ public class ContestPlanetsAI extends Player {
         mine = new HashSet<>();
         contest = true;
 
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
-        List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
+        List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
 
         if (myPlanets.size() != 1 || theirPlanets.size() != 1) {
             throw new RuntimeException("Unexpected starting situation MyPlanets: " + myPlanets.size()

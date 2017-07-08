@@ -13,15 +13,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerUtils;
-import ais.PlayerUtils.Location;
-import ais.PlayerUtils.PlanetOwner;
+import ais.PlayerWithUtils;
+import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
-import galaxy.Player;
 
 //Tuned for 3d maps
-public class GoodAI extends Player {
+public class GoodAI extends PlayerWithUtils {
 
     private List<AIConstants> currentGeneration = new ArrayList<>();
     private AIConstants constants = new AIConstants();
@@ -61,20 +59,22 @@ public class GoodAI extends Player {
             // TylerDefender on 2d
             /*
              * USE_MOVE_FORWARDS = false; USE_OLD_VALUE_CALCULATION = false;
-             * MIN_AGGRESSIVE_DEFENSE = 69; MIN_DEFENSIVE_DEFENSE = 13; AGGRESSION =
-             * 0.1965957281144417; BASE_DISTANCE_FACTOR = 688.9222691138962;
-             * DISTANCE_WEIGHTING = 0.5073434974680578; UNIT_COUNT_POSITION_WEIGHT =
-             * 0.4572860707011577; UNIT_GEN_POSITION_WEIGHT = 0.6051810864440077;
+             * MIN_AGGRESSIVE_DEFENSE = 69; MIN_DEFENSIVE_DEFENSE = 13;
+             * AGGRESSION = 0.1965957281144417; BASE_DISTANCE_FACTOR =
+             * 688.9222691138962; DISTANCE_WEIGHTING = 0.5073434974680578;
+             * UNIT_COUNT_POSITION_WEIGHT = 0.4572860707011577;
+             * UNIT_GEN_POSITION_WEIGHT = 0.6051810864440077;
              * CAPTURE_SAFTEY_MARGIN = 1.773017786429287;
              */
 
             // TylerRandom on 2d
             /*
              * USE_MOVE_FORWARDS = true; USE_OLD_VALUE_CALCULATION = false;
-             * MIN_AGGRESSIVE_DEFENSE = 39; MIN_DEFENSIVE_DEFENSE = 17; AGGRESSION =
-             * 2.0844474549539864; BASE_DISTANCE_FACTOR = 522.294342150184;
-             * DISTANCE_WEIGHTING = 0.44668924816334477; UNIT_COUNT_POSITION_WEIGHT =
-             * 0.609490464638585; UNIT_GEN_POSITION_WEIGHT = 0.37792441961384515;
+             * MIN_AGGRESSIVE_DEFENSE = 39; MIN_DEFENSIVE_DEFENSE = 17;
+             * AGGRESSION = 2.0844474549539864; BASE_DISTANCE_FACTOR =
+             * 522.294342150184; DISTANCE_WEIGHTING = 0.44668924816334477;
+             * UNIT_COUNT_POSITION_WEIGHT = 0.609490464638585;
+             * UNIT_GEN_POSITION_WEIGHT = 0.37792441961384515;
              * CAPTURE_SAFTEY_MARGIN = 0.11104507853259545;
              */
         }
@@ -190,7 +190,7 @@ public class GoodAI extends Player {
 
     @Override
     protected void turn() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         if (myPlanets.size() == 0) {
             return;
         }
@@ -200,7 +200,7 @@ public class GoodAI extends Player {
         int needed = 0;
         Set<Planet> danger = new HashSet<>();
         for (Planet p : mine) {
-            if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) != PlayerUtils.PlanetOwner.PLAYER) {
+            if (getCurrentEventualOwner(p, fleets, this) != PlanetOwner.PLAYER) {
                 danger.add(p);
             }
         }
@@ -216,8 +216,8 @@ public class GoodAI extends Player {
             } else {
                 p = danger.stream().min((a, b) -> Integer.compare(a.getNumUnits(), b.getNumUnits())).get();
             }
-            needed = PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this) - p.getNumUnits()
-                    - PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this) + constants.MIN_DEFENSIVE_DEFENSE;
+            needed = getOpponentsIncomingFleetCount(p, fleets, this) - p.getNumUnits()
+                    - getPlayersIncomingFleetCount(p, fleets, this) + constants.MIN_DEFENSIVE_DEFENSE;
             needed = Math.max(needed, 4);
             target = p;
             defending = true;
@@ -227,11 +227,11 @@ public class GoodAI extends Player {
             int available = 0;
             if (target != null) {
                 final Planet finalTarget = target;
-                for (Planet p : myPlanets.stream().sorted((Planet a, Planet b) -> Double
-                        .compare(new Location(a).distance(finalTarget), new Location(b).distance(finalTarget)))
+                for (Planet p : myPlanets.stream().sorted(
+                        (Planet a, Planet b) -> Double.compare(a.distanceTo(finalTarget), b.distanceTo(finalTarget)))
                         .collect(Collectors.toList())) {
                     if (p != target) {
-                        int contribution = p.getNumUnits() - PlayerUtils.getIncomingFleetCount(p, fleets)
+                        int contribution = p.getNumUnits() - getIncomingFleetCount(p, fleets)
                                 - constants.MIN_DEFENSIVE_DEFENSE;
 
                         if (available + contribution > needed) {
@@ -265,17 +265,17 @@ public class GoodAI extends Player {
     }
 
     public void moveFleetsForwards() {
-        List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+        List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
         if (theirPlanets.size() > 0) {
-            Location theirUnitArea = Location.getUnitCountWeightedCenter(theirPlanets);
-            Location theirProductionArea = Location.getProductionWeightedCenter(theirPlanets);
+            Coords theirUnitArea = getUnitCountWeightedCenter(theirPlanets);
+            Coords theirProductionArea = getProductionWeightedCenter(theirPlanets);
             theirUnitArea = theirUnitArea.multiply(constants.UNIT_COUNT_POSITION_WEIGHT);
             theirProductionArea = theirProductionArea.multiply(constants.UNIT_GEN_POSITION_WEIGHT);
-            Location theirLocation = theirUnitArea.sum(theirProductionArea);
+            Coords theirLocation = theirUnitArea.sum(theirProductionArea);
             Optional<Planet> target = mine.stream()
-                    .min((a, b) -> Double.compare(theirLocation.distance(a), theirLocation.distance(b)));
+                    .min((a, b) -> Double.compare(theirLocation.distanceTo(a), theirLocation.distanceTo(b)));
             if (target.isPresent()) {
-                for (Planet p : PlayerUtils.getPlanetsOwnedByPlayer(planets, this)) {
+                for (Planet p : getPlanetsOwnedByPlayer(planets, this)) {
                     int toSend = p.getNumUnits() - constants.MIN_AGGRESSIVE_DEFENSE;
                     if (toSend > 0) {
                         addAction(p, target.get(), toSend);
@@ -285,16 +285,16 @@ public class GoodAI extends Player {
         }
     }
 
-    public double getValue(Planet p, Location averageLocation, double variance) {
+    public double getValue(Planet p, Coords averageLocation, double variance) {
         double distanceFactor = (variance + constants.BASE_DISTANCE_FACTOR)
-                / (averageLocation.distance(p) + constants.BASE_DISTANCE_FACTOR);
+                / (averageLocation.distanceTo(p) + constants.BASE_DISTANCE_FACTOR);
         return (p.getColor().equals(Color.GRAY) ? 1.0 : constants.AGGRESSION)
                 * Math.pow(distanceFactor, constants.DISTANCE_WEIGHTING) / p.PRODUCTION_TIME / (10 + p.getNumUnits());
     }
 
     private void contest() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
 
         if (myPlanets.size() > 1 || theirPlanets.size() > 1) {
             contest = false;
@@ -312,7 +312,7 @@ public class GoodAI extends Player {
             }
         }
 
-        for (Fleet fleet : PlayerUtils.getOpponentsFleets(fleets, this)) {
+        for (Fleet fleet : getOpponentsFleets(fleets, this)) {
             if (retake.contains(fleet.DESTINATION)) {
                 int distance = (int) Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / Fleet.FLEET_SPEED);
                 int fleetDistance = (int) Math.ceil(fleet.distanceLeft() / Fleet.FLEET_SPEED);
@@ -399,9 +399,9 @@ public class GoodAI extends Player {
         mine = new HashSet<>();
         contest = true;
 
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
-        List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
+        List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
 
         if (myPlanets.size() != 1 || theirPlanets.size() != 1) {
             throw new RuntimeException("Unexpected starting situation MyPlanets: " + myPlanets.size()
@@ -453,16 +453,16 @@ public class GoodAI extends Player {
         }
     }
 
-    private double getInfluence(Planet a, Planet b, Location opponent) {
+    private double getInfluence(Planet a, Planet b, Coords opponent) {
         if (a == b) {
             return a.getNumUnits();
         } else {
             if (constants.USE_OLD_VALUE_CALCULATION) {
-                return a.getNumUnits() * 0.5 * (new Location(a).distance(b) + constants.BASE_DISTANCE_FACTOR)
-                        / (opponent.distance(b) + constants.BASE_DISTANCE_FACTOR);
+                return a.getNumUnits() * 0.5 * (a.distanceTo(b) + constants.BASE_DISTANCE_FACTOR)
+                        / (opponent.distanceTo(b) + constants.BASE_DISTANCE_FACTOR);
             } else {
-                double myDistance = new Location(a).distance(b);
-                double theirDistance = opponent.distance(b);
+                double myDistance = a.distanceTo(b);
+                double theirDistance = opponent.distanceTo(b);
                 double distanceFactor = theirDistance / (myDistance + theirDistance);
                 return a.getNumUnits() * Math.pow(distanceFactor, constants.DISTANCE_WEIGHTING);
             }
@@ -470,37 +470,38 @@ public class GoodAI extends Player {
     }
 
     private void evaluatePosition() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> theirPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
-        // List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
-        List<Fleet> myFleets = PlayerUtils.getMyFleets(fleets, this);
-        List<Fleet> theirFleets = PlayerUtils.getOpponentsFleets(fleets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
+        // List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
+        List<Fleet> myFleets = getMyFleets(fleets, this);
+        List<Fleet> theirFleets = getOpponentsFleets(fleets, this);
 
         /*
          * if both are true may turn on aggro mode int myUnits =
-         * PlayerUtils.getMyUnitCount(fleets, planets, this); int theirUnits =
-         * PlayerUtils.getOpponentUnitCount(fleets, planets, this); boolean
-         * unitAdvantage = myUnits > theirUnits * ADVANTAGE_THRESHOLD;
+         * getMyUnitCount(fleets, planets, this); int theirUnits =
+         * getOpponentUnitCount(fleets, planets, this); boolean unitAdvantage =
+         * myUnits > theirUnits * ADVANTAGE_THRESHOLD;
          *
-         * double myProduction = myPlanets.stream().collect(Collectors.summingDouble(p
-         * -> p.getProductionFrequency())); double theirProduction =
+         * double myProduction =
+         * myPlanets.stream().collect(Collectors.summingDouble(p ->
+         * p.getProductionFrequency())); double theirProduction =
          * theirPlanets.stream().collect(Collectors.summingDouble(p ->
-         * p.getProductionFrequency())); boolean productionAdvantage = myProduction >
-         * theirProduction * ADVANTAGE_THRESHOLD;
+         * p.getProductionFrequency())); boolean productionAdvantage =
+         * myProduction > theirProduction * ADVANTAGE_THRESHOLD;
          */
 
-        Location myUnitArea = Location.getUnitCountWeightedCenter(myPlanets);
-        Location myProductionArea = Location.getProductionWeightedCenter(myPlanets);
+        Coords myUnitArea = getUnitCountWeightedCenter(myPlanets);
+        Coords myProductionArea = getProductionWeightedCenter(myPlanets);
         myUnitArea = myUnitArea.multiply(constants.UNIT_COUNT_POSITION_WEIGHT);
         myProductionArea = myProductionArea.multiply(constants.UNIT_GEN_POSITION_WEIGHT);
-        Location myLocation = myUnitArea.sum(myProductionArea);
+        Coords myLocation = myUnitArea.sum(myProductionArea);
 
-        double mySpread = Location.variance(myPlanets);
+        double mySpread = variance(myPlanets);
 
-        Location theirLocation;
+        Coords theirLocation;
         if (theirPlanets.size() > 0) {
-            Location theirUnitArea = Location.getUnitCountWeightedCenter(theirPlanets);
-            Location theirProductionArea = Location.getProductionWeightedCenter(theirPlanets);
+            Coords theirUnitArea = getUnitCountWeightedCenter(theirPlanets);
+            Coords theirProductionArea = getProductionWeightedCenter(theirPlanets);
             theirUnitArea = theirUnitArea.multiply(constants.UNIT_COUNT_POSITION_WEIGHT);
             theirProductionArea = theirProductionArea.multiply(constants.UNIT_GEN_POSITION_WEIGHT);
             theirLocation = theirUnitArea.sum(theirProductionArea);
@@ -515,8 +516,8 @@ public class GoodAI extends Player {
                 if (influencing == p) {
                     addMap(myInfluence, p, Double.valueOf(p.getNumUnits()));
                 } else {
-                    double myDistance = new Location(influencing).distance(p);
-                    double theirDistance = theirLocation.distance(p);
+                    double myDistance = influencing.distanceTo(p);
+                    double theirDistance = theirLocation.distanceTo(p);
                     double distanceFactor = theirDistance / (myDistance + theirDistance);
                     double influence = influencing.getNumUnits()
                             * Math.pow(distanceFactor, constants.DISTANCE_WEIGHTING);
@@ -535,8 +536,8 @@ public class GoodAI extends Player {
                 if (influencing == p) {
                     addMap(theirInfluence, p, Double.valueOf(p.getNumUnits()));
                 } else {
-                    double theirDistance = new Location(influencing).distance(p);
-                    double myDistance = myLocation.distance(p);
+                    double theirDistance = influencing.distanceTo(p);
+                    double myDistance = myLocation.distanceTo(p);
                     double distanceFactor = myDistance / (myDistance + theirDistance);
                     double influence = influencing.getNumUnits()
                             * Math.pow(distanceFactor, constants.DISTANCE_WEIGHTING);

@@ -24,8 +24,21 @@ public abstract class Unit extends Coords {
     void update() {
     }
 
-    public final boolean equals(Unit u) {
-        return u == null ? false : u.ID == ID;
+    /**
+     * Checks whether a Unit is equal to another Unit.
+     * This checks based off their IDs. As such, two otherwise identical Units are
+     * actually still two distinct Units.
+     *
+     * For a null-safe way to check two potentially null Units use areEqual
+     *
+     * In the current implementation this will be equivalent to just using == but
+     * that may not always be the case and it's generally not great practice.
+     *
+     * @param u The Unit to compare to
+     */
+    @Override
+    public final boolean equals(Object u) {
+        return u instanceof Unit ? ((Unit)u).ID == ID : false;
     }
 
     public static final boolean areEqual(Unit u1, Unit u2) {

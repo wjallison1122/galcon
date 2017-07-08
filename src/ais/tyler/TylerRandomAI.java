@@ -5,11 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import ais.PlayerUtils;
+import ais.PlayerWithUtils;
 import galaxy.Planet;
-import galaxy.Player;
 
-public class TylerRandomAI extends Player {
+public class TylerRandomAI extends PlayerWithUtils {
 
     public TylerRandomAI() {
         super(new Color(50, 100, 0), "Pseudo Random AI");
@@ -47,8 +46,8 @@ public class TylerRandomAI extends Player {
     ///////////////////////
 
     private void pseudoRandomAI() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
         greedySort(otherPlanets);
 
@@ -68,7 +67,7 @@ public class TylerRandomAI extends Player {
     }
 
     // private void randomAI() {
-    // List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
+    // List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
     //
     // for (Planet p : myPlanets) {
     // if (p.getNumUnits() > 10) {

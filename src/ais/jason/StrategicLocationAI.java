@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ais.PlayerUtils;
-import ais.PlayerUtils.Location;
-import ais.PlayerUtils.PlanetOwner;
+import ais.PlayerWithUtils;
+import galaxy.Coords;
 import galaxy.Planet;
-import galaxy.Player;
 
-public class StrategicLocationAI extends Player {
+public class StrategicLocationAI extends PlayerWithUtils {
     // private static final double HAVE_ADVANTAGE_DEFENSE = 10;
     // private static final double HAVE_ADVANTAGE_OFFENSE = 20;
     // private static final double ARE_TIED_OFFENSE = 15;
@@ -37,7 +35,7 @@ public class StrategicLocationAI extends Player {
     private ArrayList<PlanetUtility> allPlanetInfo;
     // private double averageStrategicValue;
 
-   /** PlayMode details
+    /** PlayMode details
     ***************************************************************
     ********************************** PRODUCTION *****************
     ******************  MORE        *  SAME        *  LESS        *
@@ -47,15 +45,10 @@ public class StrategicLocationAI extends Player {
     ********-> LESS  *  DEFENSIVE   *  DESPARATE   *  DESPARATE   *
     ***************************************************************
     */
-   
-   private enum PlayMode
-    {
-      CONFIDENT,
-      AGGRESSIVE,
-      NORMAL,
-      DEFENSIVE,
-      DESPARATE
-   }
+
+    private enum PlayMode {
+        CONFIDENT, AGGRESSIVE, NORMAL, DEFENSIVE, DESPARATE
+    }
 
     private class PlanetUtility {
         Planet planet;
@@ -76,27 +69,26 @@ public class StrategicLocationAI extends Player {
         super(c, "Strategic Location AI");
     }
 
-    public double getBaseValue(PlanetUtility p, Location averageLocation, double variance) {
+    public double getBaseValue(PlanetUtility p, Coords averageLocation, double variance) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
-                / (averageLocation.distance(p.planet) + BASE_DISTANCE_FACTOR);
-        return (PlayerUtils.getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0 : AGGRESSION)
+                / (averageLocation.distanceTo(p.planet) + BASE_DISTANCE_FACTOR);
+        return (getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0 : AGGRESSION)
                 * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.planet.PRODUCTION_TIME / (unitBaseCost + p.units);
     }
 
-    public double getOverallValue(PlanetUtility p, Location averageLocation, double variance) {
+    public double getOverallValue(PlanetUtility p, Coords averageLocation, double variance) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
-                / (averageLocation.distance(p.planet) + BASE_DISTANCE_FACTOR);
-        double baseValue = (PlayerUtils.getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0
-                : AGGRESSION) * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.planet.PRODUCTION_TIME
-                / (unitBaseCost + p.units);
+                / (averageLocation.distanceTo(p.planet) + BASE_DISTANCE_FACTOR);
+        double baseValue = (getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0 : AGGRESSION)
+                * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.planet.PRODUCTION_TIME / (unitBaseCost + p.units);
         double stratValue = getDefensiveValue(p.planet, baseValue) / getOffensiveValue(p.planet, baseValue);
         return baseValue * stratValue;
     }
 
-    public double getAggressiveValue(PlanetUtility p, Location averageLocation, double variance) {
+    public double getAggressiveValue(PlanetUtility p, Coords averageLocation, double variance) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
-                / (averageLocation.distance(p.planet) + BASE_DISTANCE_FACTOR);
-        double baseValue = (PlayerUtils.getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0
+                / (averageLocation.distanceTo(p.planet) + BASE_DISTANCE_FACTOR);
+        double baseValue = (getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0
                 : AGGRESSION * AGGRESSION_MULTIPLIER) * Math.pow(distanceFactor, DISTANCE_WEIGHTING)
                 / p.planet.PRODUCTION_TIME / (unitBaseCost + p.units);
         // double stratValue = getDefensiveValue(p.planet, baseValue) /
@@ -105,20 +97,22 @@ public class StrategicLocationAI extends Player {
     }
 
     public double getDefensiveValue(Planet p, double baseValue) {
-        Planet nearestOwn = PlayerUtils.getNearestOwnedPlanet(planets, p, this);
+        Planet nearestOwn = getNearestOwnedPlanet(planets, p, this);
         double distToAlly = nearestOwn != null ? p.distanceTo(nearestOwn) : Integer.MAX_VALUE;
 
-        return baseValue / distToAlly; // the nearer our own planets are the better they can be defended
+        return baseValue / distToAlly; // the nearer our own planets are the
+                                       // better they can be defended
     }
 
     public double getOffensiveValue(Planet p, double baseValue) {
-        Planet nearestEnemy = PlayerUtils.getNearestEnemyPlanet(planets, p, this);
+        Planet nearestEnemy = getNearestEnemyPlanet(planets, p, this);
         double distToEnemy = nearestEnemy != null ? p.distanceTo(nearestEnemy) : Integer.MAX_VALUE;
 
-        return baseValue / distToEnemy; // the nearer our enemy's planets are the faster we can strike them
+        return baseValue / distToEnemy; // the nearer our enemy's planets are
+                                        // the faster we can strike them
     }
 
-    public ArrayList<PlanetUtility> sortByBaseValue(List<PlanetUtility> planets, Location averageLocation,
+    public ArrayList<PlanetUtility> sortByBaseValue(List<PlanetUtility> planets, Coords averageLocation,
             double variance) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
@@ -128,7 +122,7 @@ public class StrategicLocationAI extends Player {
         return rtn;
     }
 
-    public ArrayList<PlanetUtility> sortByOverallValue(List<PlanetUtility> planets, Location averageLocation,
+    public ArrayList<PlanetUtility> sortByOverallValue(List<PlanetUtility> planets, Coords averageLocation,
             double variance) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
@@ -138,7 +132,7 @@ public class StrategicLocationAI extends Player {
         return rtn;
     }
 
-    public ArrayList<PlanetUtility> sortByAggressiveValue(List<PlanetUtility> planets, Location averageLocation,
+    public ArrayList<PlanetUtility> sortByAggressiveValue(List<PlanetUtility> planets, Coords averageLocation,
             double variance) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
@@ -148,7 +142,7 @@ public class StrategicLocationAI extends Player {
         return rtn;
     }
 
-    public ArrayList<PlanetUtility> sortByOffensiveValue(List<PlanetUtility> planets, Location averageLocation,
+    public ArrayList<PlanetUtility> sortByOffensiveValue(List<PlanetUtility> planets, Coords averageLocation,
             double variance) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
@@ -157,7 +151,7 @@ public class StrategicLocationAI extends Player {
         return rtn;
     }
 
-    public ArrayList<PlanetUtility> sortByDefensiveValue(List<PlanetUtility> planets, Location averageLocation,
+    public ArrayList<PlanetUtility> sortByDefensiveValue(List<PlanetUtility> planets, Coords averageLocation,
             double variance) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
@@ -168,38 +162,48 @@ public class StrategicLocationAI extends Player {
 
     @Override
     protected void turn() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        // List<Planet> notMyPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets,
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        // List<Planet> notMyPlanets =
+        // getPlanetsNotOwnedByPlayer(planets,
         // this);
-        // List<Planet> enemyPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
-        // List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
+        // List<Planet> enemyPlanets = getOpponentsPlanets(planets,
+        // this);
+        // List<Planet> unownedPlanets =
+        // getUnoccupiedPlanets(planets);
 
-        int myTotalUnits = PlayerUtils.getMyUnitCount(fleets, planets, this);
-        int enemyTotalUnits = PlayerUtils.getOpponentUnitCount(fleets, planets, this);
+        int myTotalUnits = getMyUnitCount(fleets, planets, this);
+        int enemyTotalUnits = getOpponentUnitCount(fleets, planets, this);
         int mySpareUnits = 0;
-        double myProduction = PlayerUtils.getMyTotalProductionFrequency(planets, this);
-        double enemyProduction = PlayerUtils.getEnemyTotalProductionFrequency(planets, this);
+        double myProduction = getMyTotalProductionFrequency(planets, this);
+        double enemyProduction = getEnemyTotalProductionFrequency(planets, this);
         double currentUnitRatio = (myTotalUnits + 0.0001) / (enemyTotalUnits + 0.0001);
         double currentProductionRatio = (myProduction + 0.0001) / (enemyProduction + 0.0001);
 
-        Location averageLocation = Location.center(myPlanets);
-        double variance = Location.variance(myPlanets);
+        Coords averageLocation = center(myPlanets);
+        double variance = variance(myPlanets);
 
         PlayMode mode;
         if (currentUnitRatio > UNIT_ADVANTAGE_RATIO) { // cover more units
-            if (currentProductionRatio > PRODUCTION_DISADVANTAGE_RATIO) { // cover more/same production
+            if (currentProductionRatio > PRODUCTION_DISADVANTAGE_RATIO) { // cover
+                                                                          // more/same
+                                                                          // production
                 mode = PlayMode.CONFIDENT;
             } else { // cover less production
                 mode = PlayMode.AGGRESSIVE;
             }
-        } else if (currentUnitRatio < UNIT_DISADVANTAGE_RATIO) { // cover less units
-            if (currentProductionRatio > PRODUCTION_ADVANTAGE_RATIO) { // cover more production
+        } else if (currentUnitRatio < UNIT_DISADVANTAGE_RATIO) { // cover less
+                                                                 // units
+            if (currentProductionRatio > PRODUCTION_ADVANTAGE_RATIO) { // cover
+                                                                       // more
+                                                                       // production
                 mode = PlayMode.DEFENSIVE;
             } else { // cover less/equal production
                 mode = PlayMode.DESPARATE;
             }
         } else { // cover same units
-            if (currentProductionRatio > PRODUCTION_DISADVANTAGE_RATIO) { // cover more/same production
+            if (currentProductionRatio > PRODUCTION_DISADVANTAGE_RATIO) { // cover
+                                                                          // more/same
+                                                                          // production
                 mode = PlayMode.NORMAL;
             } else { // cover less production
                 mode = PlayMode.DESPARATE;
@@ -208,7 +212,8 @@ public class StrategicLocationAI extends Player {
 
         // System.out.println("myUnits: " + myTotalUnits + " enemyUnits: " +
         // enemyTotalUnits);
-        // System.out.println("unitRatio: " + currentUnitRatio + " prdnRatio: " +
+        // System.out.println("unitRatio: " + currentUnitRatio + " prdnRatio: "
+        // +
         // currentProductionRatio);
         // System.out.println(mode);
 
@@ -216,13 +221,14 @@ public class StrategicLocationAI extends Player {
         for (int i = 0; i < allPlanetInfo.size(); i++) {
             PlanetUtility temp = allPlanetInfo.get(i);
             temp.units = temp.planet.getNumUnits();
-            temp.eventualOwner = PlayerUtils.getCurrentEventualOwner(temp.planet, fleets, this);
-            temp.minBaseConquerCost = PlayerUtils.getUnitsToCapture(temp.planet, fleets, this);
-            temp.extraUnits = temp.units - PlayerUtils.getOpponentsIncomingFleetCount(temp.planet, fleets, this);
+            temp.eventualOwner = getCurrentEventualOwner(temp.planet, fleets, this);
+            temp.minBaseConquerCost = getUnitsToCapture(temp.planet, fleets, this);
+            temp.extraUnits = temp.units - getOpponentsIncomingFleetCount(temp.planet, fleets, this);
             temp.defensiveValue = getDefensiveValue(temp.planet, temp.baseStrategicValue);
             temp.offensiveValue = getOffensiveValue(temp.planet, temp.baseStrategicValue);
 
-            // System.out.println("num: "+i+" own: "+temp.planet.getOwner()+" units:
+            // System.out.println("num: "+i+" own: "+temp.planet.getOwner()+"
+            // units:
             // "+temp.units+" evenOwn: "+temp.eventualOwner+" conCost:
             // "+temp.minBaseConquerCost);
         }
@@ -231,11 +237,19 @@ public class StrategicLocationAI extends Player {
         for (PlanetUtility p : allPlanetInfo) {
             if (p.planet.ownedBy(this) && p.eventualOwner != PlanetOwner.PLAYER) {
                 for (PlanetUtility other : allPlanetInfo) {
-                    if (other.planet.ownedBy(this) && other != p && other.minBaseConquerCost < 0) { // planet is under
-                                                                                                    // no threat itself
-                                                                                                    // and not the same
+                    if (other.planet.ownedBy(this) && other != p && other.minBaseConquerCost < 0) { // planet
+                                                                                                    // is
+                                                                                                    // under
+                                                                                                    // no
+                                                                                                    // threat
+                                                                                                    // itself
+                                                                                                    // and
+                                                                                                    // not
+                                                                                                    // the
+                                                                                                    // same
                                                                                                     // one
-                        // send as many units as required or as many as can be spared if not enough
+                        // send as many units as required or as many as can be
+                        // spared if not enough
                         int willSend = other.extraUnits > p.minBaseConquerCost ? p.minBaseConquerCost
                                 : other.extraUnits;
                         other.units -= willSend;
@@ -249,7 +263,7 @@ public class StrategicLocationAI extends Player {
 
         for (PlanetUtility p : allPlanetInfo) {
             if (p.minBaseConquerCost < 0 && p.units > 0) {
-                mySpareUnits += p.units - PlayerUtils.getOpponentsIncomingFleetCount(p.planet, fleets, this);
+                mySpareUnits += p.units - getOpponentsIncomingFleetCount(p.planet, fleets, this);
             }
         }
 
@@ -259,31 +273,37 @@ public class StrategicLocationAI extends Player {
         switch (mode) {
             case CONFIDENT:
                 mySpareUnits *= AGGRESSIVE_SPARE_UNIT_RATIO;
-                // mySpareUnits = (int) Math.max(mySpareUnits * AGGRESSIVE_SPARE_UNIT_RATIO,
-                // mySpareUnits * currentUnitRatio); //AGGRESSIVE_SPARE_UNIT_RATIO;
+                // mySpareUnits = (int) Math.max(mySpareUnits *
+                // AGGRESSIVE_SPARE_UNIT_RATIO,
+                // mySpareUnits * currentUnitRatio);
+                // //AGGRESSIVE_SPARE_UNIT_RATIO;
                 targets = sortByAggressiveValue(allPlanetInfo, averageLocation, variance);
                 break;
             case AGGRESSIVE:
                 mySpareUnits *= AGGRESSIVE_SPARE_UNIT_RATIO;
-                // mySpareUnits = (int) Math.max(mySpareUnits * AGGRESSIVE_SPARE_UNIT_RATIO,
+                // mySpareUnits = (int) Math.max(mySpareUnits *
+                // AGGRESSIVE_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
                 targets = sortByOverallValue(allPlanetInfo, averageLocation, variance);
                 break;
             case DEFENSIVE:
                 mySpareUnits *= DEFENSIVE_SPARE_UNIT_RATIO;
-                // mySpareUnits = (int) Math.max(mySpareUnits * DEFENSIVE_SPARE_UNIT_RATIO,
+                // mySpareUnits = (int) Math.max(mySpareUnits *
+                // DEFENSIVE_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
                 targets = sortByDefensiveValue(allPlanetInfo, averageLocation, variance);
                 break;
             case DESPARATE:
                 mySpareUnits *= AGGRESSIVE_SPARE_UNIT_RATIO;
-                // mySpareUnits = (int) Math.min(mySpareUnits * AGGRESSIVE_SPARE_UNIT_RATIO,
+                // mySpareUnits = (int) Math.min(mySpareUnits *
+                // AGGRESSIVE_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
                 targets = sortByOverallValue(allPlanetInfo, averageLocation, variance);
                 break;
             case NORMAL:
                 mySpareUnits *= NORMAL_SPARE_UNIT_RATIO;
-                // mySpareUnits = (int) Math.min(mySpareUnits * NORMAL_SPARE_UNIT_RATIO,
+                // mySpareUnits = (int) Math.min(mySpareUnits *
+                // NORMAL_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
                 targets = sortByOverallValue(allPlanetInfo, averageLocation, variance);
                 break;
@@ -305,7 +325,8 @@ public class StrategicLocationAI extends Player {
 
             if (current.planet.ownedBy(this)) {
                 PlanetUtility temp = targets.get(0);
-                // System.out.println("target: " + temp.planet.getOwner() + " u: " +
+                // System.out.println("target: " + temp.planet.getOwner() + " u:
+                // " +
                 // temp.planet.getNumUnits());
                 int extraUnitsNeeded = 3;
                 if (temp.planet.ownedByOpponentOf(this)) {

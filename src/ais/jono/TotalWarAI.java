@@ -1,14 +1,12 @@
 package ais.jono;
 
-import galaxy.Planet;
-import galaxy.Player;
-
 import java.awt.Color;
 import java.util.List;
 
-import ais.PlayerUtils;
+import ais.PlayerWithUtils;
+import galaxy.Planet;
 
-public class TotalWarAI extends Player {
+public class TotalWarAI extends PlayerWithUtils {
 
     public TotalWarAI() {
         super(Color.WHITE, "Total War AI");
@@ -23,9 +21,9 @@ public class TotalWarAI extends Player {
 
     @Override
     protected void turn() {
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
-        List<Planet> opponentsPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
+        List<Planet> opponentsPlanets = getOpponentsPlanets(planets, this);
 
         Planet smallestUnoccupied = otherPlanets.stream()
                 .min((a, b) -> Integer.compare(a.getNumUnits(), b.getNumUnits())).get();

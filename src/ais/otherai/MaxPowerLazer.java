@@ -1,10 +1,5 @@
 package ais.otherai;
 
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-import galaxy.Unit;
-
 import java.awt.Color;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,15 +7,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import ais.PlayerWithUtils;
+import galaxy.Fleet;
+import galaxy.Planet;
+import galaxy.Player;
+import galaxy.Unit;
+
 /**
  * A heuristic based greedy algorithm. Searches through planets, creating a plan
  * for the planet and then assigning a "profit value" for enacting that plan.
  * All most valuable plans are then enacted.
- * 
+ *
  * @author user
  *
  */
-public class MaxPowerLazer extends Player {
+public class MaxPowerLazer extends PlayerWithUtils {
     HashMap<Planet, LinkedList<Fleet>> fleetsTargeting = new HashMap<Planet, LinkedList<Fleet>>();
     PriorityQueue<PlanetValuer> plans = new PriorityQueue<PlanetValuer>();
 
@@ -118,10 +119,12 @@ public class MaxPowerLazer extends Player {
                 int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / FLEET_SPEED)
                         / home.PRODUCTION_TIME);
                 int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
-                // If I lose more units taking over the planet than can be made before the enemy
+                // If I lose more units taking over the planet than can be made
+                // before the enemy
                 // hits the planet
                 if (prodDiff < 0) {
-                    // TODO check if close enemy planets can actually send enough units to help.
+                    // TODO check if close enemy planets can actually send
+                    // enough units to help.
 
                     return -1;
                 }

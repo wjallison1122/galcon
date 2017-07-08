@@ -7,12 +7,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import ais.PlayerUtils;
+import ais.PlayerWithUtils;
+import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
-public class TylerClusterAI extends Player {
+public class TylerClusterAI extends PlayerWithUtils {
 
     private static final int NEAR_PLANET_COUNT = 3;
 
@@ -69,7 +70,7 @@ public class TylerClusterAI extends Player {
 
     private void updateVariables() {
         myUnitCount = Player.numUnitsOwnedBy(this);
-        oppUnitCount = PlayerUtils.getOpponentUnitCount(fleets, planets, this);
+        oppUnitCount = getOpponentUnitCount(fleets, planets, this);
 
         winning = myUnitCount > oppUnitCount;
     }
@@ -78,7 +79,7 @@ public class TylerClusterAI extends Player {
     // SORTING //
     ///////////////////////
 
-    private void greedySort(List<Planet> planets, PlayerUtils.Location center) {
+    private void greedySort(List<Planet> planets, Coords center) {
         Collections.sort(planets, new Comparator<Planet>() {
             @Override
             public int compare(Planet p1, Planet p2) {
@@ -100,35 +101,39 @@ public class TylerClusterAI extends Player {
         Collections.sort(planets, new Comparator<Planet>() {
             @Override
             public int compare(Planet p1, Planet p2) {
-                return (int) (p1.PRODUCTION_TIME - p2.PRODUCTION_TIME);
+                return p1.PRODUCTION_TIME - p2.PRODUCTION_TIME;
             }
         });
     }
 
-    // The higher the value, the better the planet is (used for planets not owned by
+    // The higher the value, the better the planet is (used for planets not
+    // owned by
     // this player).
-    private int oppPlanetValue(Planet p, PlayerUtils.Location center) {
+    private int oppPlanetValue(Planet p, Coords center) {
         int value = 0;
 
         // scale the production value to 0-1 (1 being least production time).
         double productionValue = -(p.PRODUCTION_TIME - 100) / 66.0;
 
         // scale the unit value to 0-1 (1 being least # of units).
-        // opponent planets can go negative on this value if they have > 50 units.
+        // opponent planets can go negative on this value if they have > 50
+        // units.
         double unitValue = -(p.getNumUnits() - 50) / 50.0;
 
         // scale the distance value to 0-1 (1 being least distance).
-        double distValue = -(center.distance(p) - farthestPlanetDistance) / farthestPlanetDistance;
+        double distValue = -(center.distanceTo(p) - farthestPlanetDistance) / farthestPlanetDistance;
 
         if (winning) {
-            // prefer larger planets and not care as much about unit count or range
+            // prefer larger planets and not care as much about unit count or
+            // range
             // (opponent planets slightly preferred).
             value += productionValue * 5;
             value += p.isNeutral() ? 0 : 0.5;
             value += unitValue;
             value += distValue;
         } else {
-            // prefer planets with small unit count and closer range (neutral planets
+            // prefer planets with small unit count and closer range (neutral
+            // planets
             // slightly preferred).
             value += productionValue * 0.5;
             value += p.isNeutral() ? 0.5 : 0;
@@ -145,40 +150,40 @@ public class TylerClusterAI extends Player {
 
     private void clusterAI() {
         List<Planet> allPlanets = Arrays.asList(planets);
-        List<Planet> myPlanets = PlayerUtils.getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> unownedPlanets = PlayerUtils.getUnoccupiedPlanets(planets);
-        List<Planet> oppPlanets = PlayerUtils.getOpponentsPlanets(planets, this);
-        List<Planet> otherPlanets = PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this);
+        List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
+        List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
+        List<Planet> oppPlanets = getOpponentsPlanets(planets, this);
+        List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
         if (myPlanets.size() == 0) {
             return;
         }
 
         /*
-         * 
-         * 
-         * for each of my planets, get the nearest 5 planets for each of the 5 planets
-         * get the number of units I already sent there. get the number of units the
-         * enemy sent there. if I have enough units to capture it from my current
-         * planet, send them. send units
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
+         *
+         *
+         * for each of my planets, get the nearest 5 planets for each of the 5
+         * planets get the number of units I already sent there. get the number
+         * of units the enemy sent there. if I have enough units to capture it
+         * from my current planet, send them. send units
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
+         *
          */
         HashMap<Planet, Integer> myUnitsSent = new HashMap<>();
         for (Planet p : planets) {
@@ -214,8 +219,8 @@ public class TylerClusterAI extends Player {
             for (int i = 0; i < nearPlanets.size(); i++) {
                 Planet p = allPlanets.get(i);
                 if (!p.ownedBy(this)) {
-                    int enemyIncomingUnits = PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this);
-                    int myIncomingUnits = PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this);
+                    int enemyIncomingUnits = getOpponentsIncomingFleetCount(p, fleets, this);
+                    int myIncomingUnits = getOpponentsIncomingFleetCount(p, fleets, this);
                     int myUnitsAlreadySent = myUnitsSent.get(p);
                     int unitsAtPlanet = (int) (p.isNeutral() ? p.getNumUnits()
                             : p.getNumUnits() + p.PRODUCTION_TIME / myPlanet.distanceTo(p) + 1);
@@ -245,7 +250,7 @@ public class TylerClusterAI extends Player {
             }
         }
 
-        // PlayerUtils.Location center = PlayerUtils.Location.center(myPlanets);
+        // Location center = Location.center(myPlanets);
         // greedySort(otherPlanets, center);
         //
         // int expendableUnits = totalExpendableUnits(myPlanets);
@@ -258,15 +263,16 @@ public class TylerClusterAI extends Player {
         //
         // for (Planet p : oppPlanets) {
         // distSort(myPlanets, p);
-        // if (PlayerUtils.getCurrentEventualOwner(p, fleets, this) !=
-        // PlayerUtils.PlanetOwner.PLAYER) {
-        // int myUnitsEnRoute = PlayerUtils.getPlayersIncomingFleetCount(p, fleets,
+        // if (getCurrentEventualOwner(p, fleets, this) !=
+        // PlanetOwner.PLAYER) {
+        // int myUnitsEnRoute = getPlayersIncomingFleetCount(p, fleets,
         // this);
         // int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p);
         // if (expendableUnits > unitsNeededToCapturePlanet - myUnitsEnRoute) {
         // for (Planet myP : myPlanets) {
         // if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
-        // int unitsToSend = Math.min(unitsNeededToCapturePlanet, expendableUnits(myP));
+        // int unitsToSend = Math.min(unitsNeededToCapturePlanet,
+        // expendableUnits(myP));
         // addAction(myP, p, unitsToSend);
         // expendableUnits -= unitsToSend;
         // myUnitsEnRoute += unitsToSend;
@@ -276,18 +282,20 @@ public class TylerClusterAI extends Player {
         // }
         // }
         //
-        // // If we still have some extra units that haven't been sent to the opponent,
+        // // If we still have some extra units that haven't been sent to the
+        // opponent,
         // // try to capture neutral planets (only ones with small unit count).
         // if (expendableUnits > 0) {
         // for (Planet p : otherPlanets) {
         // if (p.getNumUnits() < expendableUnits / 4) {
-        // int myUnitsEnRoute = PlayerUtils.getPlayersIncomingFleetCount(p, fleets,
+        // int myUnitsEnRoute = getPlayersIncomingFleetCount(p, fleets,
         // this);
         // int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p);
         // if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
         // for (Planet myP : myPlanets) {
         // if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
-        // int unitsToSend = Math.min(unitsNeededToCapturePlanet, expendableUnits(myP));
+        // int unitsToSend = Math.min(unitsNeededToCapturePlanet,
+        // expendableUnits(myP));
         // addAction(myP, p, unitsToSend);
         // expendableUnits -= unitsToSend;
         // myUnitsEnRoute += unitsToSend;
@@ -317,11 +325,10 @@ public class TylerClusterAI extends Player {
 
     // TODO: optimize this method
     private int unitsNeededToCapturePlanet(Planet p) {
-        int myUnits = PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this);
-        int oppUnits = PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this);
+        int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
+        int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
-        int unitsGeneratedByPlanet = (int) (distOfFarthestFleet(PlayerUtils.getMyFleets(fleets, this), p))
-                % p.PRODUCTION_TIME + 2;
+        int unitsGeneratedByPlanet = (int) (distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
 
         if (p.isNeutral()) {
             return (oppUnits + p.getNumUnits()) - myUnits + 15;

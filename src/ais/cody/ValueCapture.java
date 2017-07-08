@@ -1,15 +1,13 @@
 package ais.cody;
 
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-
 import java.awt.Color;
 import java.util.ArrayList;
 
-import ais.PlayerUtils;
+import ais.PlayerWithUtils;
+import galaxy.Fleet;
+import galaxy.Planet;
 
-public class ValueCapture extends Player {
+public class ValueCapture extends PlayerWithUtils {
     private static final double FUTURE_COEFFICIENT = 2;
     private static final double DISTANCE_COEFFICIENT = .3;
     private double health;
@@ -32,7 +30,7 @@ public class ValueCapture extends Player {
         health = 0;
         heart = new Vector(0., 0., 0.);
 
-        for (Planet p : PlayerUtils.getPlanetsOwnedByPlayer(planets, this)) {
+        for (Planet p : getPlanetsOwnedByPlayer(planets, this)) {
             this.health += p.getNumUnits();
 
             planetPosition = p.getCoords();
@@ -50,12 +48,13 @@ public class ValueCapture extends Player {
 
     @Override
     protected void turn() {
-        if (turn++ < 10)
+        if (turn++ < 10) {
             return;
+        }
 
-        ArrayList<Planet> myPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsOwnedByPlayer(planets, this));
-        ArrayList<Planet> opponentsPlanets = new ArrayList<Planet>(PlayerUtils.getOpponentsPlanets(planets, this));
-        ArrayList<Planet> neutralPlanets = new ArrayList<Planet>(PlayerUtils.getPlanetsNotOwnedByPlayer(planets, this));
+        ArrayList<Planet> myPlanets = new ArrayList<Planet>(getPlanetsOwnedByPlayer(planets, this));
+        ArrayList<Planet> opponentsPlanets = new ArrayList<Planet>(getOpponentsPlanets(planets, this));
+        ArrayList<Planet> neutralPlanets = new ArrayList<Planet>(getPlanetsNotOwnedByPlayer(planets, this));
         Planet target = null;
         ArrayList<Planet> attackers = new ArrayList<Planet>();
         int[] unitsToSend;
@@ -91,8 +90,9 @@ public class ValueCapture extends Player {
         if (target != null && least != Double.MAX_VALUE) {
             targetCost = costOfPlanet(target);
             for (Planet from : myPlanets) {
-                if (planetStrength(from) < -1)
+                if (planetStrength(from) < -1) {
                     attackers.add(from);
+                }
             }
 
             if (!attackers.isEmpty()) {
@@ -114,8 +114,9 @@ public class ValueCapture extends Player {
 
                 if (totalToSend > targetCost) {
                     i = 0;
-                    for (Planet from : attackers)
+                    for (Planet from : attackers) {
                         addAction(from, target, unitsToSend[i++]);
+                    }
                 }
             }
         }
@@ -129,7 +130,7 @@ public class ValueCapture extends Player {
         timeCost = (target.getProductionFrequency() * (target.distanceTo(Vector.getCoords(heart)) / FLEET_SPEED)) + 1;
 
         if (target.ownedBy(this)) {
-            cost = ((double) planetStrength(target));
+            cost = (planetStrength(target));
         } else if (target.ownedBy(null)) {
             cost = ((double) planetStrength(target) + 1);
         } else {
@@ -152,13 +153,15 @@ public class ValueCapture extends Player {
             enemyStrength = planet.getNumUnits();
         }
 
-        for (Fleet fleet : allFleets)
+        for (Fleet fleet : allFleets) {
             if (fleet.DESTINATION.equals(planet)) {
                 if (fleet.ownedBy(this)) {
                     myStrength += fleet.getNumUnits();
-                } else
+                } else {
                     enemyStrength += fleet.getNumUnits();
+                }
             }
+        }
 
         return enemyStrength - myStrength;
     }

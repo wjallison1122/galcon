@@ -10,12 +10,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import ais.PlayerUtils;
-import ais.PlayerUtils.Location;
+import ais.PlayerWithUtils;
+import galaxy.Coords;
 import galaxy.Planet;
 import galaxy.Player;
 
-public class TylerDefenderAI extends Player {
+public class TylerDefenderAI extends PlayerWithUtils {
 
     private Set<Planet> defendPlanets = new TreeSet<>(
             (Planet p1, Planet p2) -> p1.PRODUCTION_TIME - p2.PRODUCTION_TIME);
@@ -104,7 +104,7 @@ public class TylerDefenderAI extends Player {
         }
 
         myUnitCount = Player.numUnitsOwnedBy(this);
-        enemyUnitCount = PlayerUtils.getOpponentUnitCount(fleets, planets, this);
+        enemyUnitCount = getOpponentUnitCount(fleets, planets, this);
 
         // Reset the units sent on this turn from each of my planets to 0
         myUnitsSent = new HashMap<>();
@@ -116,8 +116,8 @@ public class TylerDefenderAI extends Player {
         myUnitsApproaching = new HashMap<>();
         enemyUnitsApproaching = new HashMap<>();
         for (Planet p : planets) {
-            myUnitsApproaching.put(p, PlayerUtils.getPlayersIncomingFleetCount(p, fleets, this));
-            enemyUnitsApproaching.put(p, PlayerUtils.getOpponentsIncomingFleetCount(p, fleets, this));
+            myUnitsApproaching.put(p, getPlayersIncomingFleetCount(p, fleets, this));
+            enemyUnitsApproaching.put(p, getOpponentsIncomingFleetCount(p, fleets, this));
         }
     }
 
@@ -125,7 +125,7 @@ public class TylerDefenderAI extends Player {
     // SORTING //
     ///////////////////////
 
-    private void valueSort(List<Planet> planets, PlayerUtils.Location center) {
+    private void valueSort(List<Planet> planets, Coords center) {
         Collections.sort(planets, new Comparator<Planet>() {
             @Override
             public int compare(Planet p1, Planet p2) {
@@ -143,20 +143,22 @@ public class TylerDefenderAI extends Player {
         });
     }
 
-    // The higher the value, the better the planet is (used for planets not owned by
+    // The higher the value, the better the planet is (used for planets not
+    // owned by
     // this player).
-    private int oppPlanetValue(Planet p, PlayerUtils.Location center) {
+    private int oppPlanetValue(Planet p, Coords center) {
         int value = 0;
 
         // scale the production value to 0-1 (1 being least production time).
         double productionValue = -(p.PRODUCTION_TIME - 100) / 66.0;
 
         // scale the unit value to 0-1 (1 being least # of units).
-        // opponent planets can go negative on this value if they have > 50 units.
+        // opponent planets can go negative on this value if they have > 50
+        // units.
         double unitValue = -(p.getNumUnits() - 50) / 50.0;
 
         // scale the distance value to 0-1 (1 being least distance).
-        double distValue = -(center.distance(p) - farthestPlanetDistance) / farthestPlanetDistance;
+        double distValue = -(center.distanceTo(p) - farthestPlanetDistance) / farthestPlanetDistance;
 
         value += productionValue;
         // value += p.isNeutral() ? 0 : 10;
@@ -181,7 +183,7 @@ public class TylerDefenderAI extends Player {
         // Recapture any planets I have owned (larger ones first)
         for (Planet p : defendPlanets) {
             // if (!p.ownedBy(this) || p.isNeutral()) {
-            PlayerUtils.sortByDistance(myPlanets, p);
+            sortByDistance(myPlanets, p);
             for (Planet myPlanet : myPlanets) {
                 int unitsSentThisTurn = myUnitsSent.get(myPlanet);
                 int expendableUnits = getExpendableUnits(myPlanet) - unitsSentThisTurn;
@@ -189,8 +191,7 @@ public class TylerDefenderAI extends Player {
                 int enemyUnitsIncoming = enemyUnitsApproaching.get(p);
                 int unitsOnPlanet = unitsAtPlanetWhenArrive(p, myPlanet) + enemyUnitsIncoming;
                 if (totalExpendableUnits > unitsOnPlanet && expendableUnits > 0 && myUnitsIncoming <= unitsOnPlanet
-                        && !PlayerUtils.getCurrentEventualOwner(p, fleets, this)
-                                .equals(PlayerUtils.PlanetOwner.PLAYER)) {
+                        && !getCurrentEventualOwner(p, fleets, this).equals(PlanetOwner.PLAYER)) {
                     int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
                     addAction(myPlanet, p, unitsToSend);
                     // Update unit counts
@@ -202,10 +203,11 @@ public class TylerDefenderAI extends Player {
         }
 
         // Conquer enemy planets
-        valueSort(otherPlanets, Location.center(myPlanets));
+        valueSort(otherPlanets, center(myPlanets));
         for (Planet p : otherPlanets) {
             if (!p.ownedBy(this) && !p.isNeutral()) {
-                // System.out.println("Planet: " + (p.isNeutral() ? "Neutral" : "Enemy"));
+                // System.out.println("Planet: " + (p.isNeutral() ? "Neutral" :
+                // "Enemy"));
                 distSort(myPlanets, p);
                 for (Planet myPlanet : myPlanets) {
                     int unitsSentThisTurn = myUnitsSent.get(myPlanet);
@@ -226,13 +228,14 @@ public class TylerDefenderAI extends Player {
             }
         }
 
-        int unitsInAir = PlayerUtils.getMyUnitsInFleets(fleets, this);
+        int unitsInAir = getMyUnitsInFleets(fleets, this);
         if (myUnitCount - unitsInAir > enemyUnitCount + 50) {
             // Capture small neutral planets.
             int totalUnitsSentThisTurn = 0;
             for (Planet p : otherPlanets) {
                 if (p.isNeutral()) {
-                    // System.out.println("Planet: " + (p.isNeutral() ? "Neutral" : "Enemy"));
+                    // System.out.println("Planet: " + (p.isNeutral() ?
+                    // "Neutral" : "Enemy"));
                     distSort(myPlanets, p);
                     for (Planet myPlanet : myPlanets) {
                         int unitsSentThisTurn = myUnitsSent.get(myPlanet);

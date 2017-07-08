@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerUtils.Location;
-import ais.PlayerUtils.PlanetOwner;
+import ais.PlayerWithUtils;
 import ais.alphabeta.AlphaBeta;
 import ais.alphabeta.Move;
 import ais.alphabeta.Position;
@@ -17,7 +16,7 @@ import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
-public class SearchAI extends Player {
+public class SearchAI extends PlayerWithUtils {
 
     private static enum Limit {
         TIME, DEPTH
@@ -76,20 +75,20 @@ public class SearchAI extends Player {
                                 && !actions.stream().anyMatch(fa -> fa != null && fa.target == finali)) {
                             if (p.units > planets.get(i).units + 1) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, planets.get(i).units + 1,
-                                        (int) Math.ceil(p.location.distance(planets.get(i).location) / FLEET_SPEED)));
+                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                         } else if (!p.equals(planets.get(i))) {
                             if (p.units > 0) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, 1,
-                                        (int) Math.ceil(p.location.distance(planets.get(i).location) / FLEET_SPEED)));
+                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                             if (p.units > 1) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units,
-                                        (int) Math.ceil(p.location.distance(planets.get(i).location) / FLEET_SPEED)));
+                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                             if (p.units > 40) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units / 2,
-                                        (int) Math.ceil(p.location.distance(planets.get(i).location) / FLEET_SPEED)));
+                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                         }
                     }
@@ -165,9 +164,8 @@ public class SearchAI extends Player {
 
     }
 
-    private static class SearchPlanet {
+    private class SearchPlanet {
         public final Planet base;
-        public Location location;
         public PlanetOwner owner;
         public int productionDelay;
         public int updateCount;
@@ -175,7 +173,6 @@ public class SearchAI extends Player {
 
         public SearchPlanet(SearchPlanet other) {
             base = other.base;
-            location = new Location(other.location);
             owner = other.owner;
             productionDelay = other.productionDelay;
             updateCount = other.updateCount;
@@ -184,11 +181,14 @@ public class SearchAI extends Player {
 
         public SearchPlanet(Planet planet, Player player) {
             base = planet;
-            location = new Location(planet);
-            owner = PlanetOwner.getOwner(planet, player);
+            owner = getOwner(planet, player);
             productionDelay = planet.PRODUCTION_TIME;
             updateCount = planet.getLifespan();
             units = planet.getNumUnits();
+        }
+
+        double distanceTo(SearchPlanet p) {
+            return base.distanceTo(p.base);
         }
 
         @Override
