@@ -17,6 +17,7 @@ import ais.PlayerWithUtils;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
+import galaxy.Player;
 
 //Tuned for 3d maps
 public class GoodAI extends PlayerWithUtils {
@@ -581,9 +582,9 @@ public class GoodAI extends PlayerWithUtils {
     }
 
     @Override
-    protected void endGame(boolean victorious) {
+    protected void endGame(Player winner) {
         if (LEARNING) {
-            if (victorious) {
+            if (equals(winner)) {
                 constants.winCount++;
                 System.out.println("Game " + position + "," + gameCount + " won");
             } else {

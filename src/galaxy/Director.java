@@ -10,16 +10,10 @@ final class Director extends GameSettings {
     private MapMaker maps = createMapMaker();
     private Galaxy galaxy = new Galaxy();
     private LinkedList<Player> active;
-
     private static HashMap<Player, Integer> numUnitsInFleets, numUnitsInPlanets;
-    private static HashMap<Player, Stats> playerStats = new HashMap<Player, Stats>();
     private static int tic = 0;
 
     Director() {
-        for (Player p : players) {
-            playerStats.put(p, createStats(p));
-        }
-
         for (int i = 0; i < PLAYERS_PER_GAME; i++) {
             mm = new Matcher(mm);
         }
@@ -31,15 +25,9 @@ final class Director extends GameSettings {
         return rounds > NUM_ROUNDS;
     }
 
-    void reportStats() {
-        for (Stats s : playerStats.values()) {
-            s.reportStats();
-        }
-    }
-
     void next() {
-        numUnitsInFleets = new HashMap<Player, Integer>();
-        numUnitsInPlanets = new HashMap<Player, Integer>();
+        numUnitsInFleets.clear();
+        numUnitsInPlanets.clear();
 
         for (Player p : active) {
             numUnitsInFleets.put(p, galaxy.numUnitsInFleets(p));
@@ -65,9 +53,6 @@ final class Director extends GameSettings {
 
         Player winner = galaxy.checkWinner();
         if (winner != null) {
-            for (Player p : active) {
-                p.endGame(p == winner);
-            }
             finishGame(winner);
         } else if (tic > TIC_LIMIT) {
             finishGame(null);
@@ -75,19 +60,15 @@ final class Director extends GameSettings {
     }
 
     void finishGame(Player winner, Planet[] newMap) {
-        updateStats(winner);
+        for (Player p : active) {
+            p.endGame(winner);
+        }
         newGame(newMap);
     }
 
     void finishGame(Player winner) {
         finishGame(winner,
                 maps.hasRevsered() || !reverseEachMap ? maps.getNewMap(mm.nextMatchup()) : maps.getReversedMap());
-    }
-
-    void updateStats(Player winner) {
-        for (Player p : active) {
-            playerStats.get(p).updateStats(active, winner);
-        }
     }
 
     boolean usingVisualizer() {

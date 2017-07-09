@@ -10,7 +10,6 @@ import ais.jono.GoodAI;
 import ais.tyler.TylerRandomAI;
 import mapmakers.RandomMapMaker;
 import mapmakers.SymmetricMapMaker;
-import stats.DefaultStats;
 import visualizers.threedimensiondefault.Display;
 import visualizers.twodimensiondefault.DefaultVisualizer;
 
@@ -27,10 +26,6 @@ enum MapType {
     RANDOM, SYMMETRICAL
 }
 
-enum StatsType {
-    DEFAULT
-}
-
 public class GameSettings {
     public static final boolean debugMode = true, logGame = false;
 
@@ -43,7 +38,6 @@ public class GameSettings {
     public static final int NUM_PLANETS = 16;
 
     private final MapType map = MapType.RANDOM;
-    private final StatsType stats = StatsType.DEFAULT;
     private final VisualizerType vis = VisualizerType.TWO_D;
     public final static int FRAME_TIME = 10;
     // public final int[] DIMENSIONS = {1000, 1000, 1000};
@@ -60,15 +54,6 @@ public class GameSettings {
     public static final int MAX_NEUTRAL_UNITS = 50;
     public static final int MIN_PRODUCE_TIME = 34;
     public static final int MAX_PRODUCE_TIME = 100;
-
-    final Stats createStats(Player p) {
-        switch (stats) {
-            case DEFAULT:
-                return new DefaultStats(p);
-            default:
-                return null;
-        }
-    }
 
     final MapMaker createMapMaker() {
         switch (map) {
