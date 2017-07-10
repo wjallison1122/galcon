@@ -25,6 +25,10 @@ public class Coords extends GameSettings {
         return coords.length;
     }
 
+    final void setCoords(Coords coords) {
+        setCoords(coords.getCoords());
+    }
+
     final void setCoords(double... coords) {
         if (coords.length != DIMENSIONS.length) {
             throw new DimensionMismatchException("Invalid dimensions of coordinates given.");
@@ -50,6 +54,10 @@ public class Coords extends GameSettings {
             sum[i] += coords[i];
         }
         return new Coords(sum);
+    }
+
+    public Coords subtract(Coords other) {
+        return sum(other.multiply(-1));
     }
 
     public Coords multiply(double value) {

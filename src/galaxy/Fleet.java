@@ -2,7 +2,8 @@ package galaxy;
 
 public final class Fleet extends Unit {
     public final Planet DESTINATION;
-    private boolean hasHit = false;
+    private Coords velocity;
+    private double distanceLeft;
 
     Fleet(int units, Player owner, Planet destination, double... coords) {
         super(owner, units, coords);
@@ -11,6 +12,9 @@ public final class Fleet extends Unit {
             throw new NullPointerException("Fleet destination was null.");
         }
         DESTINATION = destination;
+
+        distanceLeft = distanceTo(DESTINATION);
+        velocity = DESTINATION.subtract(this).multiply(FLEET_SPEED / distanceLeft);
     }
 
     public boolean targeting(Planet p) {
@@ -18,33 +22,26 @@ public final class Fleet extends Unit {
     }
 
     public double distanceLeft() {
-        return distanceTo(DESTINATION);
+        return distanceLeft;
     }
 
     public boolean hasHit() {
-        return hasHit;
+        return distanceLeft == 0;
     }
 
     @Override
     void update() {
-        if (hasHit) {
+        if (hasHit()) {
             error("Fleet being updated after reaching destination");
             return;
         }
 
-        double[] targetCoords = DESTINATION.getCoords();
-        double[] fleetCoords = getCoords();
-        double distance = distanceLeft();
+        distanceLeft -= FLEET_SPEED;
+        setCoords(sum(velocity));
 
-        for (int i = 0; i < DIMENSIONS.length; i++) {
-            fleetCoords[i] += (targetCoords[i] - fleetCoords[i]) / distance * FLEET_SPEED;
-        }
-
-        setCoords(fleetCoords);
-
-        if (distance - FLEET_SPEED < 0) {
-            setCoords(targetCoords); // TODO is this needed?
-            hasHit = true;
+        if (distanceLeft < 0) {
+            setCoords(DESTINATION); // TODO is this needed?
+            distanceLeft = 0;
             DESTINATION.hitBy(this);
         }
     }
