@@ -10,7 +10,8 @@ final class Director extends GameSettings {
     private MapMaker maps = createMapMaker();
     private Galaxy galaxy = new Galaxy();
     private LinkedList<Player> active;
-    private static HashMap<Player, Integer> numUnitsInFleets, numUnitsInPlanets;
+    private static HashMap<Player, Integer> numUnitsInFleets = new HashMap<Player, Integer>(),
+            numUnitsInPlanets = new HashMap<Player, Integer>();
     private static int tic = 0;
 
     Director() {
