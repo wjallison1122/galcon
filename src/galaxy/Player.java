@@ -74,39 +74,6 @@ public abstract class Player extends GameSettings {
     protected void loadFromStore(String oldself) {
     }
 
-    /**
-     * Checks whether a Player is equal to another Player. This checks based off
-     * their IDs. As such, two instances of the same base are considered different
-     * players.
-     *
-     * For a null-safe way to check two potentially null Players use areEqual
-     *
-     * In the current implementation this will be equivalent to just using == but
-     * that may not always be the case and it's generally not great practice.
-     *
-     * @param p
-     *            The Player to compare to
-     */
-    @Override
-    public boolean equals(Object p) {
-        return !(p instanceof Player) ? false : ((Player) p).ID == ID;
-    }
-
-    /**
-     * Checks if two Players are equal. Works with null.
-     *
-     * This checks based off their IDs. As such, two instances of the same base are
-     * considered different players.
-     *
-     * @param p1
-     * @param p2
-     * @return Whether two players are equal. Both null returns true, only one null
-     *         returns false.
-     */
-    protected static final boolean areEqual(Player p1, Player p2) {
-        return (p1 == null || p2 == null) ? p1 == p2 : p1.ID == p2.ID;
-    }
-
     protected static final int numUnitsOwnedBy(Player p) {
         return Director.numUnitsOwnedBy(p);
     }

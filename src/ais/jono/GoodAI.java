@@ -235,13 +235,15 @@ public class GoodAI extends PlayerWithUtils {
                         int contribution = p.getNumUnits() - getIncomingFleetCount(p, fleets)
                                 - constants.MIN_DEFENSIVE_DEFENSE;
 
-                        if (available + contribution > needed) {
+                        if (available + contribution > needed && needed - available > 0) {
                             addAction(p, target, needed - available);
                             available += contribution;
                             break;
                         }
                         available += contribution;
-                        addAction(p, target, contribution);
+                        if (contribution > 0) {
+                            addAction(p, target, contribution);
+                        }
                     }
                 }
                 if (available < needed) {
@@ -304,7 +306,7 @@ public class GoodAI extends PlayerWithUtils {
 
         if (take != null) {
             int toSendToTake = 0;
-            while (!isEventualOwner(take, (int) Math.ceil(myPlanets.get(0).distanceTo(take) / Fleet.FLEET_SPEED),
+            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / Fleet.FLEET_SPEED),
                     toSendToTake)) {
                 toSendToTake++;
             }
@@ -315,8 +317,8 @@ public class GoodAI extends PlayerWithUtils {
 
         for (Fleet fleet : getOpponentsFleets(fleets, this)) {
             if (retake.contains(fleet.DESTINATION)) {
-                int distance = (int) Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / Fleet.FLEET_SPEED);
-                int fleetDistance = (int) Math.ceil(fleet.distanceLeft() / Fleet.FLEET_SPEED);
+                int distance = (int)Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / Fleet.FLEET_SPEED);
+                int fleetDistance = (int)Math.ceil(fleet.distanceLeft() / Fleet.FLEET_SPEED);
                 if (distance > fleetDistance) {
                     int toSend = 0;
                     while (!isEventualOwner(fleet.DESTINATION, distance, toSend)) {
@@ -355,7 +357,7 @@ public class GoodAI extends PlayerWithUtils {
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
                 .collect(Collectors.toList())) {
             PlanetAction action = new PlanetAction();
-            action.time = (int) Math.ceil(f.distanceLeft() / Fleet.FLEET_SPEED);
+            action.time = (int)Math.ceil(f.distanceLeft() / Fleet.FLEET_SPEED);
             action.amount = f.getNumUnits();
             if (f.ownedBy(this)) {
                 action.owner = PlanetOwner.PLAYER;
@@ -412,19 +414,19 @@ public class GoodAI extends PlayerWithUtils {
         Planet me = myPlanets.get(0);
         Planet them = theirPlanets.get(0);
 
-        int distance = (int) Math.ceil(me.distanceTo(them) / Fleet.FLEET_SPEED);
+        int distance = (int)Math.ceil(me.distanceTo(them) / Fleet.FLEET_SPEED);
         int distanceProduction = distance / me.PRODUCTION_TIME;
 
         Planet best = null;
         double bestValue = Double.MIN_VALUE;
 
         for (Planet p : unownedPlanets) {
-            int toMe = (int) Math.ceil(p.distanceTo(me) / Fleet.FLEET_SPEED);
-            int toThem = (int) Math.ceil(p.distanceTo(them) / Fleet.FLEET_SPEED);
+            int toMe = (int)Math.ceil(p.distanceTo(me) / Fleet.FLEET_SPEED);
+            int toThem = (int)Math.ceil(p.distanceTo(them) / Fleet.FLEET_SPEED);
             if (toMe <= toThem) {
                 int takenContribution = 0;
                 if (distance - toMe * 2 > 0) {
-                    takenContribution = (int) Math.floor((distance - toMe * 2) / p.PRODUCTION_TIME);
+                    takenContribution = (int)Math.floor((distance - toMe * 2) / p.PRODUCTION_TIME);
                 }
                 if (p.getNumUnits() + 1 - takenContribution < distanceProduction) {
                     double value = 1.0 / p.PRODUCTION_TIME / (100 + p.getNumUnits());
@@ -440,12 +442,12 @@ public class GoodAI extends PlayerWithUtils {
         retake = new ArrayList<>(unownedPlanets);
 
         for (Planet p : unownedPlanets) {
-            int toMe = (int) Math.ceil(p.distanceTo(me) / Fleet.FLEET_SPEED);
-            int toThem = (int) Math.ceil(p.distanceTo(them) / Fleet.FLEET_SPEED);
+            int toMe = (int)Math.ceil(p.distanceTo(me) / Fleet.FLEET_SPEED);
+            int toThem = (int)Math.ceil(p.distanceTo(them) / Fleet.FLEET_SPEED);
             if (toMe >= toThem) {
                 int takenContribution = 0;
                 if (distance - toThem * 2 > 0) {
-                    takenContribution = (int) Math.floor((distance - toThem * 2) / p.PRODUCTION_TIME);
+                    takenContribution = (int)Math.floor((distance - toThem * 2) / p.PRODUCTION_TIME);
                 }
                 if (p.getNumUnits() * constants.CAPTURE_SAFTEY_MARGIN + 1 - takenContribution < distanceProduction) {
                     retake.remove(p);

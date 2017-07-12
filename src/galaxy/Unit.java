@@ -12,7 +12,7 @@ public abstract class Unit extends Coords {
     public Color debugColor; // Where is this used?
 
     Unit(Player owner, int numUnits, Coords coords) {
-        super(coords.getCoords());
+        super(coords);
         this.owner = owner;
         this.numUnits = numUnits;
     }
@@ -22,27 +22,6 @@ public abstract class Unit extends Coords {
     }
 
     void update() {
-    }
-
-    /**
-     * Checks whether a Unit is equal to another Unit.
-     * This checks based off their IDs. As such, two otherwise identical Units are
-     * actually still two distinct Units.
-     *
-     * For a null-safe way to check two potentially null Units use areEqual
-     *
-     * In the current implementation this will be equivalent to just using == but
-     * that may not always be the case and it's generally not great practice.
-     *
-     * @param u The Unit to compare to
-     */
-    @Override
-    public final boolean equals(Object u) {
-        return u instanceof Unit ? ((Unit)u).ID == ID : false;
-    }
-
-    public static final boolean areEqual(Unit u1, Unit u2) {
-        return u1 == null || u2 == null ? u1 == u2 : u1.ID == u2.ID;
     }
 
     public final Player getOwner() {
@@ -57,8 +36,13 @@ public abstract class Unit extends Coords {
         return numUnits;
     }
 
+    /**
+     * Says whether the given player owns this planet.
+     * @param player
+     * @return
+     */
     public final boolean ownedBy(Player player) {
-        return Player.areEqual(owner, player);
+        return owner == player;
     }
 
     public final boolean ownedByOpponentOf(Player p) {

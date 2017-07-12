@@ -23,17 +23,14 @@ final class Galaxy {
     }
 
     void addFleet(Fleet f) {
-        // TODO Should this throw some sort of exception on a null?
-        if (f != null) {
-            fleets.add(f);
-        }
+        fleets.add(f);
     }
 
-    Fleet[] getAllFleets() {
+    Fleet[] getFleets() {
         return fleets.toArray(new Fleet[fleets.size()]);
     }
 
-    Planet[] getAllPlanets() {
+    Planet[] getPlanets() {
         return planets.clone();
     }
 
@@ -66,7 +63,6 @@ final class Galaxy {
             for (Planet p : planets) {
                 p.terminate();
             }
-            // TODO Could fleets come back from dead with this?
             fleets.clear();
         }
         planets = newMap;

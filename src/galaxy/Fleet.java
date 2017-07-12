@@ -18,7 +18,7 @@ public final class Fleet extends Unit {
     }
 
     public boolean targeting(Planet p) {
-        return DESTINATION.equals(p);
+        return DESTINATION == p;
     }
 
     public double distanceLeft() {
@@ -50,7 +50,8 @@ public final class Fleet extends Unit {
         }
     }
 
-    String storeSelf() {
+    @Override
+    public String toString() {
         return "";
     }
 }

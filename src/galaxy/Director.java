@@ -36,7 +36,7 @@ final class Director extends GameSettings {
         }
 
         for (Player p : active) {
-            p.doTurn(galaxy.getAllFleets());
+            p.doTurn(galaxy.getFleets());
         }
 
         for (Player p : active) {
@@ -47,7 +47,7 @@ final class Director extends GameSettings {
 
         galaxy.update();
         if (visualizer != null) {
-            visualizer.update(galaxy.getAllFleets());
+            visualizer.update(galaxy.getFleets());
         }
 
         tic++;
@@ -82,11 +82,11 @@ final class Director extends GameSettings {
         galaxy.nextGame(map);
 
         for (Player p : active) {
-            p.nextGame(galaxy.getAllPlanets());
+            p.nextGame(galaxy.getPlanets());
         }
 
         if (usingVisualizer()) {
-            visualizer.nextGame(active, galaxy.getAllPlanets());
+            visualizer.nextGame(active, galaxy.getPlanets());
         }
     }
 

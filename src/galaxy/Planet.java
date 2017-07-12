@@ -40,11 +40,13 @@ public final class Planet extends Unit {
     }
 
     public double getProductionFrequency() {
-        return 1. / this.PRODUCTION_TIME;
+        return 1. / PRODUCTION_TIME;
     }
 
     /**
      * For visualizer to check if a planet was recently conquered.
+     *
+     * This should ONLY be called by the active visualizer. This is not for Players.
      *
      * @return Whether this planet had changed hands since last checked
      */
@@ -56,20 +58,21 @@ public final class Planet extends Unit {
 
     Fleet sendFleet(Planet target, int numSent) {
         numSent = Math.min(numSent, numUnits);
-        if (numSent > 0) {
-            numUnits -= numSent;
-            return new Fleet(numSent, this, target);
-        } else {
-            return null;
-        }
+        numUnits -= numSent;
+        return new Fleet(numSent, this, target);
     }
 
-    String storeSelf() {
+    @Override
+    public String toString() {
         return "";
     }
 
+    /**
+     * Prevents players from trying to keep using this Planet.
+     * With owner null and remaining fleets in air not being updated, no fleets
+     * can be sent from this planet.
+     */
     void terminate() {
-        numUnits = -1;
         owner = null;
     }
 }

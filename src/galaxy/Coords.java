@@ -7,6 +7,10 @@ public class Coords extends GameSettings {
         this.coords = coords.clone();
     }
 
+    public Coords(Coords coords) {
+        this.coords = coords.getCoords();
+    }
+
     // TODO check for misuse
     public final double[] getCoords() {
         return coords.clone();

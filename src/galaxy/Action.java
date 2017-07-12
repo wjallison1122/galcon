@@ -18,8 +18,12 @@ public class Action extends GameSettings {
             throw new InvalidActionException("Player attempted to make an action for a planet not owned by them.");
         }
 
-        if (start.equals(target)) {
+        if (start == target) {
             throw new InvalidActionException("Player attempted to send a fleet nowhere.");
+        }
+
+        if (numUnits <= 0) {
+            throw new InvalidActionException("Player attempted to send a fleet with no units.");
         }
 
         START = start;
