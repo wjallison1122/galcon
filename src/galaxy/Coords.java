@@ -4,41 +4,21 @@ public class Coords extends GameSettings {
     private double[] coords;
 
     public Coords(double... coords) {
-        this.coords = coords;
+        this.coords = coords.clone();
     }
 
-    /**
-     * Creates an Coords with dimension given
-     * All values will be zero per language spec 4.12.5
-     *
-     * @param dimensions The dimension of the coords
-     */
-    public Coords(int dimensions) {
-        this.coords = new double[dimensions];
-    }
-
+    // TODO check for misuse
     public final double[] getCoords() {
         return coords.clone();
     }
 
-    public final int getDimensions() {
-        return coords.length;
-    }
-
     final void setCoords(Coords coords) {
-        setCoords(coords.getCoords());
-    }
-
-    final void setCoords(double... coords) {
-        if (coords.length != DIMENSIONS.length) {
-            throw new DimensionMismatchException("Invalid dimensions of coordinates given.");
-        }
-        this.coords = coords.clone();
+        this.coords = coords.getCoords();
     }
 
     public final double distanceTo(double... otherCoords) {
         double sum = 0;
-        for (int i = 0; i < DIMENSIONS.length; i++) {
+        for (int i = 0; i < coords.length; i++) {
             sum += Math.pow(coords[i] - otherCoords[i], 2);
         }
         return Math.sqrt(sum);
@@ -46,6 +26,10 @@ public class Coords extends GameSettings {
 
     public final double distanceTo(Coords c) {
         return distanceTo(c.getCoords());
+    }
+
+    public final int dimensions() {
+        return coords.length;
     }
 
     public Coords sum(Coords other) {
@@ -66,5 +50,14 @@ public class Coords extends GameSettings {
             product[i] *= value;
         }
         return new Coords(product);
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for (double d : coords) {
+            str += ", " + d;
+        }
+        return str;
     }
 }

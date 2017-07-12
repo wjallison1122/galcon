@@ -110,7 +110,7 @@ public abstract class PlayerWithUtils extends Player {
         if (list.size() == 0) {
             return null; // whoever would do this, screw you
         }
-        double[] rtn = new double[list.get(0).getCoords().length];
+        double[] rtn = new double[list.get(0).dimensions()];
         double weights = 0;
         for (int i = 0; i < list.size(); i++) {
             for (int j = 0; j < rtn.length; j++) {
@@ -131,7 +131,7 @@ public abstract class PlayerWithUtils extends Player {
         if (list.size() == 0) {
             return null; // whoever would do this, screw you
         }
-        double[] rtn = new double[list.get(0).getCoords().length];
+        double[] rtn = new double[list.get(0).dimensions()];
         double weights = 0;
         for (int i = 0; i < list.size(); i++) {
             for (int j = 0; j < rtn.length; j++) {

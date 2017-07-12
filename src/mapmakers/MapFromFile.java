@@ -1,12 +1,12 @@
 package mapmakers;
 
-import galaxy.MapMaker;
-import galaxy.Player;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
+
+import galaxy.MapMaker;
+import galaxy.Player;
 
 public class MapFromFile extends MapMaker {
 
@@ -31,8 +31,8 @@ public class MapFromFile extends MapMaker {
     private void makePlanetFromString(String str, LinkedList<Player> active) {
         Scanner s = new Scanner(str);
 
-        double[] coords = new double[DIMENSIONS.length];
-        for (int i = 0; i < DIMENSIONS.length; i++) {
+        double[] coords = new double[DIMENSIONS.dimensions()];
+        for (int i = 0; i < coords.length; i++) {
             coords[i] = s.nextDouble();
         }
 

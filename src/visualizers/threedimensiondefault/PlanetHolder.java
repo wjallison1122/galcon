@@ -13,7 +13,7 @@ public class PlanetHolder {
     public PlanetHolder(Planet planet) {
         this.planet = planet;
 
-        if (planet.getCoords().length == 2) {
+        if (planet.dimensions() == 2) {
             location = new Vector(planet.getCoords()[0], planet.getCoords()[1], 0);
         } else {
             location = new Vector(planet.getCoords()[0], planet.getCoords()[1], planet.getCoords()[2]);

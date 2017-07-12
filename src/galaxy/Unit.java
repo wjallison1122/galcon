@@ -11,8 +11,8 @@ public abstract class Unit extends Coords {
     public final int ID = id++;
     public Color debugColor; // Where is this used?
 
-    Unit(Player owner, int numUnits, double... coords) {
-        super(coords);
+    Unit(Player owner, int numUnits, Coords coords) {
+        super(coords.getCoords());
         this.owner = owner;
         this.numUnits = numUnits;
     }

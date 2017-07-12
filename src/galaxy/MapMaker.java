@@ -11,9 +11,9 @@ public abstract class MapMaker extends GameSettings {
     private boolean hasReversed = false;
 
     protected abstract void makeMap(LinkedList<Player> active);
-
-    protected final PlanetMaker makePlanet(Player owner, int numUnits, int radius, int prodTime, double... coords) {
-        PlanetMaker p = new PlanetMaker(owner, numUnits, radius, prodTime, coords);
+    
+    protected final PlanetMaker makePlanet(Player owner, int numUnits, int radius, int prodTime, Coords coords) {
+    	PlanetMaker p = new PlanetMaker(owner, numUnits, radius, prodTime, coords);
         planets[pi++] = p;
         if (owner != null) {
             if (startingPlanets.containsKey(owner)) {
@@ -25,6 +25,10 @@ public abstract class MapMaker extends GameSettings {
             }
         }
         return p;
+    }
+
+    protected final PlanetMaker makePlanet(Player owner, int numUnits, int radius, int prodTime, double... coords) {
+        return makePlanet(owner, numUnits, radius, prodTime, new Coords(coords));
     }
 
     boolean hasRevsered() {
@@ -103,14 +107,14 @@ public abstract class MapMaker extends GameSettings {
         final int RADIUS;
         int prodTime;
 
-        PlanetMaker(Player owner, int numUnits, int radius, int prodTime, double[] coords) {
-            super(owner, numUnits, coords);
+        PlanetMaker(Player owner, int numUnits, int radius, int prodTime, Coords coords) {
+        	super(owner, numUnits, coords);
             RADIUS = radius;
             this.prodTime = prodTime;
         }
 
         Planet makePlanet() {
-            return new Planet(owner, numUnits, RADIUS, prodTime, getCoords());
+            return new Planet(owner, numUnits, RADIUS, prodTime, this);
         }
 
         @Override

@@ -1,9 +1,9 @@
 package mapmakers;
 
+import java.util.LinkedList;
+
 import galaxy.MapMaker;
 import galaxy.Player;
-
-import java.util.LinkedList;
 
 public class SymmetricMapMaker extends MapMaker {
 
@@ -15,11 +15,7 @@ public class SymmetricMapMaker extends MapMaker {
     }
 
     void generateCenterPlanet() {
-        double[] coords = new double[DIMENSIONS.length];
-        for (int i = 0; i < DIMENSIONS.length; i++) {
-            coords[i] = DIMENSIONS[i] / 2;
-        }
-        makePlanet(null, MAX_NEUTRAL_UNITS, MAX_RADIUS, MIN_PRODUCE_TIME, coords);
+        makePlanet(null, MAX_NEUTRAL_UNITS, MAX_RADIUS, MIN_PRODUCE_TIME, DIMENSIONS.multiply(.5));
     }
 
     void generateSymmetricStartingPlanets(LinkedList<Player> players) {
@@ -31,9 +27,9 @@ public class SymmetricMapMaker extends MapMaker {
     }
 
     void generateSymmetricPlanets(LinkedList<Player> players) {
-        int numUnits = (int) (Math.random() * MAX_NEUTRAL_UNITS);
-        int radius = (int) (Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS);
-        int prodTime = (int) ((1 - ((double) radius - MIN_RADIUS) / (MAX_RADIUS - MIN_RADIUS))
+        int numUnits = (int)(Math.random() * MAX_NEUTRAL_UNITS);
+        int radius = (int)(Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS);
+        int prodTime = (int)((1 - ((double)radius - MIN_RADIUS) / (MAX_RADIUS - MIN_RADIUS))
                 * (MAX_PRODUCE_TIME - MIN_PRODUCE_TIME) + MIN_PRODUCE_TIME);
 
         double[][] locations = getRadialLocations(radius, players.size());
@@ -42,13 +38,15 @@ public class SymmetricMapMaker extends MapMaker {
         }
     }
 
+    // TODO Some of these seem funky.
     private double[][] getRadialLocations(int planetRadius, int numPlayers) {
-        if (DIMENSIONS.length == 1) {
-            return get1DLocations(planetRadius, numPlayers);
-        } else if (DIMENSIONS.length == 2) {
-            return get2DRadialLocations(planetRadius, numPlayers);
-        } else {
-            return getNDRadialLocations(planetRadius, numPlayers);
+        switch (DIMENSIONS.dimensions()) {
+            case 1:
+                return get1DLocations(planetRadius, numPlayers);
+            case 2:
+                return get2DRadialLocations(planetRadius, numPlayers);
+            default:
+                return getNDRadialLocations(planetRadius, numPlayers);
         }
     }
 
@@ -63,16 +61,16 @@ public class SymmetricMapMaker extends MapMaker {
         double[] coords2 = new double[1];
 
         do {
-            coords1[0] = Math.random() * (DIMENSIONS[0] / 2 - planetRadius * 2) + planetRadius;
+            coords1[0] = Math.random() * (DIMENSIONS.getCoords()[0] / 2 - planetRadius * 2) + planetRadius;
         } while (checkOverlappingPlanets(planetRadius, coords1));
-        coords2[0] = DIMENSIONS[0] - coords1[0];
+        coords2[0] = DIMENSIONS.getCoords()[0] - coords1[0];
 
         double[][] locs = { coords1, coords2 };
         return locs;
     }
 
     private double[][] get2DRadialLocations(int planetRadius, int numPlayers) {
-        double minDimension = Math.min(DIMENSIONS[0] / 2, DIMENSIONS[1] / 2) - planetRadius * 2;
+        double minDimension = Math.min(DIMENSIONS.getCoords()[0] / 2, DIMENSIONS.getCoords()[1] / 2) - planetRadius * 2;
         double maxAngle = Math.toRadians(360 / numPlayers);
 
         double randomRadius;
@@ -81,8 +79,8 @@ public class SymmetricMapMaker extends MapMaker {
         do {
             randomRadius = Math.random() * minDimension + planetRadius;
             randomAngle = Math.random() * maxAngle;
-            coords[0] = randomRadius * Math.cos(randomAngle) + DIMENSIONS[0] / 2;
-            coords[1] = randomRadius * Math.sin(randomAngle) + DIMENSIONS[1] / 2;
+            coords[0] = randomRadius * Math.cos(randomAngle) + DIMENSIONS.getCoords()[0] / 2;
+            coords[1] = randomRadius * Math.sin(randomAngle) + DIMENSIONS.getCoords()[1] / 2;
         } while (checkOverlappingPlanets(planetRadius, coords));
         // TODO: there might be an edge case where there are a lot of players and a
         // planet is
@@ -99,8 +97,8 @@ public class SymmetricMapMaker extends MapMaker {
         for (int i = 1; i < numPlayers; i++) {
             double[] newCoords = new double[2];
             randomAngle += maxAngle;
-            newCoords[0] = randomRadius * Math.cos(randomAngle) + DIMENSIONS[0] / 2;
-            newCoords[1] = randomRadius * Math.sin(randomAngle) + DIMENSIONS[1] / 2;
+            newCoords[0] = randomRadius * Math.cos(randomAngle) + DIMENSIONS.getCoords()[0] / 2;
+            newCoords[1] = randomRadius * Math.sin(randomAngle) + DIMENSIONS.getCoords()[1] / 2;
             locations[i] = newCoords;
         }
 
@@ -111,33 +109,33 @@ public class SymmetricMapMaker extends MapMaker {
     private double[][] getNDRadialLocations(int planetRadius, int numPlayers) {
         // Get the smallest dimension and make that the
         // max radius of the spherical coordinates
-        double minDimension = DIMENSIONS[0];
-        for (int i = 1; i < DIMENSIONS.length; i++) {
-            if (DIMENSIONS[i] < minDimension) {
-                minDimension = DIMENSIONS[i];
+        double minDimension = DIMENSIONS.getCoords()[0];
+        for (int i = 1; i < DIMENSIONS.dimensions(); i++) {
+            if (DIMENSIONS.getCoords()[i] < minDimension) {
+                minDimension = DIMENSIONS.getCoords()[i];
             }
         }
         // almost every angle varies from 0-180 degrees
         double maxAngle = Math.toRadians(360 / numPlayers);
 
-        double[] coords = new double[DIMENSIONS.length];
-        double[] randomAngles = new double[DIMENSIONS.length - 2];
+        double[] coords = new double[DIMENSIONS.dimensions()];
+        double[] randomAngles = new double[DIMENSIONS.dimensions() - 2];
         double randomRadius;
         double lastAngle;
         do {
             randomRadius = Math.random() * minDimension;
             double calculatedSin = 1;
-            for (int i = 0; i < DIMENSIONS.length - 2; i++) {
+            for (int i = 0; i < DIMENSIONS.dimensions() - 2; i++) {
                 randomAngles[i] = Math.random() * maxAngle;
-                coords[i] = randomRadius * calculatedSin * Math.cos(randomAngles[i]) + DIMENSIONS[i] / 2;
+                coords[i] = randomRadius * calculatedSin * Math.cos(randomAngles[i]) + DIMENSIONS.getCoords()[i] / 2;
                 calculatedSin *= Math.sin(randomAngles[i]);
             }
             // The last two coords use a diff angle (0-360 degrees).
             lastAngle = Math.random() * maxAngle * 2;
-            coords[DIMENSIONS.length - 2] = randomRadius * calculatedSin * Math.cos(lastAngle)
-                    + DIMENSIONS[DIMENSIONS.length - 2] / 2;
-            coords[DIMENSIONS.length - 1] = randomRadius * calculatedSin * Math.sin(lastAngle)
-                    + DIMENSIONS[DIMENSIONS.length - 1] / 2;
+            coords[DIMENSIONS.dimensions() - 2] = randomRadius * calculatedSin * Math.cos(lastAngle)
+                    + DIMENSIONS.getCoords()[DIMENSIONS.dimensions() - 2] / 2;
+            coords[DIMENSIONS.dimensions() - 1] = randomRadius * calculatedSin * Math.sin(lastAngle)
+                    + DIMENSIONS.getCoords()[DIMENSIONS.dimensions() - 1] / 2;
         } while (checkOverlappingPlanets(planetRadius, coords));
         // TODO: there might be an edge case where there are a lot of players and a
         // planet is
@@ -154,7 +152,7 @@ public class SymmetricMapMaker extends MapMaker {
         double[][] locations = new double[numPlayers][];
         locations[0] = coords;
         for (int p = 1; p < numPlayers; p++) {
-            double[] newCoords = new double[DIMENSIONS.length];
+            double[] newCoords = new double[DIMENSIONS.dimensions()];
 
             // update the angles for the next player
             for (int i = 0; i < randomAngles.length; i++) {
@@ -164,15 +162,15 @@ public class SymmetricMapMaker extends MapMaker {
 
             // calculate the new coords
             double calculatedSin = 1;
-            for (int i = 0; i < DIMENSIONS.length - 2; i++) {
-                newCoords[i] = randomRadius * calculatedSin * Math.cos(randomAngles[i]) + DIMENSIONS[i] / 2;
+            for (int i = 0; i < DIMENSIONS.dimensions() - 2; i++) {
+                newCoords[i] = randomRadius * calculatedSin * Math.cos(randomAngles[i]) + DIMENSIONS.getCoords()[i] / 2;
                 calculatedSin *= Math.sin(randomAngles[i]);
             }
             // The last two coords use a diff angle (0-360 degrees).
-            newCoords[DIMENSIONS.length - 2] = randomRadius * calculatedSin * Math.cos(lastAngle)
-                    + DIMENSIONS[DIMENSIONS.length - 2] / 2;
-            newCoords[DIMENSIONS.length - 1] = randomRadius * calculatedSin * Math.sin(lastAngle)
-                    + DIMENSIONS[DIMENSIONS.length - 1] / 2;
+            newCoords[DIMENSIONS.dimensions() - 2] = randomRadius * calculatedSin * Math.cos(lastAngle)
+                    + DIMENSIONS.getCoords()[DIMENSIONS.dimensions() - 2] / 2;
+            newCoords[DIMENSIONS.dimensions() - 1] = randomRadius * calculatedSin * Math.sin(lastAngle)
+                    + DIMENSIONS.getCoords()[DIMENSIONS.dimensions() - 1] / 2;
             locations[p] = newCoords;
         }
         return locations;

@@ -6,7 +6,7 @@ public final class Planet extends Unit {
     private int lifespan = 0;
     private boolean recentlyConquered = false;
 
-    Planet(Player owner, int numUnits, int radius, int prodTime, double... coords) {
+    Planet(Player owner, int numUnits, int radius, int prodTime, Coords coords) {
         super(owner, numUnits, coords);
         RADIUS = radius;
         PRODUCTION_TIME = prodTime;
@@ -58,7 +58,7 @@ public final class Planet extends Unit {
         numSent = Math.min(numSent, numUnits);
         if (numSent > 0) {
             numUnits -= numSent;
-            return new Fleet(numSent, owner, target, getCoords());
+            return new Fleet(numSent, this, target);
         } else {
             return null;
         }

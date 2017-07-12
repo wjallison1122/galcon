@@ -32,17 +32,16 @@ public class GameSettings {
     private static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
     private static Player p1 = new GoodAI(false);
     private static Player p2 = new TylerRandomAI();
-    public Player[] players = { p1, p2 };
+    public Player[] players = {p1, p2};
     public static final int PLAYERS_PER_GAME = 2;
 
     public static final int NUM_PLANETS = 16;
 
     private final MapType map = MapType.RANDOM;
-    private final VisualizerType vis = VisualizerType.TWO_D;
+    private static final VisualizerType vis = VisualizerType.TWO_D;
     public final static int FRAME_TIME = 10;
-    // public final int[] DIMENSIONS = {1000, 1000, 1000};
-    public final int[] DIMENSIONS = (vis == VisualizerType.TWO_D) ? new int[] { 800, 800 }
-            : new int[] { 1000, 1000, 1000 };
+    public static final Coords DIMENSIONS = new Coords(
+            (vis == VisualizerType.TWO_D) ? new double[] {800, 800} : new double[] {1000, 1000, 1000});
 
     public static final int FLEET_SPEED = 2;
     public final int NUM_ROUNDS = 5000;
@@ -72,9 +71,9 @@ public class GameSettings {
         }
         switch (vis) {
             case TWO_D:
-                return new DefaultVisualizer(DIMENSIONS);
+                return new DefaultVisualizer(DIMENSIONS.getCoords());
             case THREE_D:
-                return new Display(DIMENSIONS);
+                return new Display(DIMENSIONS.getCoords());
             case SERVER:
                 return null;
             default:
@@ -82,20 +81,20 @@ public class GameSettings {
         }
     }
 
-    public static final void debug(String str) {
+    public static final void debug(Object o) {
         if (debugMode) {
-            System.out.println(str);
+            System.out.println(o);
         }
     }
 
-    public static final void debugError(String str) {
+    public static final void debugError(Object o) {
         if (debugMode) {
-            error(str);
+            error(o);
         }
     }
 
-    public static final void error(String str) {
-        System.err.println(str);
+    public static final void error(Object o) {
+        System.err.println(o);
     }
 
     static final BufferedWriter makeLogFile(String filename) {

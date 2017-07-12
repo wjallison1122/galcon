@@ -1,10 +1,10 @@
 package visualizers.threedimensiondefault;
 
+import java.awt.Color;
+
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Unit;
-
-import java.awt.Color;
 
 /**
  *
@@ -12,11 +12,11 @@ import java.awt.Color;
  */
 public class GraphicHolder {
 
-    public static int[] DIMESIONS;
+    public static double[] DIMESIONS;
 
     public GraphicHolder(Planet planet) {
         unit = planet;
-        if (planet.getCoords().length == 2) {
+        if (planet.dimensions() == 2) {
             location = new Vector(planet.getCoords()[0] - DIMESIONS[0] / 2, planet.getCoords()[1] - DIMESIONS[1] / 2,
                     0);
         } else {
@@ -32,7 +32,7 @@ public class GraphicHolder {
 
     public GraphicHolder(Fleet fleet) {
         unit = fleet;
-        if (fleet.getCoords().length == 2) {
+        if (fleet.dimensions() == 2) {
             location = new Vector(fleet.getCoords()[0] - DIMESIONS[0] / 2, fleet.getCoords()[1] - DIMESIONS[1] / 2, 0);
         } else {
             location = new Vector(fleet.getCoords()[0] - DIMESIONS[0] / 2, fleet.getCoords()[1] - DIMESIONS[1] / 2,

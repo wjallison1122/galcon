@@ -35,7 +35,7 @@ public abstract class Visualizer extends GameSettings
     }
 
     protected Visualizer(int winWidth, int winHeight, int dimensions) {
-        if (dimensions != DIMENSIONS.length) {
+        if (dimensions != DIMENSIONS.dimensions()) {
             throw new DimensionMismatchException("Visualizer does not match galaxy dimension space.");
         }
 
@@ -130,7 +130,7 @@ public abstract class Visualizer extends GameSettings
 
     @Override
     public final void keyPressed(KeyEvent e) {
-        char command = (char) e.getKeyCode();
+        char command = (char)e.getKeyCode();
         if (command == 'Q') {
             System.exit(0);
         } else if (command == 'S') {

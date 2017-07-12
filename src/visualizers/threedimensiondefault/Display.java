@@ -1,10 +1,5 @@
 package visualizers.threedimensiondefault;
 
-import galaxy.Fleet;
-import galaxy.Planet;
-import galaxy.Player;
-import galaxy.Visualizer;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -14,13 +9,18 @@ import java.awt.event.MouseWheelEvent;
 import java.util.LinkedList;
 import java.util.List;
 
+import galaxy.Fleet;
+import galaxy.Planet;
+import galaxy.Player;
+import galaxy.Visualizer;
+
 /**
  *
  * @author Jono
  */
 public class Display extends Visualizer {
 
-    public Display(int[] dimensions) {
+    public Display(double[] dimensions) {
         super(1600, 900, 3);
         mouseOverInfo = mouseOver;
         // panel.addMouseMotionListener(ma);
@@ -109,10 +109,10 @@ public class Display extends Visualizer {
     public void mousePress(MouseEvent e) {
 
         // Minuses are to offset it to the tip of the mouse pointer
-        int mouseCoords[] = { e.getX() - 10, e.getY() - 12 };
+        int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
         for (GraphicHolder gh : displayCamera.drawList) {
-            double tempCoords[] = { mouseCoords[0], mouseCoords[1] - gh.screenRadius / 2 };
-            double scrLoc[] = { gh.screenLocation.x + 785, gh.screenLocation.y + 435 };
+            double tempCoords[] = {mouseCoords[0], mouseCoords[1] - gh.screenRadius / 2};
+            double scrLoc[] = {gh.screenLocation.x + 785, gh.screenLocation.y + 435};
 
             // Calculate distance
             double distance = 0;
@@ -139,8 +139,9 @@ public class Display extends Visualizer {
         } else {
             displayCamera.zoom *= .95;
         }
-        if (displayCamera.zoom < 1000)
+        if (displayCamera.zoom < 1000) {
             displayCamera.zoom = 1000;
+        }
     }
 
     @Override

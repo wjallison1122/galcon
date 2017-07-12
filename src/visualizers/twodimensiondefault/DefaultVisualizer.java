@@ -35,8 +35,8 @@ public class DefaultVisualizer extends Visualizer {
 
     MouseOver mouseOver = new MouseOver();
 
-    public DefaultVisualizer(int[] dimensions) {
-        super(dimensions[0], dimensions[1], 2);
+    public DefaultVisualizer(double[] dimensions) {
+        super((int)dimensions[0], (int)dimensions[1], 2);
         mouseOverInfo = mouseOver;
     }
 
@@ -53,7 +53,7 @@ public class DefaultVisualizer extends Visualizer {
 
     private void drawPlanet(Planet p, Graphics g) {
         double[] coords = p.getCoords();
-        final int X = (int) coords[0], Y = (int) coords[1];
+        final int X = (int)coords[0], Y = (int)coords[1];
         Color c = p.getColor();
         g.setColor(c);
         g.drawImage(PLANET_IMAGE, X - p.RADIUS, Y - p.RADIUS, p.RADIUS * 2, p.RADIUS * 2, null);
@@ -62,7 +62,7 @@ public class DefaultVisualizer extends Visualizer {
 
         g.setColor(invertColor(c));
         g.setFont(FONT);
-        g.drawString("" + p.getNumUnits(), (int) (X - 0.7 * Planet.MIN_RADIUS), (int) (Y + 0.7 * Planet.MIN_RADIUS));
+        g.drawString("" + p.getNumUnits(), (int)(X - 0.7 * Planet.MIN_RADIUS), (int)(Y + 0.7 * Planet.MIN_RADIUS));
 
         if (checkRecentlyConquered(p)) {
             new Explosion(coords[0], coords[1], p.RADIUS);
@@ -83,7 +83,7 @@ public class DefaultVisualizer extends Visualizer {
 
         int arbitraryRadius = 10 + f.getNumUnits() / 5;
         double[] coords = f.getCoords();
-        final int X = (int) coords[0], Y = (int) coords[1];
+        final int X = (int)coords[0], Y = (int)coords[1];
         Color c = f.getColor();
         g.setColor(c);
         g.fillOval(X - arbitraryRadius, Y - arbitraryRadius, arbitraryRadius * 2, arbitraryRadius * 2);
@@ -202,8 +202,8 @@ public class DefaultVisualizer extends Visualizer {
 
             void draw(Graphics g) {
                 if (radius > 0) {
-                    g.drawImage(PARTICLE, (int) (x - radius), (int) (y - radius), (int) (radius * 2),
-                            (int) (radius * 2), null);
+                    g.drawImage(PARTICLE, (int)(x - radius), (int)(y - radius), (int)(radius * 2), (int)(radius * 2),
+                            null);
                 }
             }
 
@@ -242,10 +242,10 @@ public class DefaultVisualizer extends Visualizer {
     @Override
     public void mouseOverPress(MouseEvent e, Planet[] planets) {
         // Minuses are to offset it to the tip of the mouse pointer
-        int mouseCoords[] = { e.getX() - 10, e.getY() - 12 };
+        int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
 
         for (Planet p : planets) {
-            double tempCoords[] = { mouseCoords[0], mouseCoords[1] - p.RADIUS / 2 };
+            double tempCoords[] = {mouseCoords[0], mouseCoords[1] - p.RADIUS / 2};
             if (p.distanceTo(tempCoords) < p.RADIUS) {
                 mouseOver.coords = mouseCoords;
                 mouseOver.text = "Production: " + p.PRODUCTION_TIME;
