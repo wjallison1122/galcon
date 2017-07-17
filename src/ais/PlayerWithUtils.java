@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import galaxy.Coords;
-import galaxy.DimensionMismatchException;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
@@ -83,7 +82,7 @@ public abstract class PlayerWithUtils extends Player {
 
         private void verifyMatchingDimensions(Location other) {
             if (this.coords.length != other.coords.length) {
-                throw new DimensionMismatchException("PlayerUtils");
+                throw new IllegalArgumentException("PlayerUtils");
             }
         }
     }
@@ -96,9 +95,9 @@ public abstract class PlayerWithUtils extends Player {
         Location[] locations = new Location[list.size()];
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof Location) {
-                locations[i] = (Location) list.get(i);
+                locations[i] = (Location)list.get(i);
             } else if (list.get(i) instanceof Planet) {
-                locations[i] = new Location((Planet) list.get(i));
+                locations[i] = new Location((Planet)list.get(i));
             } else {
                 throw new RuntimeException("I dont take those");
             }
@@ -168,9 +167,9 @@ public abstract class PlayerWithUtils extends Player {
         Location[] locations = new Location[list.size()];
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof Location) {
-                locations[i] = (Location) list.get(i);
+                locations[i] = (Location)list.get(i);
             } else if (list.get(i) instanceof Planet) {
-                locations[i] = new Location((Planet) list.get(i));
+                locations[i] = new Location((Planet)list.get(i));
             } else {
                 throw new RuntimeException("I dont take those");
             }
@@ -373,7 +372,7 @@ public abstract class PlayerWithUtils extends Player {
         int currentTime = 0;
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
                 .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft())).collect(Collectors.toList())) {
-            int passingTime = (int) Math.ceil(f.distanceLeft() / FLEET_SPEED) - currentTime;
+            int passingTime = (int)Math.ceil(f.distanceLeft() / FLEET_SPEED) - currentTime;
             if (current != PlanetOwner.NOBODY) {
                 updateCount += passingTime;
                 int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;
@@ -417,7 +416,7 @@ public abstract class PlayerWithUtils extends Player {
         int currentTime = 0;
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
                 .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft())).collect(Collectors.toList())) {
-            int passingTime = (int) Math.ceil(f.distanceLeft() / FLEET_SPEED) - currentTime;
+            int passingTime = (int)Math.ceil(f.distanceLeft() / FLEET_SPEED) - currentTime;
             if (current != PlanetOwner.NOBODY) {
                 updateCount += passingTime;
                 int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;

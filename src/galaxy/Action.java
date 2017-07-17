@@ -7,23 +7,23 @@ public class Action extends GameSettings {
 
     Action(Planet start, Planet target, int numUnits, Player current) {
         if (start == null) {
-            throw new InvalidActionException("Attempted to make action to send fleet from null planet.");
+            throw new IllegalArgumentException("Attempted to make action to send fleet from null planet.");
         }
 
         if (target == null) {
-            throw new InvalidActionException("Attempted to make action to send fleet to null planet.");
+            throw new IllegalArgumentException("Attempted to make action to send fleet to null planet.");
         }
 
         if (!start.ownedBy(current)) {
-            throw new InvalidActionException("Player attempted to make an action for a planet not owned by them.");
+            throw new IllegalArgumentException("Player attempted to make an action for a planet not owned by them.");
         }
 
         if (start == target) {
-            throw new InvalidActionException("Player attempted to send a fleet nowhere.");
+            throw new IllegalArgumentException("Player attempted to send a fleet nowhere.");
         }
 
         if (numUnits <= 0) {
-            throw new InvalidActionException("Player attempted to send a fleet with no units.");
+            throw new IllegalArgumentException("Player attempted to send a fleet with " + numUnits + " units.");
         }
 
         START = start;
@@ -38,12 +38,5 @@ public class Action extends GameSettings {
     @Override
     public final String toString() {
         return START.ID + " " + NUM_UNITS + " " + TARGET.ID;
-    }
-
-    @SuppressWarnings("serial")
-    public class InvalidActionException extends RuntimeException {
-        public InvalidActionException(String msg) {
-            super(msg);
-        }
     }
 }

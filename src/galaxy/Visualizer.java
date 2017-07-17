@@ -37,7 +37,7 @@ public abstract class Visualizer extends GameSettings
 
     protected Visualizer(int winWidth, int winHeight, int dimensions) {
         if (dimensions != DIMENSIONS.dimensions()) {
-            throw new DimensionMismatchException("Visualizer does not match galaxy dimension space.");
+            throw new IllegalArgumentException("Visualizer does not match galaxy dimension space.");
         }
 
         Visualizer listener = this;
@@ -56,10 +56,10 @@ public abstract class Visualizer extends GameSettings
             }
         };
     }
-    
+
     protected Visualizer setDirector(Director director) {
-    	this.director = director;
-    	return this;
+        this.director = director;
+        return this;
     }
 
     protected final int getWidth() {
@@ -140,13 +140,13 @@ public abstract class Visualizer extends GameSettings
         if (command == 'Q') {
             System.exit(0);
         } else if (command == 'S') {
-        	director.skipGame();
+            director.skipGame();
         } else if (command == ' ') {
-        	director.togglePause();
+            director.togglePause();
         } else if (command == 'R') {
-        	director.restartGame();
+            director.restartGame();
         } else if (command == 'T') {
-        	director.reverseMap();
+            director.reverseMap();
         }
 
         keystroke(e);
