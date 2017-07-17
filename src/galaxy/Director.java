@@ -2,17 +2,42 @@ package galaxy;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 final class Director extends GameSettings {
     private int rounds = 0;
     private Matcher mm = null;
-    private Visualizer visualizer = createVisualizer();
+    private Visualizer visualizer = createVisualizer(this);
     private MapMaker maps = createMapMaker();
     private Galaxy galaxy = new Galaxy();
     private LinkedList<Player> active;
-    private static HashMap<Player, Integer> numUnitsInFleets = new HashMap<Player, Integer>(),
+    private HashMap<Player, Integer> numUnitsInFleets = new HashMap<Player, Integer>(),
             numUnitsInPlanets = new HashMap<Player, Integer>();
-    private static int tic = 0;
+    private int tic = 0;
+    
+    private static Director director = new Director();
+    private static Timer game = new Timer();
+    private static boolean pause = false;
+    
+    public static void main(String[] args) {
+        if (director.usingVisualizer()) {
+            game.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!pause && !director.done()) {
+                        director.next();
+                    }
+                }
+            }, 0, FRAME_TIME);
+        } else {
+            while (!director.done()) {
+                if (!pause) {
+                    director.next();
+                }
+            }
+        }
+    }
 
     Director() {
         for (int i = 0; i < PLAYERS_PER_GAME; i++) {
@@ -101,20 +126,24 @@ final class Director extends GameSettings {
         finishGame(null, maps.getExistingMap());
     }
 
-    void startReversedGame() {
+    void reverseMap() {
         finishGame(null, maps.getReversedMap());
     }
+    
+    void togglePause() {
+        pause = !pause;
+    }
 
-    static final int numUnitsOwnedBy(Player p) {
+    final int numUnitsOwnedBy(Player p) {
         return numUnitsInPlanets(p) + numUnitsInFleets(p);
     }
 
-    static final int numUnitsInPlanets(Player p) {
+    final int numUnitsInPlanets(Player p) {
         Integer numUnits = numUnitsInPlanets.get(p);
         return numUnits == null ? 0 : numUnits;
     }
 
-    static final int numUnitsInFleets(Player p) {
+    final int numUnitsInFleets(Player p) {
         Integer numUnits = numUnitsInFleets.get(p);
         return numUnits == null ? 0 : numUnits;
     }

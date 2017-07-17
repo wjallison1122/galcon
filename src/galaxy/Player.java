@@ -73,16 +73,4 @@ public abstract class Player extends GameSettings {
      */
     protected void loadFromStore(String oldself) {
     }
-
-    protected static final int numUnitsOwnedBy(Player p) {
-        return Director.numUnitsOwnedBy(p);
-    }
-
-    protected static final int numUnitsInPlanets(Player p) {
-        return Director.numUnitsInPlanets(p);
-    }
-
-    protected static final int numUnitsInFleets(Player p) {
-        return Director.numUnitsInFleets(p);
-    }
 }

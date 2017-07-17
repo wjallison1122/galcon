@@ -20,6 +20,7 @@ public abstract class Visualizer extends GameSettings
     private BufferedImage bufferImage;
     private Planet[] planets;
     private LinkedList<Player> players;
+    private Director director;
     private JFrame frame;
     private JPanel panel = new JPanel() {
         @Override
@@ -54,6 +55,11 @@ public abstract class Visualizer extends GameSettings
                 addMouseWheelListener(listener);
             }
         };
+    }
+    
+    protected Visualizer setDirector(Director director) {
+    	this.director = director;
+    	return this;
     }
 
     protected final int getWidth() {
@@ -104,15 +110,15 @@ public abstract class Visualizer extends GameSettings
     }
 
     protected final int numUnitsOwnedBy(Player p) {
-        return Director.numUnitsOwnedBy(p);
+        return director.numUnitsOwnedBy(p);
     }
 
-    protected static final int numUnitsInPlanets(Player p) {
-        return Director.numUnitsInPlanets(p);
+    protected final int numUnitsInPlanets(Player p) {
+        return director.numUnitsInPlanets(p);
     }
 
-    protected static final int numUnitsInFleets(Player p) {
-        return Director.numUnitsInFleets(p);
+    protected final int numUnitsInFleets(Player p) {
+        return director.numUnitsInFleets(p);
     }
 
     protected abstract void drawBackground(Graphics g);
@@ -134,13 +140,13 @@ public abstract class Visualizer extends GameSettings
         if (command == 'Q') {
             System.exit(0);
         } else if (command == 'S') {
-            Main.skipGame();
+        	director.skipGame();
         } else if (command == ' ') {
-            Main.togglePause();
+        	director.togglePause();
         } else if (command == 'R') {
-            Main.restartGame();
+        	director.restartGame();
         } else if (command == 'T') {
-            Main.reverseMap();
+        	director.reverseMap();
         }
 
         keystroke(e);

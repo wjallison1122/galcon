@@ -65,15 +65,15 @@ public class GameSettings {
         }
     }
 
-    final Visualizer createVisualizer() {
+    final Visualizer createVisualizer(Director director) {
         if (vis == null) {
             return null;
         }
         switch (vis) {
             case TWO_D:
-                return new DefaultVisualizer(DIMENSIONS.getCoords());
+                return new DefaultVisualizer(DIMENSIONS.getCoords()).setDirector(director);
             case THREE_D:
-                return new Display(DIMENSIONS.getCoords());
+                return new Display(DIMENSIONS.getCoords()).setDirector(director);
             case SERVER:
                 return null;
             default:

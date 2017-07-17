@@ -103,7 +103,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
             }
         }
 
-        myUnitCount = Player.numUnitsOwnedBy(this);
+        myUnitCount = getMyUnitCount(fleets, planets, this);
         enemyUnitCount = getOpponentUnitCount(fleets, planets, this);
 
         // Reset the units sent on this turn from each of my planets to 0

@@ -69,7 +69,7 @@ public class TylerClusterAI extends PlayerWithUtils {
     }
 
     private void updateVariables() {
-        myUnitCount = Player.numUnitsOwnedBy(this);
+        myUnitCount = getMyUnitCount(fleets, planets, this);
         oppUnitCount = getOpponentUnitCount(fleets, planets, this);
 
         winning = myUnitCount > oppUnitCount;
