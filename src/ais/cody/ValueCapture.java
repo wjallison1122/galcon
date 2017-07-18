@@ -132,9 +132,9 @@ public class ValueCapture extends PlayerWithUtils {
         if (target.ownedBy(this)) {
             cost = (planetStrength(target));
         } else if (target.ownedBy(null)) {
-            cost = ((double) planetStrength(target) + 1);
+            cost = ((double)planetStrength(target) + 1);
         } else {
-            cost = ((double) planetStrength(target) + 1) + timeCost;
+            cost = ((double)planetStrength(target) + 1) + timeCost;
         }
 
         return cost;
@@ -169,10 +169,5 @@ public class ValueCapture extends PlayerWithUtils {
     @Override
     protected void newGame() {
 
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

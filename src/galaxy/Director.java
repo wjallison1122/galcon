@@ -52,6 +52,7 @@ final class Director extends GameSettings {
             mm = new Matcher(mm);
         }
 
+        // TODO can this be done with a finishGame call?
         newGame(maps.getNewMap(mm.nextMatchup()));
     }
 
@@ -158,7 +159,7 @@ final class Director extends GameSettings {
 
     /******************* MATCHER *****************/
 
-    private class Matcher {
+    class Matcher {
         private Matcher next, prev;
         private int player;
 

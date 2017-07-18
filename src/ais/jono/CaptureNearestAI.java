@@ -34,10 +34,4 @@ public class CaptureNearestAI extends PlayerWithUtils {
             }
         }
     }
-
-    @Override
-    protected String storeSelf() {
-        return null;
-    }
-
 }

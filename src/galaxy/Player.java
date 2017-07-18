@@ -64,13 +64,8 @@ public abstract class Player extends GameSettings {
      * allow it to be optional. '#' character is disallowed and will be cleaned if
      * used.
      */
-    protected String storeSelf() {
+    @Override
+    public String toString() {
         return "";
-    }
-
-    /**
-     * Used to allow an AI to restore its state from a file. See above method.
-     */
-    protected void loadFromStore(String oldself) {
     }
 }

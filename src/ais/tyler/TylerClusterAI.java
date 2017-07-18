@@ -11,7 +11,6 @@ import ais.PlayerWithUtils;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
-import galaxy.Player;
 
 public class TylerClusterAI extends PlayerWithUtils {
 
@@ -92,7 +91,7 @@ public class TylerClusterAI extends PlayerWithUtils {
         Collections.sort(planets, new Comparator<Planet>() {
             @Override
             public int compare(Planet p1, Planet p2) {
-                return (int) (p1.distanceTo(p) - p2.distanceTo(p));
+                return (int)(p1.distanceTo(p) - p2.distanceTo(p));
             }
         });
     }
@@ -211,7 +210,7 @@ public class TylerClusterAI extends PlayerWithUtils {
 
                 if (myPlanetCount == NEAR_PLANET_COUNT) {
                     if (myPlanet.getNumUnits() > 10) {
-                        addAction(myPlanet, nearPlanets.get((int) (Math.random() * (nearPlanets.size() - 1))), 1);
+                        addAction(myPlanet, nearPlanets.get((int)(Math.random() * (nearPlanets.size() - 1))), 1);
                     }
                 }
             }
@@ -222,7 +221,7 @@ public class TylerClusterAI extends PlayerWithUtils {
                     int enemyIncomingUnits = getOpponentsIncomingFleetCount(p, fleets, this);
                     int myIncomingUnits = getOpponentsIncomingFleetCount(p, fleets, this);
                     int myUnitsAlreadySent = myUnitsSent.get(p);
-                    int unitsAtPlanet = (int) (p.isNeutral() ? p.getNumUnits()
+                    int unitsAtPlanet = (int)(p.isNeutral() ? p.getNumUnits()
                             : p.getNumUnits() + p.PRODUCTION_TIME / myPlanet.distanceTo(p) + 1);
                     if (p.isNeutral()) {
                         int unitsNeededToCapturePlanet = unitsAtPlanet - (myIncomingUnits + myUnitsAlreadySent) + 10;
@@ -328,7 +327,7 @@ public class TylerClusterAI extends PlayerWithUtils {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
-        int unitsGeneratedByPlanet = (int) (distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
+        int unitsGeneratedByPlanet = (int)(distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
 
         if (p.isNeutral()) {
             return (oppUnits + p.getNumUnits()) - myUnits + 15;
@@ -352,10 +351,5 @@ public class TylerClusterAI extends PlayerWithUtils {
 
     @Override
     protected void newGame() {
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

@@ -1,15 +1,13 @@
 package ais.cody;
 
-import galaxy.Fleet;
-import galaxy.Player;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import ais.cody.psuedoSpace.PsuedoPlanet;
 import ais.cody.psuedoSpace.PsuedoAction;
 import ais.cody.psuedoSpace.PsuedoGalaxy;
+import ais.cody.psuedoSpace.PsuedoPlanet;
+import galaxy.Player;
 
 public class TheGeneral extends Player {
     private static final double FUTURE_COEFFICIENT = 1;
@@ -118,9 +116,9 @@ public class TheGeneral extends Player {
         currentValue = psuedoGalaxy.health(PRODUCTION_VALUE, SPREAD_VALUE);
 
         for (Move potentialMove : potentialMoves) {
-            if (potentialMove.cost < 0)
+            if (potentialMove.cost < 0) {
                 invalidMoves.add(potentialMove);
-            else {
+            } else {
                 potentialMove.evaluate();
                 if (potentialMove.value > currentValue) {
                     invalidMoves.add(potentialMove);
@@ -176,8 +174,9 @@ public class TheGeneral extends Player {
 
             targetCost = costOfPlanet(target);
             for (PsuedoPlanet from : psuedoGalaxy.myPlanets()) {
-                if (psuedoGalaxy.psuedoPlanetStrength(from) < -1)
+                if (psuedoGalaxy.psuedoPlanetStrength(from) < -1) {
                     attackers.add(from);
+                }
             }
 
             if (!attackers.isEmpty()) {
@@ -199,8 +198,9 @@ public class TheGeneral extends Player {
 
                 if (totalToSend > targetCost) {
                     i = 0;
-                    for (PsuedoPlanet from : attackers)
+                    for (PsuedoPlanet from : attackers) {
                         move.addPsuedoAction(new PsuedoAction(from, target, -unitsToSend[i++]));
+                    }
                 }
             }
         }
@@ -243,8 +243,9 @@ public class TheGeneral extends Player {
 
             targetCost = -costOfPlanet(target);
             for (PsuedoPlanet from : psuedoGalaxy.enemyPlanets()) {
-                if (psuedoGalaxy.psuedoPlanetStrength(from) > 1)
+                if (psuedoGalaxy.psuedoPlanetStrength(from) > 1) {
                     attackers.add(from);
+                }
             }
 
             if (!attackers.isEmpty()) {
@@ -266,8 +267,9 @@ public class TheGeneral extends Player {
 
                 if (totalToSend > targetCost) {
                     i = 0;
-                    for (PsuedoPlanet from : attackers)
+                    for (PsuedoPlanet from : attackers) {
                         move.addPsuedoAction(new PsuedoAction(from, target, unitsToSend[i++]));
+                    }
                 }
             }
         }
@@ -318,11 +320,6 @@ public class TheGeneral extends Player {
 
     }
 
-    @Override
-    protected String storeSelf() {
-        return null;
-    }
-
     private class Move implements Comparable<Move> {
         ArrayList<PsuedoAction> psuedoActions;
         PsuedoPlanet to;
@@ -352,10 +349,12 @@ public class TheGeneral extends Player {
                 combinedActions = new ArrayList<PsuedoAction>();
 
                 enemyMove = findWorstAction(model);
-                if (myMove != null)
+                if (myMove != null) {
                     combinedActions.addAll(myMove.psuedoActions);
-                if (enemyMove != null)
+                }
+                if (enemyMove != null) {
                     combinedActions.addAll(enemyMove.psuedoActions);
+                }
 
                 model.advance(PREDICTION_INCREMENT, combinedActions);
                 myMove = findBestAction(model);
@@ -373,9 +372,10 @@ public class TheGeneral extends Player {
 
         @Override
         public int compareTo(Move other) {
-            return (int) this.value - (int) other.value;
+            return (int)this.value - (int)other.value;
         }
 
+        @Override
         public String toString() {
             return "Send " + unitsSent + " units to planet with " + to.strength + " units, for value of " + value;
         }

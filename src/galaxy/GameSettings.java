@@ -21,7 +21,7 @@ enum SymmetryType {
 
 // TODO Switch to holder pattern
 enum VisualizerType {
-    TWO_D, THREE_D, SERVER
+    NONE, TWO_D, THREE_D,
 }
 
 enum MapType {
@@ -89,7 +89,7 @@ public class GameSettings {
                 return new DefaultVisualizer(DIMENSIONS.getCoords()).setDirector(director);
             case THREE_D:
                 return new Display(DIMENSIONS.getCoords()).setDirector(director);
-            case SERVER:
+            case NONE:
                 return null;
             default:
                 return null;

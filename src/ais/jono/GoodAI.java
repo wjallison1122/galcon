@@ -579,11 +579,6 @@ public class GoodAI extends PlayerWithUtils {
     }
 
     @Override
-    protected String storeSelf() {
-        return null;
-    }
-
-    @Override
     protected void endGame(Player winner) {
         if (LEARNING) {
             if (equals(winner)) {

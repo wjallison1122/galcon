@@ -238,9 +238,4 @@ public class InfluenceAI extends PlayerWithUtils {
     private static void addMap(Map<Planet, Double> map, Planet p, double val) {
         map.put(p, val + (map.containsKey(p) ? map.get(p) : 0));
     }
-
-    @Override
-    protected String storeSelf() {
-        return null;
-    }
 }

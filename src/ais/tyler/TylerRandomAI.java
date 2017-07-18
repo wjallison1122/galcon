@@ -53,11 +53,11 @@ public class TylerRandomAI extends PlayerWithUtils {
 
         for (Planet p : myPlanets) {
             if (p.getNumUnits() > 10) {
-                int rand = (int) (Math.random() * 2);
+                int rand = (int)(Math.random() * 2);
                 int index = 0;
                 while (rand % 2 != 0) {
                     index++;
-                    rand = (int) (Math.random() * 2);
+                    rand = (int)(Math.random() * 2);
                 }
                 if (otherPlanets.size() > 0) {
                     addAction(p, otherPlanets.get(index % otherPlanets.size()), 1);
@@ -78,10 +78,5 @@ public class TylerRandomAI extends PlayerWithUtils {
 
     @Override
     protected void newGame() {
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

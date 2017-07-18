@@ -1,11 +1,11 @@
 package ais.human;
 
-import galaxy.Planet;
-import galaxy.Player;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+
+import galaxy.Planet;
+import galaxy.Player;
 
 public class MeatSackAI extends Player {
 
@@ -48,8 +48,9 @@ public class MeatSackAI extends Player {
             }
 
         }
-        if (turnsToFinish > 0)
+        if (turnsToFinish > 0) {
             turnsToFinish--;
+        }
     }
 
     public void finishTurns(int amt) {
@@ -80,11 +81,5 @@ public class MeatSackAI extends Player {
     @Override
     protected void newGame() {
         display.newGame();
-    }
-
-    @Override
-    protected String storeSelf() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

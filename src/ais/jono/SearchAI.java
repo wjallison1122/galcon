@@ -75,20 +75,20 @@ public class SearchAI extends PlayerWithUtils {
                                 && !actions.stream().anyMatch(fa -> fa != null && fa.target == finali)) {
                             if (p.units > planets.get(i).units + 1) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, planets.get(i).units + 1,
-                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                         } else if (!p.equals(planets.get(i))) {
                             if (p.units > 0) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, 1,
-                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                             if (p.units > 1) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units,
-                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                             if (p.units > 40) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units / 2,
-                                        (int) Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
                             }
                         }
                     }
@@ -101,9 +101,9 @@ public class SearchAI extends PlayerWithUtils {
         @Override
         public void doMove(Move move) {
             playersTurn = !playersTurn;
-            actions.add((FutureAction) move);
+            actions.add((FutureAction)move);
             if (move != null) {
-                planets.get(((FutureAction) move).target).units -= ((FutureAction) move).count;
+                planets.get(((FutureAction)move).target).units -= ((FutureAction)move).count;
             }
         }
 
@@ -154,7 +154,7 @@ public class SearchAI extends PlayerWithUtils {
             if (theirUnits == 0) {
                 return 1000000000;
             }
-            return (int) ((myProduction - theirProduction) * 100000) + myUnits - theirUnits;
+            return (int)((myProduction - theirProduction) * 100000) + myUnits - theirUnits;
         }
 
         @Override
@@ -197,7 +197,7 @@ public class SearchAI extends PlayerWithUtils {
                 return true;
             } else {
                 if (obj instanceof SearchPlanet) {
-                    return base.equals(((SearchPlanet) obj).base);
+                    return base.equals(((SearchPlanet)obj).base);
                 } else {
                     return false;
                 }
@@ -222,7 +222,7 @@ public class SearchAI extends PlayerWithUtils {
 
         public FutureAction(Fleet f, Player player, List<SearchPlanet> planets) {
             source = null;
-            time = (int) Math.ceil((f.distanceLeft()) / FLEET_SPEED);
+            time = (int)Math.ceil((f.distanceLeft()) / FLEET_SPEED);
             count = f.getNumUnits();
             if (f.ownedBy(player)) {
                 owner = PlanetOwner.PLAYER;
@@ -330,9 +330,9 @@ public class SearchAI extends PlayerWithUtils {
             AlphaBeta ab = new AlphaBeta(position);
             FutureAction fa;
             if (LIMIT == Limit.TIME) {
-                fa = (FutureAction) ab.analyze(SEARCH_TIME_MILLIS);
+                fa = (FutureAction)ab.analyze(SEARCH_TIME_MILLIS);
             } else {
-                fa = (FutureAction) ab.analyzeDepth(SEARCH_DEPTH);
+                fa = (FutureAction)ab.analyzeDepth(SEARCH_DEPTH);
             }
             System.out.println("Analysis Complete");
             if (fa != null) {
@@ -340,10 +340,5 @@ public class SearchAI extends PlayerWithUtils {
                 addAction(fa.source, planets[fa.target], fa.count);
             }
         }
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

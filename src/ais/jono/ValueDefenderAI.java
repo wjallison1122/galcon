@@ -78,9 +78,4 @@ public class ValueDefenderAI extends PlayerWithUtils {
     protected void newGame() {
 
     }
-
-    @Override
-    protected String storeSelf() {
-        return null;
-    }
 }

@@ -93,7 +93,7 @@ public class TylerValueAI extends PlayerWithUtils {
         Collections.sort(planets, new Comparator<Planet>() {
             @Override
             public int compare(Planet p1, Planet p2) {
-                return (int) (p1.distanceTo(p) - p2.distanceTo(p));
+                return (int)(p1.distanceTo(p) - p2.distanceTo(p));
             }
         });
     }
@@ -260,7 +260,7 @@ public class TylerValueAI extends PlayerWithUtils {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
-        int unitsGeneratedByPlanet = (int) (distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
+        int unitsGeneratedByPlanet = (int)(distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
 
         if (p.isNeutral()) {
             return (oppUnits + p.getNumUnits()) - myUnits + 15;
@@ -284,10 +284,5 @@ public class TylerValueAI extends PlayerWithUtils {
 
     @Override
     protected void newGame() {
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

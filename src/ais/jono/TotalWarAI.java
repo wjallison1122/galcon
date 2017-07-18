@@ -40,10 +40,4 @@ public class TotalWarAI extends PlayerWithUtils {
             }
         }
     }
-
-    @Override
-    protected String storeSelf() {
-        return null;
-    }
-
 }

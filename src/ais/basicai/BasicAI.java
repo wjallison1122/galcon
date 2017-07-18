@@ -1,9 +1,9 @@
 package ais.basicai;
 
+import java.awt.Color;
+
 import galaxy.Planet;
 import galaxy.Player;
-
-import java.awt.Color;
 
 public class BasicAI extends Player {
 
@@ -28,17 +28,12 @@ public class BasicAI extends Player {
         }
 
         if (hitter != null && hitted != null) {
-            addAction(hitter, hitted, (int) (Math.random() * hitter.getNumUnits() / 4));
+            addAction(hitter, hitted, (int)(Math.random() * hitter.getNumUnits() / 4));
         }
     }
 
     @Override
     protected void newGame() {
 
-    }
-
-    @Override
-    protected String storeSelf() {
-        return "";
     }
 }

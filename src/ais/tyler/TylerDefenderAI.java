@@ -13,7 +13,6 @@ import java.util.TreeSet;
 import ais.PlayerWithUtils;
 import galaxy.Coords;
 import galaxy.Planet;
-import galaxy.Player;
 
 public class TylerDefenderAI extends PlayerWithUtils {
 
@@ -138,7 +137,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
         Collections.sort(planets, new Comparator<Planet>() {
             @Override
             public int compare(Planet p1, Planet p2) {
-                return (int) (p1.distanceTo(p) - p2.distanceTo(p));
+                return (int)(p1.distanceTo(p) - p2.distanceTo(p));
             }
         });
     }
@@ -290,7 +289,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
         } else {
             double turns = (src.distanceTo(dest) / FLEET_SPEED);
             int updateCount = dest.getLifespan() % dest.PRODUCTION_TIME;
-            int unitsProduced = (int) ((turns + updateCount) / dest.PRODUCTION_TIME);
+            int unitsProduced = (int)((turns + updateCount) / dest.PRODUCTION_TIME);
             if (updateCount == 0) {
                 unitsProduced++;
             }
@@ -316,10 +315,5 @@ public class TylerDefenderAI extends PlayerWithUtils {
     protected void newGame() {
         defendPlanets = new TreeSet<>((Planet p1, Planet p2) -> p1.PRODUCTION_TIME - p2.PRODUCTION_TIME);
         firstTurn = true;
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

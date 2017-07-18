@@ -248,8 +248,8 @@ public class StrategicLocationAI extends PlayerWithUtils {
                                                                                                     // the
                                                                                                     // same
                                                                                                     // one
-                        // send as many units as required or as many as can be
-                        // spared if not enough
+                                                                                                    // send as many units as required or as many as can be
+                                                                                                    // spared if not enough
                         int willSend = other.extraUnits > p.minBaseConquerCost ? p.minBaseConquerCost
                                 : other.extraUnits;
                         other.units -= willSend;
@@ -330,7 +330,7 @@ public class StrategicLocationAI extends PlayerWithUtils {
                 // temp.planet.getNumUnits());
                 int extraUnitsNeeded = 3;
                 if (temp.planet.ownedByOpponentOf(this)) {
-                    extraUnitsNeeded += (int) temp.planet.distanceTo(current.planet)
+                    extraUnitsNeeded += (int)temp.planet.distanceTo(current.planet)
                             / (FLEET_SPEED * temp.planet.PRODUCTION_TIME);
                 }
                 if (mySpareUnits > temp.minBaseConquerCost) {
@@ -375,10 +375,5 @@ public class StrategicLocationAI extends PlayerWithUtils {
         }
 
         // averageStrategicValue /= allPlanetInfo.size();
-    }
-
-    @Override
-    protected String storeSelf() {
-        return null;
     }
 }

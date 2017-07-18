@@ -1,9 +1,9 @@
 package ais.otherai;
 
+import java.awt.Color;
+
 import galaxy.Planet;
 import galaxy.Player;
-
-import java.awt.Color;
 
 public class OtherAI extends Player {
 
@@ -41,7 +41,7 @@ public class OtherAI extends Player {
 
         if (hitter != null && hitted != null) {
             debug("Made an action!");
-            addAction(hitter, hitted, (int) (Math.random() * hitter.getNumUnits() / 4));
+            addAction(hitter, hitted, (int)(Math.random() * hitter.getNumUnits() / 4));
         } else {
             debug("Something..." + (hitter == null) + " ? " + (hitted == null));
         }
@@ -50,10 +50,5 @@ public class OtherAI extends Player {
     @Override
     protected void newGame() {
 
-    }
-
-    @Override
-    protected String storeSelf() {
-        return "";
     }
 }
