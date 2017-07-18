@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Supplier;
 
 final class Director extends GameSettings {
     private int rounds = 0;
@@ -15,11 +16,18 @@ final class Director extends GameSettings {
     private HashMap<Player, Integer> numUnitsInFleets = new HashMap<Player, Integer>(),
             numUnitsInPlanets = new HashMap<Player, Integer>();
     private int tic = 0;
-    
+    private Player[] players = new Player[suppliers.size()];
+    {
+        for (Supplier<Player> supplier : suppliers) {
+            Player p = supplier.get();
+            players[p.ID] = p;
+        }
+    }
+
     private static Director director = new Director();
     private static Timer game = new Timer();
     private static boolean pause = false;
-    
+
     public static void main(String[] args) {
         if (director.usingVisualizer()) {
             game.schedule(new TimerTask() {
@@ -129,7 +137,7 @@ final class Director extends GameSettings {
     void reverseMap() {
         finishGame(null, maps.getReversedMap());
     }
-    
+
     void togglePause() {
         pause = !pause;
     }

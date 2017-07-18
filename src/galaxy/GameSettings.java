@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.function.Supplier;
 
 import ais.jono.GoodAI;
 import ais.tyler.TylerRandomAI;
@@ -30,11 +32,24 @@ public class GameSettings {
     public static final boolean debugMode = true, logGame = false;
 
     private static BufferedWriter gameLog = logGame ? makeLogFile("galconset-" + formatDate(new Date())) : null;
-    private static Player p1 = new GoodAI(false);
-    private static Player p2 = new TylerRandomAI();
-    public Player[] players = {p1, p2};
+    static Supplier<Player> p1 = new Supplier<Player>() {
+        @Override
+        public Player get() {
+            return new GoodAI(false);
+        }
+    };
+    static Supplier<Player> p2 = new Supplier<Player>() {
+        @Override
+        public Player get() {
+            return new TylerRandomAI();
+        }
+    };
+    static ArrayList<Supplier<Player>> suppliers = new ArrayList<Supplier<Player>>();
+    static {
+        suppliers.add(p1);
+        suppliers.add(p2);
+    }
     public static final int PLAYERS_PER_GAME = 2;
-
     public static final int NUM_PLANETS = 16;
 
     private final MapType map = MapType.RANDOM;
