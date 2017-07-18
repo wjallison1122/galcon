@@ -95,6 +95,7 @@ final class Director extends GameSettings {
     }
 
     void finishGame(Player winner, Planet[] newMap) {
+        System.out.println(winner == null ? "NULL" : winner.NAME + " wins!");
         for (Player p : active) {
             p.endGame(winner);
         }

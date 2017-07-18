@@ -123,9 +123,11 @@ public class TylerAI extends PlayerWithUtils {
                     for (Planet myP : myPlanets) {
                         if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
                             int unitsToSend = Math.min(unitsNeededToCapturePlanet, expendableUnits(myP));
-                            addAction(myP, p, unitsToSend);
-                            expendableUnits -= unitsToSend;
-                            myUnitsEnRoute += unitsToSend;
+                            if (unitsToSend > 0) {
+                                addAction(myP, p, unitsToSend);
+                                expendableUnits -= unitsToSend;
+                                myUnitsEnRoute += unitsToSend;
+                            }
                         }
                     }
                 }
@@ -144,9 +146,11 @@ public class TylerAI extends PlayerWithUtils {
                         for (Planet myP : myPlanets) {
                             if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
                                 int unitsToSend = Math.min(unitsNeededToCapturePlanet, expendableUnits(myP));
-                                addAction(myP, p, unitsToSend);
-                                expendableUnits -= unitsToSend;
-                                myUnitsEnRoute += unitsToSend;
+                                if (unitsToSend > 0) {
+                                    addAction(myP, p, unitsToSend);
+                                    expendableUnits -= unitsToSend;
+                                    myUnitsEnRoute += unitsToSend;
+                                }
                             }
                         }
                     }

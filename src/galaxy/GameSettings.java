@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.function.Supplier;
 
-import ais.jono.GoodAI;
-import ais.tyler.TylerRandomAI;
+import ais.cody.ValueCapture;
+import ais.tyler.TylerAI;
 import mapmakers.RandomMapMaker;
 import mapmakers.SymmetricMapMaker;
 import visualizers.threedimensiondefault.Display;
@@ -35,13 +35,13 @@ public class GameSettings {
     static Supplier<Player> p1 = new Supplier<Player>() {
         @Override
         public Player get() {
-            return new GoodAI(false);
+            return new ValueCapture();
         }
     };
     static Supplier<Player> p2 = new Supplier<Player>() {
         @Override
         public Player get() {
-            return new TylerRandomAI();
+            return new TylerAI();
         }
     };
     static ArrayList<Supplier<Player>> suppliers = new ArrayList<Supplier<Player>>();
@@ -53,7 +53,7 @@ public class GameSettings {
     public static final int NUM_PLANETS = 16;
 
     private final MapType map = MapType.RANDOM;
-    private static final VisualizerType vis = VisualizerType.TWO_D;
+    private static final VisualizerType vis = VisualizerType.NONE;
     public final static int FRAME_TIME = 10;
     public static final Coords DIMENSIONS = new Coords(
             (vis == VisualizerType.TWO_D) ? new double[] {800, 800} : new double[] {1000, 1000, 1000});

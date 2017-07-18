@@ -115,7 +115,10 @@ public class ValueCapture extends PlayerWithUtils {
                 if (totalToSend > targetCost) {
                     i = 0;
                     for (Planet from : attackers) {
-                        addAction(from, target, unitsToSend[i++]);
+                        if (unitsToSend[i] > 0) {
+                            addAction(from, target, unitsToSend[i]);
+                        }
+                        i++;
                     }
                 }
             }
