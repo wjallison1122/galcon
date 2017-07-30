@@ -3,14 +3,17 @@ package ais.jono;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
@@ -26,6 +29,10 @@ public class ContestInfluenceAI extends PlayerWithUtils {
     private static final double UNIT_GEN_POSITION_WEIGHT = 0.2;
     private static final double CAPTURE_SAFTEY_MARGIN = 1.02;
 
+    private Planet[] planets;
+
+    LinkedList<Action> actions;
+
     Planet take;
     List<Planet> retake;
     private boolean contest;
@@ -37,10 +44,22 @@ public class ContestInfluenceAI extends PlayerWithUtils {
 
     public ContestInfluenceAI(Color c) {
         super(c, "Contest Influence AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+                nextGame();
+            }
+        });
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         for (Planet p : myPlanets) {
             if (getCurrentEventualOwner(p, fleets, this) == PlanetOwner.PLAYER) {
@@ -48,7 +67,7 @@ public class ContestInfluenceAI extends PlayerWithUtils {
             }
         }
         if (myPlanets.size() == 0) {
-            return;
+            return actions;
         }
 
         boolean defending = false;
@@ -77,20 +96,20 @@ public class ContestInfluenceAI extends PlayerWithUtils {
                                 - (defending ? MIN_DEFENSIVE_DEFENSE : MIN_AGGRESSIVE_DEFENSE);
 
                         if (available + contribution > needed) {
-                            addAction(p, target, needed - available);
+                            actions.add(makeAction(p, target, needed - available));
                             available += contribution;
                             break;
                         }
                         available += contribution;
-                        addAction(p, target, contribution);
+                        actions.add(makeAction(p, target, contribution));
                     }
                 }
             }
         } else {
             if (contest) {
-                contest();
+                contest(fleets);
             } else {
-                evaluatePosition();
+                evaluatePosition(fleets);
                 if (take == null) {
                     if (USE_MOVE_FORWARDS) {
                         moveFleetsForwards();
@@ -100,6 +119,8 @@ public class ContestInfluenceAI extends PlayerWithUtils {
                 }
             }
         }
+
+        return actions;
     }
 
     public void moveFleetsForwards() {
@@ -115,7 +136,7 @@ public class ContestInfluenceAI extends PlayerWithUtils {
             for (Planet p : getPlanetsOwnedByPlayer(planets, this)) {
                 int toSend = p.getNumUnits() - MIN_AGGRESSIVE_DEFENSE;
                 if (toSend > 0) {
-                    addAction(p, target, toSend);
+                    actions.add(makeAction(p, target, toSend));
                 }
             }
         }
@@ -128,7 +149,7 @@ public class ContestInfluenceAI extends PlayerWithUtils {
                 / p.PRODUCTION_TIME / (10 + p.getNumUnits());
     }
 
-    private void contest() {
+    private void contest(Fleet[] fleets) {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
 
@@ -139,12 +160,12 @@ public class ContestInfluenceAI extends PlayerWithUtils {
 
         if (take != null) {
             int toSendToTake = 0;
-            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / FLEET_SPEED),
-                    toSendToTake)) {
+            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / FLEET_SPEED), toSendToTake,
+                    fleets)) {
                 toSendToTake++;
             }
             if (toSendToTake > 0) {
-                addAction(myPlanets.get(0), take, toSendToTake);
+                actions.add(makeAction(myPlanets.get(0), take, toSendToTake));
             }
         }
 
@@ -154,11 +175,11 @@ public class ContestInfluenceAI extends PlayerWithUtils {
                 int fleetDistance = (int)Math.ceil(fleet.distanceLeft() / FLEET_SPEED);
                 if (distance > fleetDistance) {
                     int toSend = 0;
-                    while (!isEventualOwner(fleet.DESTINATION, distance, toSend)) {
+                    while (!isEventualOwner(fleet.DESTINATION, distance, toSend, fleets)) {
                         toSend++;
                     }
                     if (toSend > 0) {
-                        addAction(myPlanets.get(0), fleet.DESTINATION, toSend);
+                        actions.add(makeAction(myPlanets.get(0), fleet.DESTINATION, toSend));
                     }
                     retake.remove(fleet.DESTINATION);
                     mine.add(fleet.DESTINATION);
@@ -173,7 +194,7 @@ public class ContestInfluenceAI extends PlayerWithUtils {
         public PlanetOwner owner;
     }
 
-    private boolean isEventualOwner(Planet p, int time, int amount) {
+    private boolean isEventualOwner(Planet p, int time, int amount, Fleet[] fleets) {
         PlanetOwner current;
         if (p.ownedBy(this)) {
             current = PlanetOwner.PLAYER;
@@ -230,8 +251,7 @@ public class ContestInfluenceAI extends PlayerWithUtils {
         return current == PlanetOwner.PLAYER;
     }
 
-    @Override
-    protected void newGame() {
+    protected void nextGame() {
         mine = new HashSet<>();
         contest = true;
 
@@ -289,7 +309,7 @@ public class ContestInfluenceAI extends PlayerWithUtils {
         }
     }
 
-    private void evaluatePosition() {
+    private void evaluatePosition(Fleet[] fleets) {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
         // List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);

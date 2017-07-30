@@ -1,6 +1,7 @@
 package ais.otherai;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +9,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
@@ -25,20 +27,32 @@ public class MaxPowerLazer extends PlayerWithUtils {
     HashMap<Planet, LinkedList<Fleet>> fleetsTargeting = new HashMap<Planet, LinkedList<Fleet>>();
     PriorityQueue<PlanetValuer> plans = new PriorityQueue<PlanetValuer>();
 
+    private Planet[] planets;
+
     int previd = 0;
 
     protected MaxPowerLazer(Color c, String name) {
         super(Color.CYAN, "MaxPowerLazer");
-        for (Planet p : planets) {
-            LinkedList<Fleet> fleetList = new LinkedList<Fleet>();
-            fleetsTargeting.put(p, fleetList);
-            plans.add(new PlanetValuer(p, fleetList));
-        }
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
 
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+                for (Planet p : planets) {
+                    LinkedList<Fleet> fleetList = new LinkedList<Fleet>();
+                    fleetsTargeting.put(p, fleetList);
+                    plans.add(new PlanetValuer(p, fleetList));
+                }
+            }
+        });
     }
 
-    @Override
-    protected void turn() {
+    private Collection<Action> makeTurn(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         cleanFleetsTargeting();
         for (Fleet f : fleets) {
             if (f.ID > previd) {
@@ -47,6 +61,7 @@ public class MaxPowerLazer extends PlayerWithUtils {
         }
 
         previd = Unit.getLatestID();
+        return actions;
     }
 
     void cleanFleetsTargeting() {
@@ -116,8 +131,7 @@ public class MaxPowerLazer extends PlayerWithUtils {
                 return 0;
             } else {
                 PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
-                int unitsMadeBeforeEnemyHit = (int) ((home.distanceTo(enp.peek()) / FLEET_SPEED)
-                        / home.PRODUCTION_TIME);
+                int unitsMadeBeforeEnemyHit = (int)((home.distanceTo(enp.peek()) / FLEET_SPEED) / home.PRODUCTION_TIME);
                 int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
                 // If I lose more units taking over the planet than can be made
                 // before the enemy
@@ -141,7 +155,7 @@ public class MaxPowerLazer extends PlayerWithUtils {
             PriorityQueue<Planet> orderedPlanets = new PriorityQueue<Planet>(11, new Comparator<Planet>() {
                 @Override
                 public int compare(Planet p1, Planet p2) {
-                    return (int) (target.distanceTo(p1) - target.distanceTo(p2));
+                    return (int)(target.distanceTo(p1) - target.distanceTo(p2));
                 }
             });
 
@@ -170,8 +184,8 @@ public class MaxPowerLazer extends PlayerWithUtils {
             this.numUnits = numUnits;
         }
 
-        void makeAction() {
-            addAction(start, end, numUnits);
+        Action build() {
+            return makeAction(start, end, numUnits);
         }
     }
 }

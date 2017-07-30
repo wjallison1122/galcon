@@ -2,8 +2,12 @@ package ais.human;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
+import galaxy.Action;
+import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
@@ -13,8 +17,9 @@ public class MeatSackAI extends Player {
     private boolean autoAdvance = false;
     private int turnsToFinish = 0;
     private MeatSackDisplay display;
+    private Planet[] planets;
 
-    public static class FutureAction {
+    public class FutureAction {
         Planet source;
         Planet destination;
         int count;
@@ -24,17 +29,33 @@ public class MeatSackAI extends Player {
             this.destination = destination;
             this.count = count;
         }
+
+        Action build() {
+            return makeAction(source, destination, count);
+        }
     }
 
     public MeatSackAI() {
         super(Color.CYAN, "Fleshling");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn();
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+                nextGame();
+            }
+        });
         display = new MeatSackDisplay(this);
     }
 
-    @Override
-    public void turn() {
+    public Collection<Action> makeTurn() {
+        LinkedList<Action> actions = new LinkedList<Action>();
         display.updateBase();
-        pendingActions.forEach((action) -> addAction(action.source, action.destination, action.count));
+        pendingActions.forEach(action -> actions.add(action.build()));
         pendingActions.clear();
 
         if (!autoAdvance) {
@@ -51,6 +72,8 @@ public class MeatSackAI extends Player {
         if (turnsToFinish > 0) {
             turnsToFinish--;
         }
+
+        return actions;
     }
 
     public void finishTurns(int amt) {
@@ -78,8 +101,7 @@ public class MeatSackAI extends Player {
         this.autoAdvance = autoAdvance;
     }
 
-    @Override
-    protected void newGame() {
+    protected void nextGame() {
         display.newGame();
     }
 }

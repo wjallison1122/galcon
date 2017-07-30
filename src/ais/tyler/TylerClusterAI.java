@@ -2,12 +2,15 @@ package ais.tyler;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
@@ -28,26 +31,40 @@ public class TylerClusterAI extends PlayerWithUtils {
     private boolean opponentMadeMove = false;
     private int turnCount = 0;
 
+    private Planet[] planets;
+
     public TylerClusterAI() {
-        super(new Color(50, 100, 0), "Cluster AI");
+        this(new Color(50, 100, 0));
     }
 
     public TylerClusterAI(Color c) {
         super(c, "Cluster AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+            }
+        });
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
         if (firstTurn) {
             calculateConstants();
             firstTurn = false;
         }
 
-        updateVariables();
+        updateVariables(fleets);
 
-        clusterAI();
+        LinkedList<Action> actions = clusterAI(fleets);
 
         turnCount++;
+
+        return actions;
     }
 
     private void calculateConstants() {
@@ -67,7 +84,7 @@ public class TylerClusterAI extends PlayerWithUtils {
         }
     }
 
-    private void updateVariables() {
+    private void updateVariables(Fleet[] fleets) {
         myUnitCount = getMyUnitCount(fleets, planets, this);
         oppUnitCount = getOpponentUnitCount(fleets, planets, this);
 
@@ -147,7 +164,8 @@ public class TylerClusterAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private void clusterAI() {
+    private LinkedList<Action> clusterAI(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> allPlanets = Arrays.asList(planets);
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
@@ -155,7 +173,7 @@ public class TylerClusterAI extends PlayerWithUtils {
         List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
         if (myPlanets.size() == 0) {
-            return;
+            return actions;
         }
 
         /*
@@ -210,7 +228,8 @@ public class TylerClusterAI extends PlayerWithUtils {
 
                 if (myPlanetCount == NEAR_PLANET_COUNT) {
                     if (myPlanet.getNumUnits() > 10) {
-                        addAction(myPlanet, nearPlanets.get((int)(Math.random() * (nearPlanets.size() - 1))), 1);
+                        actions.add(makeAction(myPlanet,
+                                nearPlanets.get((int)(Math.random() * (nearPlanets.size() - 1))), 1));
                     }
                 }
             }
@@ -229,7 +248,7 @@ public class TylerClusterAI extends PlayerWithUtils {
                                 enemyIncomingUnits - (myIncomingUnits + myUnitsAlreadySent));
                         if (unitsNeededToCapturePlanet > 0 && expendableUnits > unitsNeededToCapturePlanet) {
                             if (unitsNeededToCapturePlanet < myUnitCount / 3) {
-                                addAction(myPlanet, p, unitsNeededToCapturePlanet);
+                                actions.add(makeAction(myPlanet, p, unitsNeededToCapturePlanet));
                                 expendableUnits -= unitsNeededToCapturePlanet;
                                 myUnitsSent.put(p, unitsNeededToCapturePlanet + myUnitsAlreadySent);
                             }
@@ -239,7 +258,7 @@ public class TylerClusterAI extends PlayerWithUtils {
                                 - (myIncomingUnits + myUnitsAlreadySent) + 10;
                         if (unitsNeededToCapturePlanet > 0 && expendableUnits > unitsNeededToCapturePlanet) {
                             if (unitsNeededToCapturePlanet < myUnitCount / 3) {
-                                addAction(myPlanet, p, unitsNeededToCapturePlanet);
+                                actions.add(makeAction(myPlanet, p, unitsNeededToCapturePlanet));
                                 expendableUnits -= unitsNeededToCapturePlanet;
                                 myUnitsSent.put(p, unitsNeededToCapturePlanet + myUnitsAlreadySent);
                             }
@@ -248,6 +267,8 @@ public class TylerClusterAI extends PlayerWithUtils {
                 }
             }
         }
+
+        return actions;
 
         // Location center = Location.center(myPlanets);
         // greedySort(otherPlanets, center);
@@ -323,7 +344,7 @@ public class TylerClusterAI extends PlayerWithUtils {
     }
 
     // TODO: optimize this method
-    private int unitsNeededToCapturePlanet(Planet p) {
+    private int unitsNeededToCapturePlanet(Planet p, Fleet[] fleets) {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
@@ -347,9 +368,5 @@ public class TylerClusterAI extends PlayerWithUtils {
             }
         }
         return maxDist;
-    }
-
-    @Override
-    protected void newGame() {
     }
 }

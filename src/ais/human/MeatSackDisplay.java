@@ -1,7 +1,5 @@
 package ais.human;
 
-import galaxy.Planet;
-
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,7 +20,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ais.human.MeatSackAI.FutureAction;
+import galaxy.Planet;
 
 @SuppressWarnings("serial")
 public class MeatSackDisplay extends JPanel {
@@ -40,12 +38,9 @@ public class MeatSackDisplay extends JPanel {
     private static final double SCALE = 0.4;
     private static final double SELECTION_AREA_SCALE = 3;
 
-   private static enum State
-    {
-      NONE,
-      SEEKING,
-      FOUND;
-   }
+    private static enum State {
+        NONE, SEEKING, FOUND;
+    }
 
     public MeatSackDisplay(MeatSackAI ai) {
         this.player = ai;
@@ -54,7 +49,7 @@ public class MeatSackDisplay extends JPanel {
 
         myframe = new JFrame() {
             {
-                this.setSize((int) (1280 * SCALE), (int) (800 * SCALE) + 32);
+                this.setSize((int)(1280 * SCALE), (int)(800 * SCALE) + 32);
                 JPanel content = new JPanel();
                 content.setLayout(new BorderLayout());
                 content.add(display, BorderLayout.CENTER);
@@ -67,6 +62,7 @@ public class MeatSackDisplay extends JPanel {
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
             public void run() {
                 myframe.repaint();
             }
@@ -86,7 +82,7 @@ public class MeatSackDisplay extends JPanel {
         controls.add(unitCount);
 
         sendUnitsButton = new EButton("Send", () -> {
-            player.addAction(new FutureAction(selectedPlanet, destinationPlanet,
+            player.addAction(player.new FutureAction(selectedPlanet, destinationPlanet,
                     Integer.parseInt(unitCount.getText().replaceAll("[^0-9]", ""))));
         });
         sendUnitsButton.setEnabled(false);
@@ -211,9 +207,9 @@ public class MeatSackDisplay extends JPanel {
     private void circle(Planet p, Graphics2D g) {
         g.setStroke(new BasicStroke(3.0f));
         g.setColor(Color.WHITE);
-        g.drawOval((int) (p.getCoords()[0] * SCALE - p.RADIUS * SCALE - 5),
-                (int) (p.getCoords()[1] * SCALE - p.RADIUS * SCALE - 5), (int) (p.RADIUS * 2 * SCALE + 10),
-                (int) (p.RADIUS * 2 * SCALE + 10));
+        g.drawOval((int)(p.getCoords()[0] * SCALE - p.RADIUS * SCALE - 5),
+                (int)(p.getCoords()[1] * SCALE - p.RADIUS * SCALE - 5), (int)(p.RADIUS * 2 * SCALE + 10),
+                (int)(p.RADIUS * 2 * SCALE + 10));
     }
 
     private void drawPointer(Planet from, double xTo, double yTo, Graphics2D g) {
@@ -228,8 +224,8 @@ public class MeatSackDisplay extends JPanel {
         double fromx2 = x - diffy * (5 + from.RADIUS * SCALE) / factor;
         double fromy1 = y - diffx * (5 + from.RADIUS * SCALE) / factor;
         double fromy2 = y + diffx * (5 + from.RADIUS * SCALE) / factor;
-        g.drawLine((int) (fromx1), (int) (fromy1), (int) xTo, (int) yTo);
-        g.drawLine((int) (fromx2), (int) (fromy2), (int) xTo, (int) yTo);
+        g.drawLine((int)(fromx1), (int)(fromy1), (int)xTo, (int)yTo);
+        g.drawLine((int)(fromx2), (int)(fromy2), (int)xTo, (int)yTo);
     }
 
     public void updateBase() {
@@ -247,8 +243,8 @@ public class MeatSackDisplay extends JPanel {
     private void drawPlanets(Graphics g) {
         for (Planet p : player.getPlanets()) {
             g.setColor(p.getColor());
-            g.fillOval((int) ((p.getCoords()[0] - p.RADIUS) * SCALE), (int) ((p.getCoords()[1] - p.RADIUS) * SCALE),
-                    (int) (p.RADIUS * 2 * SCALE), (int) (p.RADIUS * 2 * SCALE));
+            g.fillOval((int)((p.getCoords()[0] - p.RADIUS) * SCALE), (int)((p.getCoords()[1] - p.RADIUS) * SCALE),
+                    (int)(p.RADIUS * 2 * SCALE), (int)(p.RADIUS * 2 * SCALE));
         }
     }
 

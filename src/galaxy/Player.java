@@ -1,6 +1,7 @@
 package galaxy;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.LinkedList;
 
 public abstract class Player extends GameSettings {
@@ -9,9 +10,7 @@ public abstract class Player extends GameSettings {
     private static int currentId = 0;
     public final int ID = currentId++;
 
-    protected Planet[] planets;
-    protected Fleet[] fleets;
-    private LinkedList<Action> actions = new LinkedList<Action>();
+    private PlayerHandler handler;
 
     /**
      * Arbitrary creation of new players does not matter since ID is forced unique
@@ -22,50 +21,57 @@ public abstract class Player extends GameSettings {
         NAME = name;
     }
 
-    final void nextGame(Planet[] newMap) {
-        planets = newMap;
-        newGame();
+    final Collection<Action> turn(Fleet[] fleets) {
+        Collection<Action> actions = handler.turn(fleets);
+        return actions == null ? new LinkedList<Action>() : actions;
     }
 
-    // Notify player about start of a new game (new planet set)
-    protected void newGame() {
+    final void newGame(Planet[] newMap) {
+        handler.newGame(newMap);
     }
 
-    // Notify player about end of game
-    protected void endGame(Player winner) {
+    final void endGame(Player winner) {
+        handler.endGame(winner);
     }
 
-    final LinkedList<Action> getActions() {
-        return actions;
+    protected final void setHandler(PlayerHandler handler) {
+        if (this.handler == null) {
+            this.handler = handler;
+        }
     }
 
-    final void doTurn(Fleet[] currentFleets) {
-        actions = new LinkedList<Action>();
-        fleets = currentFleets;
-        turn();
+    protected Action makeAction(Planet start, Planet target, int numUnits) {
+        return new Action(start, target, numUnits, this);
     }
 
-    protected final Action addAction(Planet start, Planet target, int numUnits) {
-        Action a = new Action(start, target, numUnits, this);
-        actions.add(a);
-        return a;
-    }
-
-    protected final void clearActions() {
-        actions.clear();
-    }
-
-    protected abstract void turn();
-
-    /**
-     * Used to allow an AI to write its state to a file. AI is expected to be able
-     * to recreate itself from this string. Note that order of operations is new AI
-     * -> loadFromStore and the save string should be written as such. Non-final to
-     * allow it to be optional. '#' character is disallowed and will be cleaned if
-     * used.
-     */
     @Override
     public String toString() {
-        return "";
+        return "" + ID + " ";
+    }
+
+    /**
+     * Allows for Player functions to be called by Director thru Player but not other Players
+     *
+     */
+    protected abstract class PlayerHandler {
+        /**
+         * Has the Player take their turn.
+         * @param fleets The current fleets active.
+         * @return The Actions the Player wishes to take.
+         */
+        protected abstract Collection<Action> turn(Fleet[] fleets);
+
+        /**
+         * Tells the Player a new game is starting.
+         * @param planets The planets for the upcoming game.
+         */
+        protected abstract void newGame(Planet[] newMap);
+
+        /**
+         * Tells the Player the current game has ended.
+         * @param winner The Player that won the game. Null if no winner.
+         */
+        protected void endGame(Player winner) {
+        }
     }
 }

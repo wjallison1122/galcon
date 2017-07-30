@@ -1,19 +1,34 @@
 package ais.basicai;
 
 import java.awt.Color;
+import java.util.Collection;
+import java.util.LinkedList;
 
+import galaxy.Action;
+import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
 public class BasicAI extends Player {
+    private Planet[] planets;
 
     public BasicAI() {
         super(Color.BLUE, "James");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
 
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+            }
+        });
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         Planet hitter = null;
         Planet hitted = null;
 
@@ -28,12 +43,8 @@ public class BasicAI extends Player {
         }
 
         if (hitter != null && hitted != null) {
-            addAction(hitter, hitted, (int)(Math.random() * hitter.getNumUnits() / 4));
+            actions.add(makeAction(hitter, hitted, (int)(Math.random() * hitter.getNumUnits() / 4)));
         }
-    }
-
-    @Override
-    protected void newGame() {
-
+        return actions;
     }
 }

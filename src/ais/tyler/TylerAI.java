@@ -1,11 +1,14 @@
 package ais.tyler;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 
@@ -20,16 +23,28 @@ public class TylerAI extends PlayerWithUtils {
     private int minUnits = 1000;
     private int stalemateTimer = 0;
 
+    private Planet[] planets;
+
     public TylerAI() {
         super(new Color(50, 100, 0), "Tyler AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+            }
+        });
     }
 
     public TylerAI(Color c) {
         super(c, "Tyler AI");
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
         if (getOpponentsFleets(fleets, this).size() > 0) {
             opponentMadeMove = true;
         }
@@ -59,12 +74,14 @@ public class TylerAI extends PlayerWithUtils {
             stalemate = true;
         }
 
+        LinkedList<Action> actions = new LinkedList<Action>();
         if ((opponentMadeMove || turnCount > 200) && !stalemate) {
-            firstAI();
+            actions = firstAI(fleets);
         }
 
         turnCount++;
         stalemateTimer++;
+        return actions;
     }
 
     ///////////////////////
@@ -104,7 +121,8 @@ public class TylerAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private void firstAI() {
+    private LinkedList<Action> firstAI(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> otherPlanets = getUnoccupiedPlanets(planets);
         List<Planet> oppPlanets = getOpponentsPlanets(planets, this);
@@ -118,13 +136,13 @@ public class TylerAI extends PlayerWithUtils {
             distSort(myPlanets, p);
             if (getCurrentEventualOwner(p, fleets, this) != PlanetOwner.PLAYER) {
                 int myUnitsEnRoute = getPlayersIncomingFleetCount(p, fleets, this);
-                int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p);
+                int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p, fleets);
                 if (expendableUnits > unitsNeededToCapturePlanet - myUnitsEnRoute) {
                     for (Planet myP : myPlanets) {
                         if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
                             int unitsToSend = Math.min(unitsNeededToCapturePlanet, expendableUnits(myP));
                             if (unitsToSend > 0) {
-                                addAction(myP, p, unitsToSend);
+                                actions.add(makeAction(myP, p, unitsToSend));
                                 expendableUnits -= unitsToSend;
                                 myUnitsEnRoute += unitsToSend;
                             }
@@ -141,13 +159,13 @@ public class TylerAI extends PlayerWithUtils {
             for (Planet p : otherPlanets) {
                 if (p.getNumUnits() < expendableUnits / 4) {
                     int myUnitsEnRoute = getPlayersIncomingFleetCount(p, fleets, this);
-                    int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p);
+                    int unitsNeededToCapturePlanet = unitsNeededToCapturePlanet(p, fleets);
                     if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
                         for (Planet myP : myPlanets) {
                             if (myUnitsEnRoute < unitsNeededToCapturePlanet) {
                                 int unitsToSend = Math.min(unitsNeededToCapturePlanet, expendableUnits(myP));
                                 if (unitsToSend > 0) {
-                                    addAction(myP, p, unitsToSend);
+                                    actions.add(makeAction(myP, p, unitsToSend));
                                     expendableUnits -= unitsToSend;
                                     myUnitsEnRoute += unitsToSend;
                                 }
@@ -157,6 +175,7 @@ public class TylerAI extends PlayerWithUtils {
                 }
             }
         }
+        return actions;
     }
 
     ///////////////////////
@@ -176,7 +195,7 @@ public class TylerAI extends PlayerWithUtils {
     }
 
     // TODO: optimize this method
-    private int unitsNeededToCapturePlanet(Planet p) {
+    private int unitsNeededToCapturePlanet(Planet p, Fleet[] fleets) {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
@@ -200,9 +219,5 @@ public class TylerAI extends PlayerWithUtils {
             }
         }
         return maxDist;
-    }
-
-    @Override
-    protected void newGame() {
     }
 }

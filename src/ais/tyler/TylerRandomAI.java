@@ -1,26 +1,42 @@
 package ais.tyler;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
+import galaxy.Fleet;
 import galaxy.Planet;
 
 public class TylerRandomAI extends PlayerWithUtils {
 
+    private Planet[] planets;
+
     public TylerRandomAI() {
-        super(new Color(50, 100, 0), "Pseudo Random AI");
+        this(new Color(50, 100, 0));
     }
 
     public TylerRandomAI(Color c) {
         super(c, "Pseudo Random AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+            }
+        });
     }
 
-    @Override
-    protected void turn() {
-        pseudoRandomAI();
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        return pseudoRandomAI(fleets);
     }
 
     ///////////////////////
@@ -45,7 +61,8 @@ public class TylerRandomAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private void pseudoRandomAI() {
+    private Collection<Action> pseudoRandomAI(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
@@ -60,10 +77,12 @@ public class TylerRandomAI extends PlayerWithUtils {
                     rand = (int)(Math.random() * 2);
                 }
                 if (otherPlanets.size() > 0) {
-                    addAction(p, otherPlanets.get(index % otherPlanets.size()), 1);
+                    actions.add(makeAction(p, otherPlanets.get(index % otherPlanets.size()), 1));
                 }
             }
         }
+
+        return actions;
     }
 
     // private void randomAI() {
@@ -75,8 +94,4 @@ public class TylerRandomAI extends PlayerWithUtils {
     // }
     // }
     // }
-
-    @Override
-    protected void newGame() {
-    }
 }

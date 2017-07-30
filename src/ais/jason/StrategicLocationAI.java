@@ -2,11 +2,15 @@ package ais.jason;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Coords;
+import galaxy.Fleet;
 import galaxy.Planet;
 
 public class StrategicLocationAI extends PlayerWithUtils {
@@ -31,6 +35,8 @@ public class StrategicLocationAI extends PlayerWithUtils {
     private static final double AGGRESSION = 2.5;
     private static final double AGGRESSION_MULTIPLIER = 100;
     private static final int unitBaseCost = 2;
+
+    private Planet[] planets;
 
     private ArrayList<PlanetUtility> allPlanetInfo;
     // private double averageStrategicValue;
@@ -67,16 +73,28 @@ public class StrategicLocationAI extends PlayerWithUtils {
 
     public StrategicLocationAI(Color c) {
         super(c, "Strategic Location AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+                nextGame(newMap);
+            }
+        });
     }
 
-    public double getBaseValue(PlanetUtility p, Coords averageLocation, double variance) {
+    public double getBaseValue(PlanetUtility p, Coords averageLocation, double variance, Fleet[] fleets) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
                 / (averageLocation.distanceTo(p.planet) + BASE_DISTANCE_FACTOR);
         return (getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0 : AGGRESSION)
                 * Math.pow(distanceFactor, DISTANCE_WEIGHTING) / p.planet.PRODUCTION_TIME / (unitBaseCost + p.units);
     }
 
-    public double getOverallValue(PlanetUtility p, Coords averageLocation, double variance) {
+    public double getOverallValue(PlanetUtility p, Coords averageLocation, double variance, Fleet[] fleets) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
                 / (averageLocation.distanceTo(p.planet) + BASE_DISTANCE_FACTOR);
         double baseValue = (getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0 : AGGRESSION)
@@ -85,7 +103,7 @@ public class StrategicLocationAI extends PlayerWithUtils {
         return baseValue * stratValue;
     }
 
-    public double getAggressiveValue(PlanetUtility p, Coords averageLocation, double variance) {
+    public double getAggressiveValue(PlanetUtility p, Coords averageLocation, double variance, Fleet[] fleets) {
         double distanceFactor = (variance + BASE_DISTANCE_FACTOR)
                 / (averageLocation.distanceTo(p.planet) + BASE_DISTANCE_FACTOR);
         double baseValue = (getCurrentEventualOwner(p.planet, fleets, this) == PlanetOwner.NOBODY ? 1.0
@@ -113,31 +131,31 @@ public class StrategicLocationAI extends PlayerWithUtils {
     }
 
     public ArrayList<PlanetUtility> sortByBaseValue(List<PlanetUtility> planets, Coords averageLocation,
-            double variance) {
+            double variance, Fleet[] fleets) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
-            return Double.compare(getBaseValue(b, averageLocation, variance),
-                    getBaseValue(a, averageLocation, variance));
+            return Double.compare(getBaseValue(b, averageLocation, variance, fleets),
+                    getBaseValue(a, averageLocation, variance, fleets));
         });
         return rtn;
     }
 
     public ArrayList<PlanetUtility> sortByOverallValue(List<PlanetUtility> planets, Coords averageLocation,
-            double variance) {
+            double variance, Fleet[] fleets) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
-            return Double.compare(getOverallValue(b, averageLocation, variance),
-                    getOverallValue(a, averageLocation, variance));
+            return Double.compare(getOverallValue(b, averageLocation, variance, fleets),
+                    getOverallValue(a, averageLocation, variance, fleets));
         });
         return rtn;
     }
 
     public ArrayList<PlanetUtility> sortByAggressiveValue(List<PlanetUtility> planets, Coords averageLocation,
-            double variance) {
+            double variance, Fleet[] fleets) {
         ArrayList<PlanetUtility> rtn = new ArrayList<PlanetUtility>(planets);
         Collections.sort(rtn, (a, b) -> {
-            return Double.compare(getAggressiveValue(b, averageLocation, variance),
-                    getAggressiveValue(a, averageLocation, variance));
+            return Double.compare(getAggressiveValue(b, averageLocation, variance, fleets),
+                    getAggressiveValue(a, averageLocation, variance, fleets));
         });
         return rtn;
     }
@@ -160,8 +178,8 @@ public class StrategicLocationAI extends PlayerWithUtils {
         return rtn;
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         // List<Planet> notMyPlanets =
         // getPlanetsNotOwnedByPlayer(planets,
@@ -255,7 +273,7 @@ public class StrategicLocationAI extends PlayerWithUtils {
                         other.units -= willSend;
                         other.extraUnits -= willSend;
                         p.minBaseConquerCost -= willSend;
-                        addAction(other.planet, p.planet, willSend);
+                        actions.add(makeAction(other.planet, p.planet, willSend));
                     }
                 }
             }
@@ -277,14 +295,14 @@ public class StrategicLocationAI extends PlayerWithUtils {
                 // AGGRESSIVE_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
                 // //AGGRESSIVE_SPARE_UNIT_RATIO;
-                targets = sortByAggressiveValue(allPlanetInfo, averageLocation, variance);
+                targets = sortByAggressiveValue(allPlanetInfo, averageLocation, variance, fleets);
                 break;
             case AGGRESSIVE:
                 mySpareUnits *= AGGRESSIVE_SPARE_UNIT_RATIO;
                 // mySpareUnits = (int) Math.max(mySpareUnits *
                 // AGGRESSIVE_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
-                targets = sortByOverallValue(allPlanetInfo, averageLocation, variance);
+                targets = sortByOverallValue(allPlanetInfo, averageLocation, variance, fleets);
                 break;
             case DEFENSIVE:
                 mySpareUnits *= DEFENSIVE_SPARE_UNIT_RATIO;
@@ -298,18 +316,18 @@ public class StrategicLocationAI extends PlayerWithUtils {
                 // mySpareUnits = (int) Math.min(mySpareUnits *
                 // AGGRESSIVE_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
-                targets = sortByOverallValue(allPlanetInfo, averageLocation, variance);
+                targets = sortByOverallValue(allPlanetInfo, averageLocation, variance, fleets);
                 break;
             case NORMAL:
                 mySpareUnits *= NORMAL_SPARE_UNIT_RATIO;
                 // mySpareUnits = (int) Math.min(mySpareUnits *
                 // NORMAL_SPARE_UNIT_RATIO,
                 // mySpareUnits * currentUnitRatio);
-                targets = sortByOverallValue(allPlanetInfo, averageLocation, variance);
+                targets = sortByOverallValue(allPlanetInfo, averageLocation, variance, fleets);
                 break;
             default:
                 System.out.println("Error - in default of switch");
-                return;
+                return null;
         }
 
         // System.out.println("spareUnits: " + mySpareUnits);
@@ -344,7 +362,7 @@ public class StrategicLocationAI extends PlayerWithUtils {
                         if (willSend == temp.minBaseConquerCost) {
                             targets.remove(0);
                         }
-                        addAction(current.planet, temp.planet, willSend);
+                        actions.add(makeAction(current.planet, temp.planet, willSend));
                     }
                 } else {
                     targets.remove(0);
@@ -353,18 +371,18 @@ public class StrategicLocationAI extends PlayerWithUtils {
             }
         }
 
+        return actions;
     }
 
-    @Override
-    protected void newGame() {
+    protected void nextGame(Planet[] newMap) {
         allPlanetInfo = new ArrayList<PlanetUtility>();
 
-        for (Planet p : planets) {
+        for (Planet p : newMap) {
             PlanetUtility newPU = new PlanetUtility();
             newPU.planet = p;
 
             // Add distance to each planet (if this one will just add 0)
-            for (Planet other : planets) {
+            for (Planet other : newMap) {
                 newPU.baseStrategicValue += p.distanceTo(other);
             }
 

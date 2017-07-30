@@ -2,8 +2,11 @@ package ais.cody;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 
@@ -12,11 +15,24 @@ public class ValueCapture extends PlayerWithUtils {
     private static final double DISTANCE_COEFFICIENT = .3;
     private double health;
     private Vector heart;
-    private int turn;
+    private int turn = 0;
+    Color myColor = Color.RED;
+
+    private Planet[] planets;
 
     public ValueCapture() {
-        super(new Color(255, 255, 255), "ValueCapture");
-        turn = 0;
+        this(new Color(255, 255, 255));
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+            }
+        });
     }
 
     public ValueCapture(Color c) {
@@ -46,10 +62,10 @@ public class ValueCapture extends PlayerWithUtils {
         heart = Vector.scale(heart, 1. / health);
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        LinkedList<Action> actions = new LinkedList<Action>();
         if (turn++ < 10) {
-            return;
+            return actions;
         }
 
         ArrayList<Planet> myPlanets = new ArrayList<Planet>(getPlanetsOwnedByPlayer(planets, this));
@@ -75,7 +91,7 @@ public class ValueCapture extends PlayerWithUtils {
         // find the best planet to send units to
         least = Double.MAX_VALUE;
         for (Planet to : planets) {
-            cost = costOfPlanet(to);
+            cost = costOfPlanet(to, fleets);
             weightedCost = cost;
             distance = to.distanceTo(Vector.getCoords(heart));
             weightedCost += DISTANCE_COEFFICIENT * distance;
@@ -88,9 +104,9 @@ public class ValueCapture extends PlayerWithUtils {
 
         // determine who should send units
         if (target != null && least != Double.MAX_VALUE) {
-            targetCost = costOfPlanet(target);
+            targetCost = costOfPlanet(target, fleets);
             for (Planet from : myPlanets) {
-                if (planetStrength(from) < -1) {
+                if (planetStrength(from, fleets) < -1) {
                     attackers.add(from);
                 }
             }
@@ -102,7 +118,7 @@ public class ValueCapture extends PlayerWithUtils {
                     canAttack = false;
                     i = 0;
                     for (Planet from : attackers) {
-                        strength = planetStrength(from);
+                        strength = planetStrength(from, fleets);
                         if (-strength - unitsToSend[i] > 2) {
                             unitsToSend[i]++;
                             totalToSend++;
@@ -116,7 +132,7 @@ public class ValueCapture extends PlayerWithUtils {
                     i = 0;
                     for (Planet from : attackers) {
                         if (unitsToSend[i] > 0) {
-                            addAction(from, target, unitsToSend[i]);
+                            actions.add(makeAction(from, target, unitsToSend[i]));
                         }
                         i++;
                     }
@@ -124,29 +140,29 @@ public class ValueCapture extends PlayerWithUtils {
             }
         }
 
+        return actions;
     }
 
-    private double costOfPlanet(Planet target) {
+    private double costOfPlanet(Planet target, Fleet[] fleets) {
         double cost = Double.MAX_VALUE;
         double timeCost;
 
         timeCost = (target.getProductionFrequency() * (target.distanceTo(Vector.getCoords(heart)) / FLEET_SPEED)) + 1;
 
         if (target.ownedBy(this)) {
-            cost = (planetStrength(target));
+            cost = planetStrength(target, fleets);
         } else if (target.ownedBy(null)) {
-            cost = ((double)planetStrength(target) + 1);
+            cost = (double)planetStrength(target, fleets) + 1;
         } else {
-            cost = ((double)planetStrength(target) + 1) + timeCost;
+            cost = (double)planetStrength(target, fleets) + 1 + timeCost;
         }
 
         return cost;
     }
 
-    private int planetStrength(Planet planet) {
+    private int planetStrength(Planet planet, Fleet[] fleets) {
         int myStrength;
         int enemyStrength;
-        Fleet[] allFleets = fleets;
 
         if (planet.ownedBy(this)) {
             myStrength = planet.getNumUnits();
@@ -156,7 +172,7 @@ public class ValueCapture extends PlayerWithUtils {
             enemyStrength = planet.getNumUnits();
         }
 
-        for (Fleet fleet : allFleets) {
+        for (Fleet fleet : fleets) {
             if (fleet.DESTINATION.equals(planet)) {
                 if (fleet.ownedBy(this)) {
                     myStrength += fleet.getNumUnits();
@@ -167,10 +183,5 @@ public class ValueCapture extends PlayerWithUtils {
         }
 
         return enemyStrength - myStrength;
-    }
-
-    @Override
-    protected void newGame() {
-
     }
 }

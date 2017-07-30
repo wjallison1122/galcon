@@ -1,10 +1,14 @@
 package ais.jono;
 
 import java.awt.Color;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Coords;
+import galaxy.Fleet;
 import galaxy.Planet;
 
 public class DistanceValueDefenderAI extends PlayerWithUtils {
@@ -23,14 +27,29 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
     private static final double BASE_DISTANCE_FACTOR = 10;
     private static final double DISTANCE_WEIGHTING = 1;
     private static final double AGGRESSION = 0.8;
+
+    private Planet[] planets;
+
+    LinkedList<Action> actions = new LinkedList<Action>();
     // */
 
     public DistanceValueDefenderAI() {
-        super(new Color(40, 0, 0), "Distance Value Defender AI");
+        this(new Color(40, 0, 0));
     }
 
     public DistanceValueDefenderAI(Color c) {
         super(c, "Distance Value Defender AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+            }
+        });
     }
 
     public double getValue(Planet p, Coords averageLocation, double variance) {
@@ -39,11 +58,11 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
                 / p.PRODUCTION_TIME / (100 + p.getNumUnits());
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         if (myPlanets.size() == 0) {
-            return;
+            return actions;
         }
         List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
@@ -75,7 +94,7 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
                 }
             }
             if (target == null) {
-                return;
+                return actions;
             }
             needed = target.getNumUnits() + 20;
         }
@@ -87,22 +106,19 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
                         - (defending ? MIN_DEFENSIVE_DEFENSE : MIN_AGGRESSIVE_DEFENSE);
 
                 if (available + contribution > needed) {
-                    addAction(p, target, needed - available);
+                    actions.add(makeAction(p, target, needed - available));
                     available += contribution;
                     break;
                 }
                 available += contribution;
-                addAction(p, target, contribution);
+                actions.add(makeAction(p, target, contribution));
             }
         }
 
         if (available < needed) {
-            clearActions();
+            actions.clear();
         }
-    }
 
-    @Override
-    protected void newGame() {
-
+        return actions;
     }
 }

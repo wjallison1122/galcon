@@ -2,8 +2,10 @@ package ais.jono;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +14,7 @@ import ais.PlayerWithUtils;
 import ais.alphabeta.AlphaBeta;
 import ais.alphabeta.Move;
 import ais.alphabeta.Position;
+import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
@@ -280,22 +283,35 @@ public class SearchAI extends PlayerWithUtils {
         this(Color.orange);
     }
 
+    private Planet[] planets;
+
     public SearchAI(Color c) {
         super(c, "Search AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+                nextGame();
+            }
+        });
     }
 
     private static int analyzeTickTime = 0;
     private static int count = 0;
 
-    @Override
-    protected void newGame() {
+    protected void nextGame() {
         analyzeTickTime = 0;
         count = 0;
         knownFleets = new HashSet<>();
     }
 
-    @Override
-    protected void turn() {
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        LinkedList<Action> acts = new LinkedList<Action>();
         for (Fleet f : fleets) {
             if (!knownFleets.contains(f.ID)) {
                 knownFleets.add(f.ID);
@@ -337,8 +353,10 @@ public class SearchAI extends PlayerWithUtils {
             System.out.println("Analysis Complete");
             if (fa != null) {
                 analyzeTickTime = 0;
-                addAction(fa.source, planets[fa.target], fa.count);
+                acts.add(makeAction(fa.source, planets[fa.target], fa.count));
             }
         }
+
+        return acts;
     }
 }

@@ -69,14 +69,14 @@ final class Director extends GameSettings {
             numUnitsInPlanets.put(p, galaxy.numUnitsInPlanets(p));
         }
 
-        for (Player p : active) {
-            p.doTurn(galaxy.getFleets());
-        }
+        LinkedList<Action> actions = new LinkedList<Action>();
 
         for (Player p : active) {
-            for (Action a : p.getActions()) {
-                galaxy.addFleet(a.doAction());
-            }
+            actions.addAll(p.turn(galaxy.getFleets()));
+        }
+
+        for (Action a : actions) {
+            galaxy.addFleet(a.doAction());
         }
 
         galaxy.update();
@@ -117,7 +117,7 @@ final class Director extends GameSettings {
         galaxy.nextGame(map);
 
         for (Player p : active) {
-            p.nextGame(galaxy.getPlanets());
+            p.newGame(galaxy.getPlanets());
         }
 
         if (usingVisualizer()) {

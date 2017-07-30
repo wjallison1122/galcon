@@ -2,16 +2,20 @@ package ais.tyler;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import ais.PlayerWithUtils;
+import galaxy.Action;
 import galaxy.Coords;
+import galaxy.Fleet;
 import galaxy.Planet;
 
 public class TylerDefenderAI extends PlayerWithUtils {
@@ -38,24 +42,41 @@ public class TylerDefenderAI extends PlayerWithUtils {
 
     private boolean firstTurn = true;
 
+    private Planet[] planets;
+
+    LinkedList<Action> actions = new LinkedList<Action>();
+
     public TylerDefenderAI(Color c) {
         super(c, "Tyler Defender AI");
+        setHandler(new PlayerHandler() {
+            @Override
+            public Collection<Action> turn(Fleet[] fleets) {
+                return makeTurn(fleets);
+            }
+
+            @Override
+            public void newGame(Planet[] newMap) {
+                planets = newMap;
+                nextGame();
+            }
+        });
     }
 
     public TylerDefenderAI() {
-        super(new Color(135, 206, 250), "Tyler Defender AI");
+        this(new Color(135, 206, 250));
     }
 
-    @Override
-    protected void turn() {
-        updateVariables();
+    protected Collection<Action> makeTurn(Fleet[] fleets) {
+        actions = new LinkedList<Action>();
+        updateVariables(fleets);
         if (firstTurn) {
             firstTurn = false;
             calculateConstants();
             sendInitialFleets();
         }
 
-        defenderAI();
+        defenderAI(fleets);
+        return actions;
     }
 
     private void calculateConstants() {
@@ -80,12 +101,12 @@ public class TylerDefenderAI extends PlayerWithUtils {
     private void sendInitialFleets() {
         for (Planet p : unownedPlanets) {
             if (p.getNumUnits() <= 4 && p.distanceTo(myStartingPlanet) < p.distanceTo(enemyStartingPlanet)) {
-                addAction(myStartingPlanet, p, p.getNumUnits() + 1);
+                actions.add(makeAction(myStartingPlanet, p, p.getNumUnits() + 1));
             }
         }
     }
 
-    private void updateVariables() {
+    private void updateVariables(Fleet[] fleets) {
         myPlanets = new ArrayList<>();
         unownedPlanets = new ArrayList<>();
         enemyPlanets = new ArrayList<>();
@@ -171,7 +192,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private void defenderAI() {
+    private void defenderAI(Fleet[] fleets) {
         if (myPlanets.size() == 0) {
             return;
         }
@@ -192,7 +213,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
                 if (totalExpendableUnits > unitsOnPlanet && expendableUnits > 0 && myUnitsIncoming <= unitsOnPlanet
                         && !getCurrentEventualOwner(p, fleets, this).equals(PlanetOwner.PLAYER)) {
                     int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
-                    addAction(myPlanet, p, unitsToSend);
+                    actions.add(makeAction(myPlanet, p, unitsToSend));
                     // Update unit counts
                     myUnitsApproaching.put(p, myUnitsIncoming + unitsToSend);
                     myUnitsSent.put(myPlanet, unitsSentThisTurn + unitsToSend);
@@ -218,7 +239,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
                     if (totalExpendableUnits > unitsOnPlanet && unitsOnPlanet < myUnitCount / 4 && expendableUnits > 0
                             && myUnitsIncoming <= unitsOnPlanet) {
                         int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
-                        addAction(myPlanet, p, unitsToSend);
+                        actions.add(makeAction(myPlanet, p, unitsToSend));
                         // Update unit counts
                         myUnitsApproaching.put(p, myUnitsIncoming + unitsToSend);
                         myUnitsSent.put(myPlanet, unitsSentThisTurn + unitsToSend);
@@ -247,7 +268,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
                                 && expendableUnits > 0 && myUnitsIncoming < unitsOnPlanet) {
                             int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
                             if (unitsToSend < 50 - totalUnitsSentThisTurn) {
-                                addAction(myPlanet, p, unitsToSend);
+                                actions.add(makeAction(myPlanet, p, unitsToSend));
                                 // Update unit counts
                                 myUnitsApproaching.put(p, myUnitsIncoming + unitsToSend);
                                 myUnitsSent.put(myPlanet, unitsSentThisTurn + unitsToSend);
@@ -311,8 +332,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
         }
     }
 
-    @Override
-    protected void newGame() {
+    protected void nextGame() {
         defendPlanets = new TreeSet<>((Planet p1, Planet p2) -> p1.PRODUCTION_TIME - p2.PRODUCTION_TIME);
         firstTurn = true;
     }
