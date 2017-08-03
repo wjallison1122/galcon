@@ -1,6 +1,6 @@
 package galaxy;
 
-public class Coords extends GameSettings {
+public class Coords {
     private double[] coords;
 
     public Coords(double... coords) {
@@ -60,8 +60,8 @@ public class Coords extends GameSettings {
     public String toString() {
         String str = "";
         for (double d : coords) {
-            str += ", " + d;
+            str += d + ", ";
         }
-        return str;
+        return str.substring(0, str.length() - 2);
     }
 }

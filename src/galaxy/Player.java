@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public abstract class Player extends GameSettings {
+public abstract class Player {
     public final Color COLOR;
     public final String NAME;
     private static int currentId = 0;

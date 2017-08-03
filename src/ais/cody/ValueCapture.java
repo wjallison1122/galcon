@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import ais.PlayerWithUtils;
 import galaxy.Action;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 
 public class ValueCapture extends PlayerWithUtils {
@@ -147,7 +148,8 @@ public class ValueCapture extends PlayerWithUtils {
         double cost = Double.MAX_VALUE;
         double timeCost;
 
-        timeCost = (target.getProductionFrequency() * (target.distanceTo(Vector.getCoords(heart)) / FLEET_SPEED)) + 1;
+        timeCost = (target.getProductionFrequency()
+                * (target.distanceTo(Vector.getCoords(heart)) / GameSettings.FLEET_SPEED)) + 1;
 
         if (target.ownedBy(this)) {
             cost = planetStrength(target, fleets);

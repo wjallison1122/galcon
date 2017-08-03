@@ -3,7 +3,6 @@ package mapmakers;
 import java.util.LinkedList;
 
 import galaxy.MapMaker;
-import galaxy.Planet;
 import galaxy.Player;
 
 public class RandomMapMaker extends MapMaker {
@@ -29,7 +28,7 @@ public class RandomMapMaker extends MapMaker {
     }
 
     private void generateStartingPlanet(Player owner) {
-        makePlanet(owner, 100, Planet.MAX_RADIUS, Planet.MIN_PRODUCE_TIME, makeLocation(Planet.MAX_RADIUS));
+        makePlanet(owner, 100, MAX_RADIUS, MIN_PRODUCE_TIME, makeLocation(MAX_RADIUS));
     }
 
     private double[] makeLocation(int radius) {

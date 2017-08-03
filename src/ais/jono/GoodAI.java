@@ -19,6 +19,7 @@ import ais.PlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 import galaxy.Player;
 
@@ -181,6 +182,10 @@ public class GoodAI extends PlayerWithUtils {
 
     private Planet[] planets;
 
+    public GoodAI() {
+        this(true);
+    }
+
     public GoodAI(boolean learning) {
         this(learning, Color.ORANGE);
     }
@@ -333,8 +338,9 @@ public class GoodAI extends PlayerWithUtils {
 
         if (take != null) {
             int toSendToTake = 0;
-            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / Fleet.FLEET_SPEED),
-                    toSendToTake, fleets)) {
+            while (!isEventualOwner(take,
+                    (int)Math.ceil(myPlanets.get(0).distanceTo(take) / GameSettings.FLEET_SPEED), toSendToTake,
+                    fleets)) {
                 toSendToTake++;
             }
             if (toSendToTake > 0) {
@@ -344,8 +350,9 @@ public class GoodAI extends PlayerWithUtils {
 
         for (Fleet fleet : getOpponentsFleets(fleets, this)) {
             if (retake.contains(fleet.DESTINATION)) {
-                int distance = (int)Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / Fleet.FLEET_SPEED);
-                int fleetDistance = (int)Math.ceil(fleet.distanceLeft() / Fleet.FLEET_SPEED);
+                int distance = (int)Math
+                        .ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / GameSettings.FLEET_SPEED);
+                int fleetDistance = fleet.ticsLeft();
                 if (distance > fleetDistance) {
                     int toSend = 0;
                     while (!isEventualOwner(fleet.DESTINATION, distance, toSend, fleets)) {
@@ -384,7 +391,7 @@ public class GoodAI extends PlayerWithUtils {
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
                 .collect(Collectors.toList())) {
             PlanetAction action = new PlanetAction();
-            action.time = (int)Math.ceil(f.distanceLeft() / Fleet.FLEET_SPEED);
+            action.time = f.ticsLeft();
             action.amount = f.getNumUnits();
             if (f.ownedBy(this)) {
                 action.owner = PlanetOwner.PLAYER;
@@ -440,15 +447,15 @@ public class GoodAI extends PlayerWithUtils {
         Planet me = myPlanets.get(0);
         Planet them = theirPlanets.get(0);
 
-        int distance = (int)Math.ceil(me.distanceTo(them) / Fleet.FLEET_SPEED);
+        int distance = (int)Math.ceil(me.distanceTo(them) / GameSettings.FLEET_SPEED);
         int distanceProduction = distance / me.PRODUCTION_TIME;
 
         Planet best = null;
         double bestValue = Double.MIN_VALUE;
 
         for (Planet p : unownedPlanets) {
-            int toMe = (int)Math.ceil(p.distanceTo(me) / Fleet.FLEET_SPEED);
-            int toThem = (int)Math.ceil(p.distanceTo(them) / Fleet.FLEET_SPEED);
+            int toMe = (int)Math.ceil(p.distanceTo(me) / GameSettings.FLEET_SPEED);
+            int toThem = (int)Math.ceil(p.distanceTo(them) / GameSettings.FLEET_SPEED);
             if (toMe <= toThem) {
                 int takenContribution = 0;
                 if (distance - toMe * 2 > 0) {
@@ -468,8 +475,8 @@ public class GoodAI extends PlayerWithUtils {
         retake = new ArrayList<>(unownedPlanets);
 
         for (Planet p : unownedPlanets) {
-            int toMe = (int)Math.ceil(p.distanceTo(me) / Fleet.FLEET_SPEED);
-            int toThem = (int)Math.ceil(p.distanceTo(them) / Fleet.FLEET_SPEED);
+            int toMe = (int)Math.ceil(p.distanceTo(me) / GameSettings.FLEET_SPEED);
+            int toThem = (int)Math.ceil(p.distanceTo(them) / GameSettings.FLEET_SPEED);
             if (toMe >= toThem) {
                 int takenContribution = 0;
                 if (distance - toThem * 2 > 0) {
@@ -502,7 +509,7 @@ public class GoodAI extends PlayerWithUtils {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
         // List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
-        List<Fleet> myFleets = getMyFleets(fleets, this);
+        List<Fleet> myFleets = getFleetsOfPlayer(fleets, this);
         List<Fleet> theirFleets = getOpponentsFleets(fleets, this);
 
         /*

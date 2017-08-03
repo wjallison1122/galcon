@@ -15,8 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public abstract class Visualizer extends GameSettings
-        implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public abstract class Visualizer implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
     private BufferedImage bufferImage;
     private Planet[] planets;
     private LinkedList<Player> players;
@@ -36,7 +35,7 @@ public abstract class Visualizer extends GameSettings
     }
 
     protected Visualizer(int winWidth, int winHeight, int dimensions) {
-        if (dimensions != DIMENSIONS.dimensions()) {
+        if (dimensions != GameSettings.DIMENSIONS.dimensions()) {
             throw new IllegalArgumentException("Visualizer does not match galaxy dimension space.");
         }
 
@@ -78,11 +77,14 @@ public abstract class Visualizer extends GameSettings
 
     protected abstract void newGame();
 
-    final void update(Fleet[] fleets) {
+    void update(Fleet[] fleets) {
         BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = image.getGraphics();
+        draw(planets, fleets, image.getGraphics());
+        bufferImage = image;
+        repaint();
+    }
 
-        // Switch to being drawAllUnits(planets, fleets)
+    protected void draw(Planet[] planets, Fleet[] fleets, Graphics g) {
         drawBackground(g);
         drawPlanets(planets, g);
         drawFleets(fleets, g);
@@ -91,12 +93,8 @@ public abstract class Visualizer extends GameSettings
         if (mouseOverInfo != null) {
             mouseOverInfo.draw(g);
         }
-
-        bufferImage = image;
-        repaint();
     }
 
-    // Why put this separate but not final?
     protected void repaint() {
         frame.repaint();
     }
@@ -105,31 +103,36 @@ public abstract class Visualizer extends GameSettings
         panel.requestFocus(true);
     }
 
-    protected final boolean checkRecentlyConquered(Planet p) {
+    protected boolean checkRecentlyConquered(Planet p) {
         return p.checkRecentlyConquered();
     }
 
-    protected final int numUnitsOwnedBy(Player p) {
+    protected int numUnitsOwnedBy(Player p) {
         return director.numUnitsOwnedBy(p);
     }
 
-    protected final int numUnitsInPlanets(Player p) {
+    protected int numUnitsInPlanets(Player p) {
         return director.numUnitsInPlanets(p);
     }
 
-    protected final int numUnitsInFleets(Player p) {
+    protected int numUnitsInFleets(Player p) {
         return director.numUnitsInFleets(p);
     }
 
-    protected abstract void drawBackground(Graphics g);
+    protected void drawBackground(Graphics g) {
+    }
 
-    protected abstract void drawPlanets(Planet[] planets, Graphics g);
+    protected void drawPlanets(Planet[] planets, Graphics g) {
+    }
 
-    protected abstract void drawFleets(Fleet[] fleets, Graphics g);
+    protected void drawFleets(Fleet[] fleets, Graphics g) {
+    }
 
-    protected abstract void drawPlayerInfo(LinkedList<Player> players, Graphics g);
+    protected void drawPlayerInfo(LinkedList<Player> players, Graphics g) {
+    }
 
-    protected abstract void drawOther(Graphics g);
+    protected void drawOther(Graphics g) {
+    }
 
     protected void keystroke(KeyEvent e) {
     }

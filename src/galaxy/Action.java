@@ -1,6 +1,6 @@
 package galaxy;
 
-public class Action extends GameSettings {
+public class Action {
     private final Planet START;
     private final Planet TARGET;
     private final int NUM_UNITS;

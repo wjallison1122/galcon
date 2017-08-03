@@ -321,12 +321,25 @@ public abstract class PlayerWithUtils extends Player {
         return rtn;
     }
 
-    public List<Fleet> getMyFleets(Fleet[] fleets, Player player) {
+    public List<Fleet> getFleetsOfPlayer(Fleet[] fleets, Player player) {
         return Arrays.asList(fleets).stream().filter((fleet) -> fleet.ownedBy(player)).collect(Collectors.toList());
     }
 
     public List<Fleet> getOpponentsFleets(Fleet[] fleets, Player player) {
         return Arrays.asList(fleets).stream().filter((fleet) -> !fleet.ownedBy(player)).collect(Collectors.toList());
+    }
+
+    public int distOfFarthestFleet(List<Fleet> fleets, Planet p) {
+        int maxDist = 0;
+        for (Fleet f : fleets) {
+            if (f.targeting(p)) {
+                int dist = f.ticsLeft();
+                if (dist > maxDist) {
+                    maxDist = dist;
+                }
+            }
+        }
+        return maxDist;
     }
 
     public int getMyUnitCount(Fleet[] fleets, Planet[] planets, Player player) {
@@ -371,8 +384,8 @@ public abstract class PlayerWithUtils extends Player {
         int unitCount = p.getNumUnits();
         int currentTime = 0;
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
-                .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft())).collect(Collectors.toList())) {
-            int passingTime = (int)Math.ceil(f.distanceLeft() / FLEET_SPEED) - currentTime;
+                .sorted((a, b) -> Double.compare(a.ticsLeft(), b.ticsLeft())).collect(Collectors.toList())) {
+            int passingTime = f.ticsLeft() - currentTime;
             if (current != PlanetOwner.NOBODY) {
                 updateCount += passingTime;
                 int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;
@@ -415,8 +428,8 @@ public abstract class PlayerWithUtils extends Player {
         int unitCount = p.getNumUnits();
         int currentTime = 0;
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
-                .sorted((a, b) -> Double.compare(a.distanceLeft(), b.distanceLeft())).collect(Collectors.toList())) {
-            int passingTime = (int)Math.ceil(f.distanceLeft() / FLEET_SPEED) - currentTime;
+                .sorted((a, b) -> Double.compare(a.ticsLeft(), b.ticsLeft())).collect(Collectors.toList())) {
+            int passingTime = f.ticsLeft() - currentTime;
             if (current != PlanetOwner.NOBODY) {
                 updateCount += passingTime;
                 int unitsToAdd = (updateCount + p.PRODUCTION_TIME - 1) / p.PRODUCTION_TIME - previousUnits;

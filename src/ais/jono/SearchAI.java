@@ -16,6 +16,7 @@ import ais.alphabeta.Move;
 import ais.alphabeta.Position;
 import galaxy.Action;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 import galaxy.Player;
 
@@ -78,20 +79,20 @@ public class SearchAI extends PlayerWithUtils {
                                 && !actions.stream().anyMatch(fa -> fa != null && fa.target == finali)) {
                             if (p.units > planets.get(i).units + 1) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, planets.get(i).units + 1,
-                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / GameSettings.FLEET_SPEED)));
                             }
                         } else if (!p.equals(planets.get(i))) {
                             if (p.units > 0) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, 1,
-                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / GameSettings.FLEET_SPEED)));
                             }
                             if (p.units > 1) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units,
-                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / GameSettings.FLEET_SPEED)));
                             }
                             if (p.units > 40) {
                                 potentialMoves.add(new FutureAction(p.base, i, p.owner, p.units / 2,
-                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / FLEET_SPEED)));
+                                        (int)Math.ceil(p.distanceTo(planets.get(i)) / GameSettings.FLEET_SPEED)));
                             }
                         }
                     }
@@ -225,7 +226,7 @@ public class SearchAI extends PlayerWithUtils {
 
         public FutureAction(Fleet f, Player player, List<SearchPlanet> planets) {
             source = null;
-            time = (int)Math.ceil((f.distanceLeft()) / FLEET_SPEED);
+            time = f.ticsLeft();
             count = f.getNumUnits();
             if (f.ownedBy(player)) {
                 owner = PlanetOwner.PLAYER;

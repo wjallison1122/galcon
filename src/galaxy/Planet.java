@@ -1,6 +1,6 @@
 package galaxy;
 
-public final class Planet extends Unit {
+public class Planet extends Unit {
 
     public final int RADIUS, PRODUCTION_TIME;
     private int lifespan = 0;
@@ -51,9 +51,7 @@ public final class Planet extends Unit {
      * @return Whether this planet had changed hands since last checked
      */
     boolean checkRecentlyConquered() {
-        boolean recent = recentlyConquered;
-        recentlyConquered = false;
-        return recent;
+        return recentlyConquered && !(recentlyConquered = false);
     }
 
     Fleet sendFleet(Planet target, int numSent) {

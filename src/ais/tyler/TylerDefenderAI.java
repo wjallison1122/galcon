@@ -16,6 +16,7 @@ import ais.PlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 
 public class TylerDefenderAI extends PlayerWithUtils {
@@ -308,7 +309,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
         if (dest.isNeutral()) {
             return dest.getNumUnits();
         } else {
-            double turns = (src.distanceTo(dest) / FLEET_SPEED);
+            double turns = src.distanceTo(dest) / GameSettings.FLEET_SPEED;
             int updateCount = dest.getLifespan() % dest.PRODUCTION_TIME;
             int unitsProduced = (int)((turns + updateCount) / dest.PRODUCTION_TIME);
             if (updateCount == 0) {

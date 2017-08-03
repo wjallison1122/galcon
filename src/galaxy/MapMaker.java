@@ -4,16 +4,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public abstract class MapMaker extends GameSettings {
+public abstract class MapMaker {
+    protected final int NUM_PLANETS = GameSettings.NUM_PLANETS, MAX_RADIUS = GameSettings.MAX_RADIUS,
+            MIN_RADIUS = GameSettings.MIN_RADIUS, MAX_NEUTRAL_UNITS = GameSettings.MAX_NEUTRAL_UNITS,
+            MIN_PRODUCE_TIME = GameSettings.MIN_PRODUCE_TIME, MAX_PRODUCE_TIME = GameSettings.MAX_PRODUCE_TIME;
+    protected final Coords DIMENSIONS = GameSettings.DIMENSIONS;
+
     private PlanetMaker[] planets = new PlanetMaker[NUM_PLANETS];
     private HashMap<Player, LinkedList<PlanetMaker>> startingPlanets = new HashMap<Player, LinkedList<PlanetMaker>>();
     private int pi;
     private boolean hasReversed = false;
 
     protected abstract void makeMap(LinkedList<Player> active);
-    
+
     protected final PlanetMaker makePlanet(Player owner, int numUnits, int radius, int prodTime, Coords coords) {
-    	PlanetMaker p = new PlanetMaker(owner, numUnits, radius, prodTime, coords);
+        PlanetMaker p = new PlanetMaker(owner, numUnits, radius, prodTime, coords);
         planets[pi++] = p;
         if (owner != null) {
             if (startingPlanets.containsKey(owner)) {
@@ -108,7 +113,7 @@ public abstract class MapMaker extends GameSettings {
         int prodTime;
 
         PlanetMaker(Player owner, int numUnits, int radius, int prodTime, Coords coords) {
-        	super(owner, numUnits, coords);
+            super(owner, numUnits, coords);
             RADIUS = radius;
             this.prodTime = prodTime;
         }

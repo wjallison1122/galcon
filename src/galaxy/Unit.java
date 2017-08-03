@@ -6,10 +6,8 @@ public abstract class Unit extends Coords {
     Player owner;
     int numUnits;
 
-    // TODO add game ID
     private static int id = 0;
     public final int ID = id++;
-    public Color debugColor; // Where is this used?
 
     Unit(Player owner, int numUnits, Coords coords) {
         super(coords);
@@ -29,7 +27,7 @@ public abstract class Unit extends Coords {
     }
 
     public final Color getColor() {
-        return debugMode && debugColor != null ? debugColor : (owner == null ? Color.GRAY : owner.COLOR);
+        return owner == null ? Color.GRAY : owner.COLOR;
     }
 
     public final int getNumUnits() {

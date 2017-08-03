@@ -14,6 +14,7 @@ import ais.PlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 
 public class ContestPlanetsAI extends PlayerWithUtils {
@@ -146,7 +147,8 @@ public class ContestPlanetsAI extends PlayerWithUtils {
 
         if (take != null) {
             int toSendToTake = 0;
-            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / FLEET_SPEED), toSendToTake,
+            while (!isEventualOwner(take,
+                    (int)Math.ceil(myPlanets.get(0).distanceTo(take) / GameSettings.FLEET_SPEED), toSendToTake,
                     fleets)) {
                 toSendToTake++;
             }
@@ -157,8 +159,9 @@ public class ContestPlanetsAI extends PlayerWithUtils {
 
         for (Fleet fleet : getOpponentsFleets(fleets, this)) {
             if (retake.contains(fleet.DESTINATION)) {
-                int distance = (int)Math.ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / FLEET_SPEED);
-                int fleetDistance = (int)Math.ceil(fleet.distanceLeft() / FLEET_SPEED);
+                int distance = (int)Math
+                        .ceil(myPlanets.get(0).distanceTo(fleet.DESTINATION) / GameSettings.FLEET_SPEED);
+                int fleetDistance = fleet.ticsLeft();
                 if (distance > fleetDistance) {
                     int toSend = 0;
                     while (!isEventualOwner(fleet.DESTINATION, distance, toSend, fleets)) {
@@ -197,7 +200,7 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
                 .collect(Collectors.toList())) {
             PlanetAction action = new PlanetAction();
-            action.time = (int)Math.ceil(f.distanceLeft() / FLEET_SPEED);
+            action.time = f.ticsLeft();
             action.amount = f.getNumUnits();
             if (f.ownedBy(this)) {
                 action.owner = PlanetOwner.PLAYER;
@@ -256,15 +259,15 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         Planet me = myPlanets.get(0);
         Planet them = theirPlanets.get(0);
 
-        int distance = (int)Math.ceil(me.distanceTo(them) / FLEET_SPEED);
+        int distance = (int)Math.ceil(me.distanceTo(them) / GameSettings.FLEET_SPEED);
         int distanceProduction = distance / me.PRODUCTION_TIME;
 
         Planet best = null;
         double bestValue = Double.MIN_VALUE;
 
         for (Planet p : unownedPlanets) {
-            int toMe = (int)Math.ceil(p.distanceTo(me) / FLEET_SPEED);
-            int toThem = (int)Math.ceil(p.distanceTo(them) / FLEET_SPEED);
+            int toMe = (int)Math.ceil(p.distanceTo(me) / GameSettings.FLEET_SPEED);
+            int toThem = (int)Math.ceil(p.distanceTo(them) / GameSettings.FLEET_SPEED);
             if (toMe <= toThem) {
                 int takenContribution = 0;
                 if (distance - toMe * 2 > 0) {
@@ -284,8 +287,8 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         retake = new ArrayList<>(unownedPlanets);
 
         for (Planet p : unownedPlanets) {
-            int toMe = (int)Math.ceil(p.distanceTo(me) / FLEET_SPEED);
-            int toThem = (int)Math.ceil(p.distanceTo(them) / FLEET_SPEED);
+            int toMe = (int)Math.ceil(p.distanceTo(me) / GameSettings.FLEET_SPEED);
+            int toThem = (int)Math.ceil(p.distanceTo(them) / GameSettings.FLEET_SPEED);
             if (toMe >= toThem) {
                 int takenContribution = 0;
                 if (distance - toThem * 2 > 0) {

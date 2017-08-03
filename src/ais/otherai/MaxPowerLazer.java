@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 import ais.PlayerWithUtils;
 import galaxy.Action;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 import galaxy.Player;
 import galaxy.Unit;
@@ -31,8 +32,12 @@ public class MaxPowerLazer extends PlayerWithUtils {
 
     int previd = 0;
 
-    protected MaxPowerLazer(Color c, String name) {
-        super(Color.CYAN, "MaxPowerLazer");
+    public MaxPowerLazer() {
+        this(Color.CYAN);
+    }
+
+    public MaxPowerLazer(Color c) {
+        super(c, "MaxPowerLazer");
         setHandler(new PlayerHandler() {
             @Override
             public Collection<Action> turn(Fleet[] fleets) {
@@ -131,7 +136,8 @@ public class MaxPowerLazer extends PlayerWithUtils {
                 return 0;
             } else {
                 PriorityQueue<Planet> enp = planetsNearOwnedBy(home, MaxPowerLazer.this);
-                int unitsMadeBeforeEnemyHit = (int)((home.distanceTo(enp.peek()) / FLEET_SPEED) / home.PRODUCTION_TIME);
+                int unitsMadeBeforeEnemyHit = (int)((home.distanceTo(enp.peek()) / GameSettings.FLEET_SPEED)
+                        / home.PRODUCTION_TIME);
                 int prodDiff = unitsMadeBeforeEnemyHit - home.getNumUnits();
                 // If I lose more units taking over the planet than can be made
                 // before the enemy

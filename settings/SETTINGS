@@ -1,0 +1,18 @@
+debug: true
+logfile: none
+players: tyler.TylerAI jono.GoodAI
+playerspergame: 2
+numplanets: 16
+visualizer: twodimensiondefault.DefaultVisualizer
+mapmaker: RandomMapMaker
+frametime: 10
+dimensions: 800 800
+fleetspeed: 2
+numrounds: 5000
+ticlimit: 50000
+reversemaps: true
+maxradius: 50
+minradius: 12
+maxneutralunits: 50
+minproducetime: 34
+maxproducetime: 100

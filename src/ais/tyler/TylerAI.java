@@ -199,25 +199,12 @@ public class TylerAI extends PlayerWithUtils {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 
-        int unitsGeneratedByPlanet = (int)(distOfFarthestFleet(getMyFleets(fleets, this), p)) % p.PRODUCTION_TIME + 2;
+        int unitsGeneratedByPlanet = distOfFarthestFleet(getFleetsOfPlayer(fleets, this), p) % p.PRODUCTION_TIME + 2;
 
         if (p.isNeutral()) {
             return (oppUnits + p.getNumUnits()) - myUnits + 1;
         } else {
             return (oppUnits + p.getNumUnits() + unitsGeneratedByPlanet) - myUnits + 1;
         }
-    }
-
-    private double distOfFarthestFleet(List<Fleet> fleets, Planet p) {
-        double maxDist = 0;
-        for (Fleet f : fleets) {
-            if (f.targeting(p)) {
-                double dist = f.distanceLeft();
-                if (dist > maxDist) {
-                    maxDist = dist;
-                }
-            }
-        }
-        return maxDist;
     }
 }

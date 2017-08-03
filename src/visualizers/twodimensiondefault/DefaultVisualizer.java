@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import javax.swing.ImageIcon;
 
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 import galaxy.Player;
 import galaxy.Visualizer;
@@ -62,7 +63,8 @@ public class DefaultVisualizer extends Visualizer {
 
         g.setColor(invertColor(c));
         g.setFont(FONT);
-        g.drawString("" + p.getNumUnits(), (int)(X - 0.7 * Planet.MIN_RADIUS), (int)(Y + 0.7 * Planet.MIN_RADIUS));
+        g.drawString("" + p.getNumUnits(), (int)(X - 0.7 * GameSettings.MIN_RADIUS),
+                (int)(Y + 0.7 * GameSettings.MIN_RADIUS));
 
         if (checkRecentlyConquered(p)) {
             new Explosion(coords[0], coords[1], p.RADIUS);
@@ -77,10 +79,6 @@ public class DefaultVisualizer extends Visualizer {
     }
 
     private void drawFleet(Fleet f, Graphics g) {
-        if (f == null) {
-            debug("wft?)')");
-        }
-
         int arbitraryRadius = 10 + f.getNumUnits() / 5;
         double[] coords = f.getCoords();
         final int X = (int)coords[0], Y = (int)coords[1];
@@ -142,7 +140,8 @@ public class DefaultVisualizer extends Visualizer {
          */
         Explosion(double x, double y, int radius) {
             int numParticles = (MAX_PARTICLES_PER_EXPLOSION - MIN_PARTICLES_PER_EXPLOSION)
-                    * (radius - Planet.MIN_RADIUS) / (Planet.MAX_RADIUS - Planet.MIN_RADIUS);
+                    * (radius - GameSettings.MIN_RADIUS)
+                    / (GameSettings.MAX_RADIUS - GameSettings.MIN_RADIUS);
             while (numParticles-- > 0) {
                 new Particle(x, y, radius);
             }

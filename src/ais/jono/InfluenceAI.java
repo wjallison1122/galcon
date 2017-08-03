@@ -159,7 +159,7 @@ public class InfluenceAI extends PlayerWithUtils {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
         // List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
-        List<Fleet> myFleets = getMyFleets(fleets, this);
+        List<Fleet> myFleets = getFleetsOfPlayer(fleets, this);
         List<Fleet> theirFleets = getOpponentsFleets(fleets, this);
 
         /*

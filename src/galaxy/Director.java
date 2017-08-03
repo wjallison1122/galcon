@@ -4,25 +4,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.Supplier;
 
-final class Director extends GameSettings {
+class Director {
     private int rounds = 0;
     private Matcher mm = null;
-    private Visualizer visualizer = createVisualizer(this);
-    private MapMaker maps = createMapMaker();
+    private Visualizer visualizer = GameSettings.getVisualizer(this);
+    private MapMaker maps = GameSettings.getMapMaker();
     private Galaxy galaxy = new Galaxy();
     private LinkedList<Player> active;
     private HashMap<Player, Integer> numUnitsInFleets = new HashMap<Player, Integer>(),
             numUnitsInPlanets = new HashMap<Player, Integer>();
     private int tic = 0;
-    private Player[] players = new Player[suppliers.size()];
-    {
-        for (Supplier<Player> supplier : suppliers) {
-            Player p = supplier.get();
-            players[p.ID] = p;
-        }
-    }
+    private Player[] players = GameSettings.getPlayers();
 
     private static Director director = new Director();
     private static Timer game = new Timer();
@@ -37,7 +30,7 @@ final class Director extends GameSettings {
                         director.next();
                     }
                 }
-            }, 0, FRAME_TIME);
+            }, 0, GameSettings.FRAME_TIME);
         } else {
             while (!director.done()) {
                 if (!pause) {
@@ -48,7 +41,7 @@ final class Director extends GameSettings {
     }
 
     Director() {
-        for (int i = 0; i < PLAYERS_PER_GAME; i++) {
+        for (int i = 0; i < GameSettings.PLAYERS_PER_GAME; i++) {
             mm = new Matcher(mm);
         }
 
@@ -57,7 +50,7 @@ final class Director extends GameSettings {
     }
 
     boolean done() {
-        return rounds > NUM_ROUNDS;
+        return rounds > GameSettings.NUM_ROUNDS;
     }
 
     void next() {
@@ -89,7 +82,7 @@ final class Director extends GameSettings {
         Player winner = galaxy.checkWinner();
         if (winner != null) {
             finishGame(winner);
-        } else if (tic > TIC_LIMIT) {
+        } else if (tic > GameSettings.TIC_LIMIT) {
             finishGame(null);
         }
     }
@@ -103,8 +96,8 @@ final class Director extends GameSettings {
     }
 
     void finishGame(Player winner) {
-        finishGame(winner,
-                maps.hasRevsered() || !reverseEachMap ? maps.getNewMap(mm.nextMatchup()) : maps.getReversedMap());
+        finishGame(winner, maps.hasRevsered() || !GameSettings.REVERSE_EACH_MAP ? maps.getNewMap(mm.nextMatchup())
+                : maps.getReversedMap());
     }
 
     boolean usingVisualizer() {

@@ -11,6 +11,7 @@ import ais.PlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
+import galaxy.GameSettings;
 import galaxy.Planet;
 
 public class StrategicLocationAI extends PlayerWithUtils {
@@ -349,7 +350,7 @@ public class StrategicLocationAI extends PlayerWithUtils {
                 int extraUnitsNeeded = 3;
                 if (temp.planet.ownedByOpponentOf(this)) {
                     extraUnitsNeeded += (int)temp.planet.distanceTo(current.planet)
-                            / (FLEET_SPEED * temp.planet.PRODUCTION_TIME);
+                            / (GameSettings.FLEET_SPEED * temp.planet.PRODUCTION_TIME);
                 }
                 if (mySpareUnits > temp.minBaseConquerCost) {
                     if (current.minBaseConquerCost < 0 && current.units > 0) {
