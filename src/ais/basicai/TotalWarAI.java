@@ -1,29 +1,34 @@
-package ais.jono;
+package ais.basicai;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 
-public class TotalWarAI extends PlayerWithUtils {
+/**
+ * At the start of the game sends a fleet to take over the neutral planet with the fewest units.
+ * Then sends all units at most productive enemy planet.
+ */
+public class TotalWarAI extends LegacyPlayerWithUtils {
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     public TotalWarAI() {
         super(Color.WHITE, "Total War AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
                 nextGame();
             }
@@ -36,7 +41,7 @@ public class TotalWarAI extends PlayerWithUtils {
 
     private boolean sentFleet = false;
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
@@ -51,7 +56,8 @@ public class TotalWarAI extends PlayerWithUtils {
         }
 
         if (opponentsPlanets.size() > 0) {
-            Planet target = opponentsPlanets.get(0);
+            Planet target = opponentsPlanets.stream()
+                    .min((a, b) -> Integer.compare(a.PRODUCTION_TIME, b.PRODUCTION_TIME)).get();
             for (Planet p : myPlanets) {
                 actions.add(makeAction(p, target, 1000));
             }

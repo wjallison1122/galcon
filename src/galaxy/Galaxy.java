@@ -1,11 +1,11 @@
 package galaxy;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 final class Galaxy {
-    private Planet[] planets;
-    private LinkedList<Fleet> fleets = new LinkedList<Fleet>();
+    private ArrayList<Planet> planets;
+    private ArrayList<Fleet> fleets = new ArrayList<Fleet>();
 
     void update() {
         for (Planet p : planets) {
@@ -23,15 +23,18 @@ final class Galaxy {
     }
 
     void addFleet(Fleet f) {
-        fleets.add(f);
+        if (f.getNumUnits() > 0) {
+            fleets.add(f);
+        }
+
     }
 
-    Fleet[] getFleets() {
-        return fleets.toArray(new Fleet[fleets.size()]);
+    ArrayList<Fleet> getFleets() {
+        return new ArrayList<Fleet>(fleets);
     }
 
-    Planet[] getPlanets() {
-        return planets.clone();
+    ArrayList<Planet> getPlanets() {
+        return new ArrayList<Planet>(planets);
     }
 
     Player checkWinner() {
@@ -48,14 +51,14 @@ final class Galaxy {
         int i = -1;
         Player p = null;
         // Finds first planet owned by a player
-        while (++i < planets.length && (p = planets[i].getOwner()) == null) {
+        while (++i < planets.size() && (p = planets.get(i).getOwner()) == null) {
             ;
         }
         // Sees if any planets are owned by another player
-        while (++i < planets.length && !planets[i].ownedByOpponentOf(p)) {
+        while (++i < planets.size() && !planets.get(i).ownedByOpponentOf(p)) {
             ;
         }
-        return i == planets.length ? p : null;
+        return i == planets.size() ? p : null;
     }
 
     void nextGame(Planet[] newMap) {
@@ -65,7 +68,7 @@ final class Galaxy {
             }
             fleets.clear();
         }
-        planets = newMap;
+        planets = new ArrayList<Planet>();
     }
 
     @Override

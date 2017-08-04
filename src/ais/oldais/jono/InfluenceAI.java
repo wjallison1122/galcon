@@ -1,4 +1,4 @@
-package ais.jono;
+package ais.oldais.jono;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
 
-public class InfluenceAI extends PlayerWithUtils {
+public class InfluenceAI extends LegacyPlayerWithUtils {
     private static final int MIN_AGGRESSIVE_DEFENSE = 10;
     private static final int MIN_DEFENSIVE_DEFENSE = 2;
     private static final double BASE_DISTANCE_FACTOR = 50;
@@ -28,7 +28,7 @@ public class InfluenceAI extends PlayerWithUtils {
     // private static final double ADVANTAGE_THRESHOLD = 1.05;
     private static final double CAPTURE_SAFTEY_MARGIN = 1.02;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
     private Set<Planet> mine;
     private LinkedList<Action> actions;
 
@@ -40,12 +40,12 @@ public class InfluenceAI extends PlayerWithUtils {
         super(c, "Influence AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
                 nextGame();
             }
@@ -59,7 +59,7 @@ public class InfluenceAI extends PlayerWithUtils {
                 / p.PRODUCTION_TIME / (10 + p.getNumUnits());
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         for (Planet p : myPlanets) {
@@ -155,7 +155,7 @@ public class InfluenceAI extends PlayerWithUtils {
         mine = new HashSet<>();
     }
 
-    private void evaluatePosition(Fleet[] fleets) {
+    private void evaluatePosition(ArrayList<Fleet> fleets) {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
         // List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);

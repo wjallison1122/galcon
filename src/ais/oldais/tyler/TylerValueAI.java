@@ -1,19 +1,20 @@
-package ais.tyler;
+package ais.oldais.tyler;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
 
-public class TylerValueAI extends PlayerWithUtils {
+public class TylerValueAI extends LegacyPlayerWithUtils {
 
     // CONSTANTS (only calculated once)
     private boolean firstTurn = true;
@@ -27,18 +28,18 @@ public class TylerValueAI extends PlayerWithUtils {
     private boolean opponentMadeMove = false;
     private int turnCount = 0;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     public TylerValueAI() {
         this(new Color(50, 100, 0));
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
             }
         });
@@ -48,7 +49,7 @@ public class TylerValueAI extends PlayerWithUtils {
         super(c, "Tyler Value AI");
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         if (firstTurn) {
             calculateConstants();
             firstTurn = false;
@@ -75,10 +76,10 @@ public class TylerValueAI extends PlayerWithUtils {
     }
 
     private void calculateFarthestPlanetDistance() {
-        for (int i = 0; i < planets.length; i++) {
-            Planet a = planets[i];
-            for (int j = i + 1; j < planets.length; j++) {
-                Planet b = planets[j];
+        for (int i = 0; i < planets.size(); i++) {
+            Planet a = planets.get(i);
+            for (int j = i + 1; j < planets.size(); j++) {
+                Planet b = planets.get(j);
                 double dist = a.distanceTo(b);
                 if (dist > farthestPlanetDistance) {
                     farthestPlanetDistance = dist;
@@ -87,7 +88,7 @@ public class TylerValueAI extends PlayerWithUtils {
         }
     }
 
-    private void updateVariables(Fleet[] fleets) {
+    private void updateVariables(ArrayList<Fleet> fleets) {
         myUnitCount = getMyUnitCount(fleets, planets, this);
         oppUnitCount = getOpponentUnitCount(fleets, planets, this);
 
@@ -158,11 +159,9 @@ public class TylerValueAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private Collection<Action> valueAI(Fleet[] fleets) {
+    private Collection<Action> valueAI(ArrayList<Fleet> fleets) {
         LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
-        List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
-        List<Planet> oppPlanets = getOpponentsPlanets(planets, this);
         List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
 
         if (myPlanets.size() == 0) {
@@ -279,7 +278,7 @@ public class TylerValueAI extends PlayerWithUtils {
     }
 
     // TODO: optimize this method
-    private int unitsNeededToCapturePlanet(Planet p, Fleet[] fleets) {
+    private int unitsNeededToCapturePlanet(Planet p, ArrayList<Fleet> fleets) {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 

@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -46,7 +47,7 @@ public class DefaultVisualizer extends Visualizer {
     private static final Font FONT = new Font("Monospaced", Font.BOLD, 18);
 
     @Override
-    protected void drawPlanets(Planet[] planets, Graphics g) {
+    protected void drawPlanets(ArrayList<Planet> planets, Graphics g) {
         for (Planet p : planets) {
             drawPlanet(p, g);
         }
@@ -72,7 +73,7 @@ public class DefaultVisualizer extends Visualizer {
     }
 
     @Override
-    protected void drawFleets(Fleet[] fleets, Graphics g) {
+    protected void drawFleets(ArrayList<Fleet> fleets, Graphics g) {
         for (Fleet f : fleets) {
             drawFleet(f, g);
         }
@@ -140,8 +141,7 @@ public class DefaultVisualizer extends Visualizer {
          */
         Explosion(double x, double y, int radius) {
             int numParticles = (MAX_PARTICLES_PER_EXPLOSION - MIN_PARTICLES_PER_EXPLOSION)
-                    * (radius - GameSettings.MIN_RADIUS)
-                    / (GameSettings.MAX_RADIUS - GameSettings.MIN_RADIUS);
+                    * (radius - GameSettings.MIN_RADIUS) / (GameSettings.MAX_RADIUS - GameSettings.MIN_RADIUS);
             while (numParticles-- > 0) {
                 new Particle(x, y, radius);
             }
@@ -239,7 +239,7 @@ public class DefaultVisualizer extends Visualizer {
     }
 
     @Override
-    public void mouseOverPress(MouseEvent e, Planet[] planets) {
+    public void mouseOverPress(MouseEvent e, ArrayList<Planet> planets) {
         // Minuses are to offset it to the tip of the mouse pointer
         int mouseCoords[] = {e.getX() - 10, e.getY() - 12};
 

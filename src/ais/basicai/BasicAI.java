@@ -1,6 +1,7 @@
 package ais.basicai;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -9,25 +10,34 @@ import galaxy.Fleet;
 import galaxy.Planet;
 import galaxy.Player;
 
+/**
+ * A very basic AI that makes random actions.
+ *
+ * Shows a very basic setup and allows very basic testing.
+ */
 public class BasicAI extends Player {
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     public BasicAI() {
-        super(Color.BLUE, "James");
+        this(Color.BLUE);
+    }
+
+    public BasicAI(Color c) {
+        super(c, "James");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
             }
         });
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         LinkedList<Action> actions = new LinkedList<Action>();
         Planet hitter = null;
         Planet hitted = null;
@@ -43,7 +53,7 @@ public class BasicAI extends Player {
         }
 
         if (hitter != null && hitted != null) {
-            actions.add(makeAction(hitter, hitted, (int)(Math.random() * hitter.getNumUnits() / 4)));
+            actions.add(makeAction(hitter, hitted, (int)(Math.random() * hitter.getNumUnits() / 4) + 1));
         }
         return actions;
     }

@@ -1,7 +1,6 @@
 package galaxy;
 
 public class Planet extends Unit {
-
     public final int RADIUS, PRODUCTION_TIME;
     private int lifespan = 0;
     private boolean recentlyConquered = false;
@@ -55,14 +54,14 @@ public class Planet extends Unit {
     }
 
     Fleet sendFleet(Planet target, int numSent) {
-        numSent = Math.min(numSent, numUnits);
+        numSent = Math.min(Math.max(0, numSent), numUnits);
         numUnits -= numSent;
         return new Fleet(numSent, this, target);
     }
 
     @Override
     public String toString() {
-        return "";
+        return super.toString();
     }
 
     /**

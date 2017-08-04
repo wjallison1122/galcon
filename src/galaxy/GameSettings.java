@@ -70,10 +70,9 @@ public class GameSettings {
             return v;
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-            e.printStackTrace();
-            System.exit(0);
+            System.out.println("Running without visualizer");
+            return null;
         }
-        return null;
     }
 
     static MapMaker getMapMaker() {

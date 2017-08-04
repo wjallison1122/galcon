@@ -1,18 +1,19 @@
-package ais.tyler;
+package ais.oldais.tyler;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 
-public class TylerAI extends PlayerWithUtils {
+public class TylerAI extends LegacyPlayerWithUtils {
 
     private static final int MAX_UNIT_SPREAD_TO_DETECT_STALEMATE = 10;
 
@@ -23,18 +24,18 @@ public class TylerAI extends PlayerWithUtils {
     private int minUnits = 1000;
     private int stalemateTimer = 0;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     public TylerAI() {
         super(new Color(50, 100, 0), "Tyler AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
             }
         });
@@ -44,7 +45,7 @@ public class TylerAI extends PlayerWithUtils {
         super(c, "Tyler AI");
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         if (getOpponentsFleets(fleets, this).size() > 0) {
             opponentMadeMove = true;
         }
@@ -121,7 +122,7 @@ public class TylerAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private LinkedList<Action> firstAI(Fleet[] fleets) {
+    private LinkedList<Action> firstAI(ArrayList<Fleet> fleets) {
         LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> otherPlanets = getUnoccupiedPlanets(planets);
@@ -195,7 +196,7 @@ public class TylerAI extends PlayerWithUtils {
     }
 
     // TODO: optimize this method
-    private int unitsNeededToCapturePlanet(Planet p, Fleet[] fleets) {
+    private int unitsNeededToCapturePlanet(Planet p, ArrayList<Fleet> fleets) {
         int myUnits = getPlayersIncomingFleetCount(p, fleets, this);
         int oppUnits = getOpponentsIncomingFleetCount(p, fleets, this);
 

@@ -1,8 +1,7 @@
-package ais.jono;
+package ais.oldais.jono;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
@@ -24,7 +23,7 @@ import galaxy.Planet;
 import galaxy.Player;
 
 //Tuned for 3d maps
-public class GoodAI extends PlayerWithUtils {
+public class GoodAI extends LegacyPlayerWithUtils {
 
     private List<AIConstants> currentGeneration = new ArrayList<>();
     private AIConstants constants = new AIConstants();
@@ -180,7 +179,7 @@ public class GoodAI extends PlayerWithUtils {
 
     LinkedList<Action> actions;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     public GoodAI() {
         this(true);
@@ -202,12 +201,12 @@ public class GoodAI extends PlayerWithUtils {
 
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
                 nextGame();
             }
@@ -219,7 +218,7 @@ public class GoodAI extends PlayerWithUtils {
         });
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         if (myPlanets.size() == 0) {
@@ -266,13 +265,13 @@ public class GoodAI extends PlayerWithUtils {
                                 - constants.MIN_DEFENSIVE_DEFENSE;
 
                         if (available + contribution > needed && needed - available > 0) {
-                            makeAction(p, target, needed - available);
+                            actions.add(makeAction(p, target, needed - available));
                             available += contribution;
                             break;
                         }
                         available += contribution;
                         if (contribution > 0) {
-                            makeAction(p, target, contribution);
+                            actions.add(makeAction(p, target, contribution));
                         }
                     }
                 }
@@ -312,8 +311,8 @@ public class GoodAI extends PlayerWithUtils {
             if (target.isPresent()) {
                 for (Planet p : getPlanetsOwnedByPlayer(planets, this)) {
                     int toSend = p.getNumUnits() - constants.MIN_AGGRESSIVE_DEFENSE;
-                    if (toSend > 0) {
-                        makeAction(p, target.get(), toSend);
+                    if (toSend > 0 && p != target.get()) {
+                        actions.add(makeAction(p, target.get(), toSend));
                     }
                 }
             }
@@ -327,7 +326,7 @@ public class GoodAI extends PlayerWithUtils {
                 * Math.pow(distanceFactor, constants.DISTANCE_WEIGHTING) / p.PRODUCTION_TIME / (10 + p.getNumUnits());
     }
 
-    private void contest(Fleet[] fleets) {
+    private void contest(ArrayList<Fleet> fleets) {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
 
@@ -338,13 +337,12 @@ public class GoodAI extends PlayerWithUtils {
 
         if (take != null) {
             int toSendToTake = 0;
-            while (!isEventualOwner(take,
-                    (int)Math.ceil(myPlanets.get(0).distanceTo(take) / GameSettings.FLEET_SPEED), toSendToTake,
-                    fleets)) {
+            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / GameSettings.FLEET_SPEED),
+                    toSendToTake, fleets)) {
                 toSendToTake++;
             }
             if (toSendToTake > 0) {
-                makeAction(myPlanets.get(0), take, toSendToTake);
+                actions.add(makeAction(myPlanets.get(0), take, toSendToTake));
             }
         }
 
@@ -359,7 +357,7 @@ public class GoodAI extends PlayerWithUtils {
                         toSend++;
                     }
                     if (toSend > 0) {
-                        makeAction(myPlanets.get(0), fleet.DESTINATION, toSend);
+                        actions.add(makeAction(myPlanets.get(0), fleet.DESTINATION, toSend));
                     }
                     retake.remove(fleet.DESTINATION);
                     mine.add(fleet.DESTINATION);
@@ -374,7 +372,7 @@ public class GoodAI extends PlayerWithUtils {
         public PlanetOwner owner;
     }
 
-    private boolean isEventualOwner(Planet p, int time, int amount, Fleet[] fleets) {
+    private boolean isEventualOwner(Planet p, int time, int amount, ArrayList<Fleet> fleets) {
         PlanetOwner current;
         if (p.ownedBy(this)) {
             current = PlanetOwner.PLAYER;
@@ -388,8 +386,7 @@ public class GoodAI extends PlayerWithUtils {
         int unitCount = p.getNumUnits();
         int currentTime = 0;
         List<PlanetAction> actions = new ArrayList<>();
-        for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
-                .collect(Collectors.toList())) {
+        for (Fleet f : fleets.stream().filter((fleet) -> fleet.DESTINATION == p).collect(Collectors.toList())) {
             PlanetAction action = new PlanetAction();
             action.time = f.ticsLeft();
             action.amount = f.getNumUnits();
@@ -489,23 +486,7 @@ public class GoodAI extends PlayerWithUtils {
         }
     }
 
-    private double getInfluence(Planet a, Planet b, Coords opponent) {
-        if (a == b) {
-            return a.getNumUnits();
-        } else {
-            if (constants.USE_OLD_VALUE_CALCULATION) {
-                return a.getNumUnits() * 0.5 * (a.distanceTo(b) + constants.BASE_DISTANCE_FACTOR)
-                        / (opponent.distanceTo(b) + constants.BASE_DISTANCE_FACTOR);
-            } else {
-                double myDistance = a.distanceTo(b);
-                double theirDistance = opponent.distanceTo(b);
-                double distanceFactor = theirDistance / (myDistance + theirDistance);
-                return a.getNumUnits() * Math.pow(distanceFactor, constants.DISTANCE_WEIGHTING);
-            }
-        }
-    }
-
-    private void evaluatePosition(Fleet[] fleets) {
+    private void evaluatePosition(ArrayList<Fleet> fleets) {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
         // List<Planet> unownedPlanets = getUnoccupiedPlanets(planets);
@@ -615,9 +596,9 @@ public class GoodAI extends PlayerWithUtils {
         if (LEARNING) {
             if (equals(winner)) {
                 constants.winCount++;
-                System.out.println("Game " + position + "," + gameCount + " won");
+                //System.out.println("Game " + position + "," + gameCount + " won");
             } else {
-                System.out.println("Game " + position + "," + gameCount + " lost");
+                //System.out.println("Game " + position + "," + gameCount + " lost");
             }
             gameCount++;
             if (gameCount == GAMES_PER_SAMPLE) {

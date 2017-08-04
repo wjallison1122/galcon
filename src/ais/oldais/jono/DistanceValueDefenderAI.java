@@ -1,17 +1,18 @@
-package ais.jono;
+package ais.oldais.jono;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.Planet;
 
-public class DistanceValueDefenderAI extends PlayerWithUtils {
+public class DistanceValueDefenderAI extends LegacyPlayerWithUtils {
     /*
      * defeats aggressively tuned value defender private static final int
      * MIN_AGGRESSIVE_DEFENSE = 50; private static final int
@@ -28,7 +29,7 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
     private static final double DISTANCE_WEIGHTING = 1;
     private static final double AGGRESSION = 0.8;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     LinkedList<Action> actions = new LinkedList<Action>();
     // */
@@ -41,12 +42,12 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
         super(c, "Distance Value Defender AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
             }
         });
@@ -58,7 +59,7 @@ public class DistanceValueDefenderAI extends PlayerWithUtils {
                 / p.PRODUCTION_TIME / (100 + p.getNumUnits());
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         if (myPlanets.size() == 0) {

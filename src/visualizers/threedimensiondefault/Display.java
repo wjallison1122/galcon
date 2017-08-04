@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -211,19 +212,13 @@ public class Display extends Visualizer {
     }
 
     @Override
-    protected void drawPlanets(Planet[] p, Graphics g) {
-        planets = new LinkedList<Planet>();
-        for (Planet pl : p) {
-            planets.add(pl);
-        }
+    protected void drawPlanets(ArrayList<Planet> ps, Graphics g) {
+        planets = ps;
     }
 
     @Override
-    protected void drawFleets(Fleet[] f, Graphics g) {
-        fleets = new LinkedList<Fleet>();
-        for (Fleet fl : f) {
-            fleets.add(fl);
-        }
+    protected void drawFleets(ArrayList<Fleet> fs, Graphics g) {
+        fleets = fs;
     }
 
     @Override

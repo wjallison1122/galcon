@@ -1,9 +1,9 @@
 debug: true
 logfile: none
-players: tyler.TylerAI jono.GoodAI
+players: oldais.tyler.TylerAI oldais.jono.ValuePlanetsAI
 playerspergame: 2
 numplanets: 16
-visualizer: twodimensiondefault.DefaultVisualizer
+visualizer: none twodimensiondefault.DefaultVisualizer
 mapmaker: RandomMapMaker
 frametime: 10
 dimensions: 800 800

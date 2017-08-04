@@ -1,4 +1,4 @@
-package ais.tyler;
+package ais.oldais.tyler;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -12,14 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.GameSettings;
 import galaxy.Planet;
 
-public class TylerDefenderAI extends PlayerWithUtils {
+public class TylerDefenderAI extends LegacyPlayerWithUtils {
 
     private Set<Planet> defendPlanets = new TreeSet<>(
             (Planet p1, Planet p2) -> p1.PRODUCTION_TIME - p2.PRODUCTION_TIME);
@@ -43,7 +43,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
 
     private boolean firstTurn = true;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     LinkedList<Action> actions = new LinkedList<Action>();
 
@@ -51,12 +51,12 @@ public class TylerDefenderAI extends PlayerWithUtils {
         super(c, "Tyler Defender AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
                 nextGame();
             }
@@ -67,7 +67,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
         this(new Color(135, 206, 250));
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         actions = new LinkedList<Action>();
         updateVariables(fleets);
         if (firstTurn) {
@@ -87,10 +87,10 @@ public class TylerDefenderAI extends PlayerWithUtils {
     }
 
     private void calculateFarthestPlanetDistance() {
-        for (int i = 0; i < planets.length; i++) {
-            Planet a = planets[i];
-            for (int j = i + 1; j < planets.length; j++) {
-                Planet b = planets[j];
+        for (int i = 0; i < planets.size(); i++) {
+            Planet a = planets.get(i);
+            for (int j = i + 1; j < planets.size(); j++) {
+                Planet b = planets.get(j);
                 double dist = a.distanceTo(b);
                 if (dist > farthestPlanetDistance) {
                     farthestPlanetDistance = dist;
@@ -107,7 +107,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
         }
     }
 
-    private void updateVariables(Fleet[] fleets) {
+    private void updateVariables(ArrayList<Fleet> fleets) {
         myPlanets = new ArrayList<>();
         unownedPlanets = new ArrayList<>();
         enemyPlanets = new ArrayList<>();
@@ -193,7 +193,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
     // AIs //
     ///////////////////////
 
-    private void defenderAI(Fleet[] fleets) {
+    private void defenderAI(ArrayList<Fleet> fleets) {
         if (myPlanets.size() == 0) {
             return;
         }
@@ -212,7 +212,7 @@ public class TylerDefenderAI extends PlayerWithUtils {
                 int enemyUnitsIncoming = enemyUnitsApproaching.get(p);
                 int unitsOnPlanet = unitsAtPlanetWhenArrive(p, myPlanet) + enemyUnitsIncoming;
                 if (totalExpendableUnits > unitsOnPlanet && expendableUnits > 0 && myUnitsIncoming <= unitsOnPlanet
-                        && !getCurrentEventualOwner(p, fleets, this).equals(PlanetOwner.PLAYER)) {
+                        && !getCurrentEventualOwner(p, fleets, this).equals(PlanetOwner.PLAYER) && myPlanet != p) {
                     int unitsToSend = Math.min(unitsOnPlanet - myUnitsIncoming + 1, expendableUnits);
                     actions.add(makeAction(myPlanet, p, unitsToSend));
                     // Update unit counts
@@ -316,20 +316,6 @@ public class TylerDefenderAI extends PlayerWithUtils {
                 unitsProduced++;
             }
             return dest.getNumUnits() + unitsProduced;
-        }
-    }
-
-    private class PlanetModel {
-        int units;
-        int prodTime;
-        int radius;
-        Planet planet;
-
-        private PlanetModel(Planet p) {
-            units = p.getNumUnits();
-            prodTime = p.PRODUCTION_TIME;
-            radius = p.RADIUS;
-            planet = p;
         }
     }
 

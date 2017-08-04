@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
@@ -17,7 +18,7 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public abstract class Visualizer implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
     private BufferedImage bufferImage;
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
     private LinkedList<Player> players;
     private Director director;
     private JFrame frame;
@@ -69,7 +70,7 @@ public abstract class Visualizer implements KeyListener, MouseListener, MouseMot
         return panel.getHeight();
     }
 
-    final void nextGame(LinkedList<Player> active, Planet[] newMap) {
+    final void nextGame(LinkedList<Player> active, ArrayList<Planet> newMap) {
         planets = newMap;
         players = active;
         newGame();
@@ -77,14 +78,14 @@ public abstract class Visualizer implements KeyListener, MouseListener, MouseMot
 
     protected abstract void newGame();
 
-    void update(Fleet[] fleets) {
+    void update(ArrayList<Fleet> fleets) {
         BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         draw(planets, fleets, image.getGraphics());
         bufferImage = image;
         repaint();
     }
 
-    protected void draw(Planet[] planets, Fleet[] fleets, Graphics g) {
+    protected void draw(ArrayList<Planet> planets, ArrayList<Fleet> fleets, Graphics g) {
         drawBackground(g);
         drawPlanets(planets, g);
         drawFleets(fleets, g);
@@ -122,10 +123,10 @@ public abstract class Visualizer implements KeyListener, MouseListener, MouseMot
     protected void drawBackground(Graphics g) {
     }
 
-    protected void drawPlanets(Planet[] planets, Graphics g) {
+    protected void drawPlanets(ArrayList<Planet> planets, Graphics g) {
     }
 
-    protected void drawFleets(Fleet[] fleets, Graphics g) {
+    protected void drawFleets(ArrayList<Fleet> fleets, Graphics g) {
     }
 
     protected void drawPlayerInfo(LinkedList<Player> players, Graphics g) {
@@ -155,7 +156,7 @@ public abstract class Visualizer implements KeyListener, MouseListener, MouseMot
         keystroke(e);
     }
 
-    protected void mouseOverPress(MouseEvent e, Planet[] planets) {
+    protected void mouseOverPress(MouseEvent e, ArrayList<Planet> planets) {
     }
 
     protected void mousePress(MouseEvent e) {

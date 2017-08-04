@@ -1,8 +1,7 @@
-package ais.jono;
+package ais.oldais.jono;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,14 +9,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Coords;
 import galaxy.Fleet;
 import galaxy.GameSettings;
 import galaxy.Planet;
 
-public class ContestPlanetsAI extends PlayerWithUtils {
+public class ContestPlanetsAI extends LegacyPlayerWithUtils {
     private static final int MIN_AGGRESSIVE_DEFENSE = 10;
     private static final int MIN_DEFENSIVE_DEFENSE = 2;
     private static final double BASE_DISTANCE_FACTOR = 20;
@@ -28,7 +27,7 @@ public class ContestPlanetsAI extends PlayerWithUtils {
 
     private Set<Planet> mine;
 
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     LinkedList<Action> actions;
 
@@ -40,12 +39,12 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         super(c, "Contest Planets AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
                 nextGame();
             }
@@ -59,7 +58,7 @@ public class ContestPlanetsAI extends PlayerWithUtils {
                 / p.PRODUCTION_TIME / (10 + p.getNumUnits());
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         for (Planet p : myPlanets) {
@@ -136,7 +135,7 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         return actions;
     }
 
-    private void contest(Fleet[] fleets) {
+    private void contest(ArrayList<Fleet> fleets) {
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> theirPlanets = getOpponentsPlanets(planets, this);
 
@@ -147,9 +146,8 @@ public class ContestPlanetsAI extends PlayerWithUtils {
 
         if (take != null) {
             int toSendToTake = 0;
-            while (!isEventualOwner(take,
-                    (int)Math.ceil(myPlanets.get(0).distanceTo(take) / GameSettings.FLEET_SPEED), toSendToTake,
-                    fleets)) {
+            while (!isEventualOwner(take, (int)Math.ceil(myPlanets.get(0).distanceTo(take) / GameSettings.FLEET_SPEED),
+                    toSendToTake, fleets)) {
                 toSendToTake++;
             }
             if (toSendToTake > 0) {
@@ -183,7 +181,7 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         public PlanetOwner owner;
     }
 
-    private boolean isEventualOwner(Planet p, int time, int amount, Fleet[] fleets) {
+    private boolean isEventualOwner(Planet p, int time, int amount, ArrayList<Fleet> fleets) {
         PlanetOwner current;
         if (p.ownedBy(this)) {
             current = PlanetOwner.PLAYER;
@@ -197,8 +195,7 @@ public class ContestPlanetsAI extends PlayerWithUtils {
         int unitCount = p.getNumUnits();
         int currentTime = 0;
         List<PlanetAction> actions = new ArrayList<>();
-        for (Fleet f : Arrays.asList(fleets).stream().filter((fleet) -> fleet.DESTINATION == p)
-                .collect(Collectors.toList())) {
+        for (Fleet f : fleets.stream().filter((fleet) -> fleet.DESTINATION == p).collect(Collectors.toList())) {
             PlanetAction action = new PlanetAction();
             action.time = f.ticsLeft();
             action.amount = f.getNumUnits();

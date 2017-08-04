@@ -1,18 +1,19 @@
-package ais.jono;
+package ais.oldais.jono;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import ais.PlayerWithUtils;
+import ais.oldais.LegacyPlayerWithUtils;
 import galaxy.Action;
 import galaxy.Fleet;
 import galaxy.Planet;
 
-public class ValueDefenderAI extends PlayerWithUtils {
+public class ValueDefenderAI extends LegacyPlayerWithUtils {
     private static int MIN_DEFENSE = 5;
-    private Planet[] planets;
+    private ArrayList<Planet> planets;
 
     public ValueDefenderAI() {
         this(new Color(40, 0, 0));
@@ -22,12 +23,12 @@ public class ValueDefenderAI extends PlayerWithUtils {
         super(c, "Value Defender AI");
         setHandler(new PlayerHandler() {
             @Override
-            public Collection<Action> turn(Fleet[] fleets) {
+            public Collection<Action> turn(ArrayList<Fleet> fleets) {
                 return makeTurn(fleets);
             }
 
             @Override
-            public void newGame(Planet[] newMap) {
+            public void newGame(ArrayList<Planet> newMap) {
                 planets = newMap;
             }
         });
@@ -37,7 +38,7 @@ public class ValueDefenderAI extends PlayerWithUtils {
         return (p.ownedByOpponentOf(this) ? 1400.0 : 1000.0) / p.PRODUCTION_TIME / (100 + p.getNumUnits());
     }
 
-    protected Collection<Action> makeTurn(Fleet[] fleets) {
+    protected Collection<Action> makeTurn(ArrayList<Fleet> fleets) {
         LinkedList<Action> actions = new LinkedList<Action>();
         List<Planet> myPlanets = getPlanetsOwnedByPlayer(planets, this);
         List<Planet> otherPlanets = getPlanetsNotOwnedByPlayer(planets, this);
