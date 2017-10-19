@@ -5,12 +5,23 @@ public class Planet extends Unit {
     private int lifespan = 0;
     private boolean recentlyConquered = false;
 
+    /**
+     * Creates a new Planet.
+     * @param owner Who this Planet starts out belonging to.
+     * @param numUnits The number of units this Planet starts with.
+     * @param radius The radius of this Planet.
+     * @param prodTime The number of tics between creating units.
+     * @param coords The location of this Planet.
+     */
     Planet(Player owner, int numUnits, int radius, int prodTime, Coords coords) {
         super(owner, numUnits, coords);
         RADIUS = radius;
         PRODUCTION_TIME = prodTime;
     }
 
+    /**
+     * Adds a unit to this Planet if it has been long enough.
+     */
     @Override
     void update() {
         if (!ownedBy(null) && lifespan++ % PRODUCTION_TIME == 0) {
@@ -18,10 +29,22 @@ public class Planet extends Unit {
         }
     }
 
+    /**
+     * Used to determine whether to create a unit on a tic.
+     * @return How many tics it has been since the Planet was last conquered.
+     */
     public int getLifespan() {
         return lifespan;
     }
 
+    /**
+     * Called by a Fleet when it hits this Planet.
+     * If it is a friendly Fleet the units are added to this Planet.
+     * If it is an enemy Fleet the units are removed.
+     * If the units go negative control of the Planet goes to the owner of the attacking Fleet, with leftover units.
+     * If the units go to zero the Planet returns to neutral.
+     * @param f The Fleet hitting this Planet.
+     */
     void hitBy(Fleet f) {
         if (f.ownedBy(owner)) {
             numUnits += f.getNumUnits();
@@ -38,6 +61,9 @@ public class Planet extends Unit {
         }
     }
 
+    /**
+     * @return The inverse of production time.
+     */
     public double getProductionFrequency() {
         return 1. / PRODUCTION_TIME;
     }
@@ -53,12 +79,24 @@ public class Planet extends Unit {
         return recentlyConquered && !(recentlyConquered = false);
     }
 
+    /**
+     * Launches a Fleet at the target planet.
+     * Attempting to send negative units will send 0 units.
+     * Fleets with less than 1 unit will be ignored.
+     * Should only be called from {link {@link Action#doAction()}
+     * @param target The Planet to send the Fleet at.
+     * @param numSent The number of units to send.
+     * @return The Fleet sent.
+     */
     Fleet sendFleet(Planet target, int numSent) {
         numSent = Math.min(Math.max(0, numSent), numUnits);
         numUnits -= numSent;
         return new Fleet(numSent, this, target);
     }
 
+    /**
+     * Will eventually have all the info needed to write games to file.
+     */
     @Override
     public String toString() {
         return super.toString();
