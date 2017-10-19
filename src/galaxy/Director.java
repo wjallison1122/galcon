@@ -21,6 +21,10 @@ class Director {
     private static Timer game = new Timer();
     private static boolean pause = false;
 
+    /**
+     * The game loop.
+     * @param args
+     */
     public static void main(String[] args) {
         if (director.usingVisualizer()) {
             game.schedule(new TimerTask() {
@@ -40,6 +44,9 @@ class Director {
         }
     }
 
+    /**
+     * Creates a new Director.
+     */
     Director() {
         for (int i = 0; i < GameSettings.PLAYERS_PER_GAME; i++) {
             mm = new Matcher(mm);
@@ -49,10 +56,17 @@ class Director {
         newGame(maps.getNewMap(mm.nextMatchup()));
     }
 
+    /**
+     * Determines if all rounds have been played.
+     * @return Whether all rounds have been played.
+     */
     boolean done() {
         return rounds > GameSettings.NUM_ROUNDS;
     }
 
+    /**
+     * Does all work for a game tic.
+     */
     void next() {
         numUnitsInFleets.clear();
         numUnitsInPlanets.clear();
@@ -87,6 +101,9 @@ class Director {
         }
     }
 
+    /**
+     * Finishes a game.
+     */
     void finishGame(Player winner, Planet[] newMap) {
         System.out.println(winner == null ? "NULL" : winner.NAME + " wins!");
         for (Player p : active) {
@@ -95,15 +112,25 @@ class Director {
         newGame(newMap);
     }
 
+    /**
+     * Finishes a game.
+     */
     void finishGame(Player winner) {
         finishGame(winner, maps.hasRevsered() || !GameSettings.REVERSE_EACH_MAP ? maps.getNewMap(mm.nextMatchup())
                 : maps.getReversedMap());
     }
 
+    /**
+     * @return Whether or not a visualizer is in use.
+     */
     boolean usingVisualizer() {
         return visualizer != null;
     }
 
+    /**
+     * Starts a new game
+     * @param map The map for the new game.
+     */
     private void newGame(Planet[] map) {
         tic = 0;
 
@@ -153,10 +180,17 @@ class Director {
 
     /******************* MATCHER *****************/
 
+    /**
+     * Creates combinations of Players to determine who plays next.
+     */
     class Matcher {
         private Matcher next, prev;
         private int player;
 
+        /**
+         * Creates a new Matcher. There will be an equal number of Matchers and active Players.
+         * @param previous The Matcher created before this one.
+         */
         Matcher(Matcher previous) {
             prev = previous;
             if (prev != null) {
@@ -167,12 +201,19 @@ class Director {
             }
         }
 
+        /**
+         * Sets the list of active Players.
+         * @return The set of Players who will play next
+         */
         LinkedList<Player> nextMatchup() {
             active = getPlayers();
             update();
             return active;
         }
 
+        /**
+         * Increments this Matcher to point to the next Player for the next game.
+         */
         void update() {
             player++;
             if (player == players.length) {
@@ -183,6 +224,10 @@ class Director {
             }
         }
 
+        /**
+         * When a Matcher reaches the end of the Player list it must increment the Matcher behind it.
+         * @return The value for the Matcher after this to be set to.
+         */
         int overflow() {
             if (prev == null) { // Full set of games completed - reset to start
                 rounds++;
@@ -204,6 +249,9 @@ class Director {
             }
         }
 
+        /**
+         * @return The set of Players who will play next
+         */
         LinkedList<Player> getPlayers() {
             LinkedList<Player> set = prev != null ? prev.getPlayers() : new LinkedList<Player>();
             set.add(players[player]);
